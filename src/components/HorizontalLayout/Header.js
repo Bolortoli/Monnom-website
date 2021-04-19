@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types"
 
 import { connect } from "react-redux"
 
@@ -97,10 +97,10 @@ const Header = props => {
               }}
               data-target="#topnav-menu-content"
             >
-              <i className="fa fa-fw fa-bars"/>
+              <i className="fa fa-fw fa-bars" />
             </button>
 
-            <form className="app-search d-none d-lg-block">
+            {/* <form className="app-search d-none d-lg-block">
               <div className="position-relative">
                 <input
                   type="text"
@@ -109,9 +109,9 @@ const Header = props => {
                 />
                 <span className="bx bx-search-alt"/>
               </div>
-            </form>
+            </form> */}
 
-            <Dropdown
+            {/* <Dropdown
               className="dropdown-mega d-none d-lg-block ml-2"
               isOpen={menu}
               toggle={() => setMenu(!menu)}
@@ -121,7 +121,7 @@ const Header = props => {
                 caret
                 tag="button"
               >
-                {props.t("Mega Menu")} <i className="mdi mdi-chevron-down"/>
+                {props.t("Mega Menu")} <i className="mdi mdi-chevron-down" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-megamenu">
                 <Row>
@@ -256,18 +256,18 @@ const Header = props => {
                   </Col>
                 </Row>
               </DropdownMenu>
-            </Dropdown>
+            </Dropdown> */}
           </div>
 
           <div className="d-flex">
-            <div className="dropdown d-inline-block d-lg-none ml-2">
+            {/* <div className="dropdown d-inline-block d-lg-none ml-2">
               <button
                 type="button"
                 className="btn header-item noti-icon waves-effect"
                 id="page-header-search-dropdown"
                 onClick={() => setSearch(!isSearch)}
               >
-                <i className="mdi mdi-magnify"/>
+                <i className="mdi mdi-magnify" />
               </button>
               <div
                 className={
@@ -288,18 +288,18 @@ const Header = props => {
                       />
                       <div className="input-group-append">
                         <button className="btn btn-primary" type="submit">
-                          <i className="mdi mdi-magnify"/>
+                          <i className="mdi mdi-magnify" />
                         </button>
                       </div>
                     </div>
                   </div>
                 </form>
               </div>
-            </div>
+            </div> */}
 
-            <LanguageDropdown />
+            {/* <LanguageDropdown /> */}
 
-            <Dropdown
+            {/* <Dropdown
               className="d-none d-lg-inline-block ml-1"
               isOpen={socialDrp}
               toggle={() => {
@@ -311,7 +311,7 @@ const Header = props => {
                 caret
                 tag="button"
               >
-                <i className="bx bx-customize"/>
+                <i className="bx bx-customize" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-lg" right>
                 <div className="px-lg-2">
@@ -357,7 +357,7 @@ const Header = props => {
                   </Row>
                 </div>
               </DropdownMenu>
-            </Dropdown>
+            </Dropdown> */}
 
             <div className="dropdown d-none d-lg-inline-block ml-1">
               <button
@@ -368,11 +368,11 @@ const Header = props => {
                 }}
                 data-toggle="fullscreen"
               >
-                <i className="bx bx-fullscreen"/>
+                <i className="bx bx-fullscreen" />
               </button>
             </div>
 
-            <NotificationDropdown />
+            {/* <NotificationDropdown /> */}
 
             <ProfileMenu />
 
@@ -384,7 +384,7 @@ const Header = props => {
                 type="button"
                 className="btn header-item noti-icon right-bar-toggle waves-effect"
               >
-                <i className="bx bx-cog bx-spin"/>
+                <i className="bx bx-cog bx-spin" />
               </button>
             </div>
           </div>
@@ -399,7 +399,7 @@ Header.propTypes = {
   showRightSidebar: PropTypes.any,
   showRightSidebarAction: PropTypes.func,
   t: PropTypes.any,
-  toggleLeftmenu: PropTypes.func
+  toggleLeftmenu: PropTypes.func,
 }
 
 const mapStatetoProps = state => {
