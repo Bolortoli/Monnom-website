@@ -82,6 +82,7 @@ const Sales = () => {
     })
       .then(res => {
         set_data(res.data)
+        setIsNetworking(false)
       })
       .catch(err => {
         setIsNetworking(true)
@@ -94,13 +95,14 @@ const Sales = () => {
   return (
     <React.Fragment>
       <div className="page-content">
+        <Breadcrumb breadcrumbItem="Борлуулатын мэдээлэл" title="Борлуулалт" />
         {isNetworking ? (
           <Alert color="danger" role="alert">
             Сүлжээ уналаа ! Дахин ачааллна уу ?
           </Alert>
-        ) : null}
-        <Breadcrumb breadcrumbItem="Борлуулатын мэдээлэл" title="Борлуулалт" />
-        <SalesList books={data} />
+        ) : (
+          <SalesList books={data} />
+        )}
       </div>
     </React.Fragment>
   )

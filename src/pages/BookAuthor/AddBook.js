@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"
 import {
   Row,
   Col,
@@ -16,38 +16,34 @@ import {
   Input,
   Form,
   FormGroup,
-} from "reactstrap";
-// import { Scrollbars } from "react-custom-scrollbars";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import Switch from "react-switch";
-import classnames from "classnames";
-import { Link } from "react-router-dom";
+} from "reactstrap"
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
+import Switch from "react-switch"
+import classnames from "classnames"
+import { Link } from "react-router-dom"
 
-// fake data generator
-const getItems = (files) => {
-  // return [];
-  let tempArray = [];
+// file  generator
+const getItems = files => {
+  let tempArray = []
   Object.keys(files).map((key, index) => {
     tempArray.push({
       id: `item-${index}`,
       content: files[key].name,
-    });
-  });
-  console.log("%cfiles", "font-size: 14px;");
-  console.log(tempArray);
-  return tempArray;
-};
+    })
+  })
+  return tempArray
+}
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
+  const result = Array.from(list)
+  const [removed] = result.splice(startIndex, 1)
+  result.splice(endIndex, 0, removed)
 
-  return result;
-};
+  return result
+}
 
-const grid = 8;
+const grid = 8
 
 const getItemStyle = (isDragging, draggableStyle) => ({
   // some basic styles to make the items look a bit nicer
@@ -57,166 +53,144 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   width: 450,
   // styles we need to apply on draggables
   ...draggableStyle,
-});
+})
 
-const getListStyle = (isDraggingOver) => ({
+const getListStyle = isDraggingOver => ({
   background: isDraggingOver ? "lightgreen" : "white",
   padding: grid,
   width: 460,
-});
+})
 
 const AddBook = () => {
-  const [modal, setModal] = useState(false);
-  const [activeTab, set_activeTab] = useState(1);
-  const [progressValue, setprogressValue] = useState(33);
-  const [selectedFiles, set_selectedFiles] = useState([]);
-  const [podcast_name_message, set_podcast_name_message] = useState("");
-  const [podcast_name_value, set_podcast_name_value] = useState("");
-  const [checked, set_checked] = useState(false);
-  const [audio_book_files, set_audio_book_files] = useState([]);
-  const [book_files, set_book_files] = useState([]);
-  const [item, set_item] = useState();
-  const [pdf_file, set_pdf_file] = useState(false);
-  const [mp3_file, set_mp3_file] = useState(false);
-  const [book_label, set_book_label] = useState("pdf book");
-  const [progress_mp3, set_progress_mp3] = useState(0);
-  const [progress_pdf, set_progress_pdf] = useState(0);
-  const [page, setPage] = useState(1);
-  const [users, setUsers] = useState([]);
-  const [next_button_label, set_next_button_label] = useState("Дараах");
+  const [modal, setModal] = useState(false)
+  const [activeTab, set_activeTab] = useState(1)
+  const [progressValue, setprogressValue] = useState(33)
+  const [podcast_name_message, set_podcast_name_message] = useState("")
+  const [podcast_name_value, set_podcast_name_value] = useState("")
+  const [checked, set_checked] = useState(false)
+  const [audio_book_files, set_audio_book_files] = useState([])
+  const [book_files, set_book_files] = useState([])
+  const [item, set_item] = useState()
+  const [pdf_file, set_pdf_file] = useState(false)
+  const [mp3_file, set_mp3_file] = useState(false)
+  const [book_label, set_book_label] = useState("pdf book")
+  const [progress_mp3, set_progress_mp3] = useState(0)
+  const [progress_pdf, set_progress_pdf] = useState(0)
+  const [page, setPage] = useState(1)
+  const [users, setUsers] = useState([])
+  const [next_button_label, set_next_button_label] = useState("Дараах")
   const [podcast_description_value, set_podcast_description_value] = useState(
     ""
-  );
+  )
   const [
     podcast_description_message,
     set_podcast_description_message,
-  ] = useState("");
-  const [profileImage, set_profileImage] = useState("");
-  const [audio_book_label, set_audio_book_label] = useState("mp3 book");
+  ] = useState("")
+  const [profileImage, set_profileImage] = useState("")
+  const [audio_book_label, set_audio_book_label] = useState("mp3 book")
 
   // Nomiig hudaldah esehiig asuuj input nemne
-  const handleChange = (checked) => {
-    set_checked(checked);
-  };
+  const handleChange = checked => {
+    set_checked(checked)
+  }
 
   // popup garch ireh, arilgahad tuslah
   const togglemodal = () => {
-    setModal(!modal);
-  };
+    setModal(!modal)
+  }
 
   // popup iin huudas ru usreh
-  const toggleTab = (tab) => {
+  const toggleTab = tab => {
     if (activeTab !== tab) {
       if (tab >= 1 && tab <= 3) {
-        set_activeTab(tab);
+        set_activeTab(tab)
 
         if (tab === 1) {
-          setprogressValue(33);
-          set_next_button_label("Дараах");
+          setprogressValue(33)
+          set_next_button_label("Дараах")
         }
         if (tab === 2) {
-          setprogressValue(66);
-          set_next_button_label("Дараах");
+          setprogressValue(66)
+          set_next_button_label("Дараах")
         }
         if (tab === 3) {
-          setprogressValue(100);
-          set_next_button_label("Дуусгах");
+          setprogressValue(100)
+          set_next_button_label("Дуусгах")
         }
       }
     }
-  };
+  }
 
   // podcastiin zurag solih
-  const imageHandler = (e) => {
-    const reader = new FileReader();
+  const imageHandler = e => {
+    const reader = new FileReader()
     reader.onload = () => {
       if (reader.readyState === 2) {
-        set_profileImage(reader.result);
+        set_profileImage(reader.result)
       }
-    };
-    reader.readAsDataURL(e.target.files[0]);
-  };
+    }
+    reader.readAsDataURL(e.target.files[0])
+  }
 
   // inputiin utga hooson esehiig shalgah
-  const handle = (event) => {
+  const handle = event => {
     if (podcast_name_value === "") {
-      set_podcast_name_message("Хоосон утгатай байна !");
+      set_podcast_name_message("Хоосон утгатай байна !")
     } else {
-      set_podcast_name_message("");
+      set_podcast_name_message("")
     }
     if (podcast_description_value === "") {
-      set_podcast_description_message("Хоосон утгатай байна !");
+      set_podcast_description_message("Хоосон утгатай байна !")
     } else {
-      set_podcast_description_message("");
+      set_podcast_description_message("")
     }
-  };
+  }
 
   // mp3 file upload hiih, nemeh
-  const uploadAudioBook = (e) => {
-    var files = e.target.files;
+  const uploadAudioBook = e => {
+    var files = e.target.files
 
-    set_audio_book_files(getItems(files));
-    if (files.length > 0) set_audio_book_label("Цахим ном нэмэх");
-  };
+    set_audio_book_files(getItems(files))
+    if (files.length > 0) set_audio_book_label("Цахим ном нэмэх")
+  }
 
   // upload hiij bga mp3 file aa ustgah
-  const removeAudioBookFiles = (f) => {
-    set_audio_book_files(audio_book_files.filter((x) => x !== f));
-    if (audio_book_files.length === 0) set_audio_book_label("pdf book");
-  };
+  const removeAudioBookFiles = f => {
+    set_audio_book_files(audio_book_files.filter(x => x !== f))
+    if (audio_book_files.length === 0) set_audio_book_label("pdf book")
+  }
 
   // pdf file upload hiih
-  const uploadBook = (e) => {
-    var files = e.target.files;
+  const uploadBook = e => {
+    var files = e.target.files
 
-    // var filesArr = Array.prototype.slice.call(files);
-    // console.log(filesArr);
+    set_book_files([files[0]])
 
-    // Array.from({ length: filesArr.length }, (v, k) => k).map((k) => ({
-    //   id: `item-${k}`,
-    //   content: `item${k}`,
-    // }));
-
-    set_book_files([files[0]]);
-
-    if (files.length > 0) set_book_label("pdf book");
-  };
+    if (files.length > 0) set_book_label("pdf book")
+  }
 
   // upload hiisen pdf file aa ustgah
-  const removeBookFiles = (f) => {
-    set_progress_mp3(0);
-    set_book_files(book_files.filter((x) => x !== f));
-    if (book_files.length === 0) set_book_label("mp3 book");
-  };
+  const removeBookFiles = f => {
+    set_progress_mp3(0)
+    set_book_files(book_files.filter(x => x !== f))
+    if (book_files.length === 0) set_book_label("mp3 book")
+  }
 
   // upload hiisen file uudiin zooh, indexuudiig zaaj ogoh
-  const onDragEnd = (result) => {
+  const onDragEnd = result => {
     // dropped outside the list
     if (!result.destination) {
-      return;
+      return
     }
 
     const items = reorder(
       audio_book_files,
       result.source.index,
       result.destination.index
-    );
+    )
 
-    set_audio_book_files(items);
-  };
-
-  // const handleScroll = (event) => {
-  //   const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-
-  //   if (scrollHeight - scrollTop === clientHeight) {
-  //     setPage((prev) => prev + 1);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const newUsers = pdf_file.length;
-  //   setUsers((prev) => [...prev, ...newUsers]);
-  // }, [page]);
+    set_audio_book_files(items)
+  }
 
   return (
     <React.Fragment>
@@ -258,9 +232,6 @@ const AddBook = () => {
                         className={classnames({
                           active: activeTab === 2,
                         })}
-                        // onClick={() => {
-                        //   toggleTab(2);
-                        // }}
                       >
                         <span className="step-number mr-2">02</span>
                         Файл оруулах
@@ -302,8 +273,8 @@ const AddBook = () => {
                                 className="podcast_channel"
                                 required
                                 value={podcast_name_value}
-                                onChange={(e) => {
-                                  set_podcast_name_value(e.target.value);
+                                onChange={e => {
+                                  set_podcast_name_value(e.target.value)
                                 }}
                               />
                             </FormGroup>
@@ -316,8 +287,8 @@ const AddBook = () => {
                                 className="podcast_channel"
                                 required
                                 value={podcast_name_value}
-                                onChange={(e) => {
-                                  set_podcast_name_value(e.target.value);
+                                onChange={e => {
+                                  set_podcast_name_value(e.target.value)
                                 }}
                               />
                               <p class="text-danger">{podcast_name_message}</p>
@@ -334,8 +305,8 @@ const AddBook = () => {
                                 id="productdesc"
                                 rows="5"
                                 value={podcast_description_value}
-                                onChange={(e) => {
-                                  set_podcast_description_value(e.target.value);
+                                onChange={e => {
+                                  set_podcast_description_value(e.target.value)
                                 }}
                               />
                               <p class="text-danger">
@@ -409,7 +380,7 @@ const AddBook = () => {
 
                       <Row style={{ borderBottom: "1px solid #1f3bcc" }}>
                         <Col xl={8}>
-                          {book_files.map((file) => (
+                          {book_files.map(file => (
                             <div
                               className="d-flex justify-content-between bg-light border  rounded py-2 px-3 mb-3 align-items-center"
                               style={{ width: "450px", marginLeft: "10px" }}
@@ -464,7 +435,7 @@ const AddBook = () => {
                               style={{
                                 display: "none",
                               }}
-                              onChange={(e) => uploadBook(e)}
+                              onChange={e => uploadBook(e)}
                             />
                             <i
                               className="font-size-15 btn btn-danger text-dark btn-rounded py-2 px-3"
@@ -552,7 +523,7 @@ const AddBook = () => {
                               accept="audio/*"
                               multiple
                               className="invisible"
-                              onChange={(e) => uploadAudioBook(e)}
+                              onChange={e => uploadAudioBook(e)}
                             />
                             <i
                               className="font-size-15 py-2 px-3 btn btn-warning btn-rounded text-dark"
@@ -594,7 +565,7 @@ const AddBook = () => {
                       <Link
                         to="#"
                         onClick={() => {
-                          toggleTab(activeTab - 1);
+                          toggleTab(activeTab - 1)
                         }}
                       >
                         Өмнөх
@@ -603,13 +574,13 @@ const AddBook = () => {
                     <li className={activeTab === 4 ? "next disabled" : "next"}>
                       <Link
                         to="#"
-                        onClick={(e) => {
-                          handle(e);
+                        onClick={e => {
+                          handle(e)
                           if (
                             podcast_name_value !== "" &&
                             podcast_description_value !== ""
                           ) {
-                            toggleTab(activeTab + 1);
+                            toggleTab(activeTab + 1)
                           }
                         }}
                       >
@@ -624,7 +595,7 @@ const AddBook = () => {
         </Card>
       </Col>
     </React.Fragment>
-  );
-};
+  )
+}
 
-export default AddBook;
+export default AddBook

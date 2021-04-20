@@ -1,6 +1,6 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { Row, Col, Form, Container } from "reactstrap"
+import { Row, Col, Form, Container, Button } from "reactstrap"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import { useLiveChannelStates } from "../../contexts/LiveChannelContext"
@@ -44,40 +44,39 @@ const getListStyle = isDraggingOver => ({
 })
 
 const Live = props => {
-  let { liveState, setLiveState, setSelectedCard } = useLiveChannelStates()
+  // const { liveState, setLiveState, setSelectedCard } = useLiveChannelStates();
+
+  const {
+    selectedCard,
+    setselectedCard,
+    edit_live_channel,
+    set_edit_live_channel,
+  } = useLiveChannelStates()
+
   const [old_files, set_old_files] = useState([])
-  const [all_files, set_all_files] = useState([])
+
+  // const [old_files, set_old_files] = useState(getItems(liveState.lives));
 
   const [searchItms, setSearchItms] = useState("")
+  const [remove_old_file_name, set_remove_old_file_name] = useState("")
+  const [remove_upload_file_name, set_remove_upload_file_name] = useState("")
 
   const [upload_files, set_upload_files] = useState([])
-  const [remove_file, set_remove_file] = useState(false)
   const [confirm_remove_file, set_confirm_remove_file] = useState(false)
-  const [success_dlg, setsuccess_dlg] = useState(false)
-  const [dynamic_title, setdynamic_title] = useState("")
-  const [dynamic_description, setdynamic_description] = useState("")
-  const [file_upload_label, set_file_upload_label] = useState("Create Files")
-
-  let changeProductName = productIndex => {
-    setSelectedCard(liveState[productIndex])
-  }
-  // global variable
-  var removeFile = {
-    a: null,
-    b: null,
-  }
 
   // mp3 file upload hiih, nemeh
   const uploadLiveFiles = e => {
     var files = e.target.files
     set_upload_files(getItems(files))
-    set_old_files(getItems(liveState))
-    set_all_files(...upload_files, ...old_files)
   }
 
   // upload hiij bga mp3 file aa ustgah
   const removeAudioBookFiles = f => {
     set_upload_files(upload_files.filter(x => x !== f))
+  }
+
+  const removeOldAudioBookFiles = f => {
+    set_old_files(old_files.filter(x => x !== f))
   }
 
   // upload hiisen file uudiin zooh, indexuudiig zaaj ogoh
@@ -95,7 +94,10 @@ const Live = props => {
 
     set_upload_files(items)
   }
-
+  useEffect(() => {
+    if (selectedCard[edit_live_channel].lives.length)
+      set_old_files(getItems(selectedCard[edit_live_channel].lives))
+  }, [edit_live_channel])
   // huuchin file uudiin zooh, indexuudiig zaaj ogoh
   const oldOnDragEnd = result => {
     // dropped outside the list
@@ -132,7 +134,11 @@ const Live = props => {
           <Row className="mb-3">
             <Col xl={3} sm={6}>
               <div className="mt-2">
-                <h5>Live 1</h5>
+                <h5>
+                  {selectedCard[edit_live_channel]
+                    ? selectedCard[edit_live_channel].live_name
+                    : selectedCard[0].live_name}
+                </h5>
               </div>
             </Col>
             <Col xl={9} sm={6}>
@@ -142,7 +148,7 @@ const Live = props => {
                     <input
                       type="text"
                       className="form-control bg-light border-light rounded"
-                      placeholder="Search..."
+                      placeholder="Хайх ..."
                       onChange={e => {
                         setSearchItms(e.target.value)
                       }}
@@ -154,121 +160,88 @@ const Live = props => {
             </Col>
           </Row>
           <Row className="mb-4">
-            <Col xl={6} className="mx-auto">
-              <label className="custom-file-upload">
-                <input
-                  type="file"
-                  accept="audio/*"
-                  multiple
-                  className="invisible"
-                  onChange={e => uploadLiveFiles(e)}
-                />
+            <input
+              type="file"
+              accept=".mp3"
+              multiple
+              id="file_upload"
+              className="invisible"
+              onChange={e => uploadLiveFiles(e)}
+            />
+            <Col xl={12} className="mx-auto d-flex justify-content-around">
+              <label htmlFor="file_upload" className="custom-file-upload h-100">
                 <i
-                  className="d-flex btn btn-light btn-block mdi mdi-plus font-size-14 text-dark btn-rounded py-2 px-5 justify-content-around"
+                  className="btn btn-light font-size-13 h-100 pt-2 pb-1 px-4"
                   style={{
                     cursor: "pointer",
                   }}
                 >
-                  {file_upload_label}
+                  Файл оруулах
                 </i>
               </label>
+              <Button className="btn py-2 px-4" color="success">
+                Лайвд нэмэх
+              </Button>
             </Col>
           </Row>
           <hr className="mt-2" />
 
-          <div className="table-responsive file-manager">
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="droppable">
-                {(provided, snapshot) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    style={getListStyle(snapshot.isDraggingOver)}
+          <div className="table-responsive file-manager mb-4">
+            {upload_files.map((item, index) => (
+              <div
+                key={index}
+                className="file-preview bg-light px-3 py-2 d-flex align-items-center border rounded mt-3"
+              >
+                <i className="bx bxs-music w-10 font-size-22 text-warning mr-2" />
+
+                {item.content.length > 25 ? (
+                  <p
+                    style={{
+                      color: "#000",
+                      margin: "auto",
+                      marginLeft: "5px",
+                      width: "45%",
+                    }}
                   >
-                    {upload_files.map((item, index) => (
-                      <Draggable
-                        key={item.id}
-                        draggableId={item.id}
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            className="file-preview bg-light py-2 d-flex align-items-center border rounded mt-3"
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={getItemStyle(
-                              snapshot.isDragging,
-                              provided.draggableProps.style
-                            )}
-                          >
-                            <i className="bx bxs-music w-10 font-size-22 text-warning mr-2" />
-
-                            {item.content.length > 25 ? (
-                              <p
-                                style={{
-                                  color: "#000",
-                                  margin: "auto",
-                                  marginLeft: "5px",
-                                  width: "45%",
-                                }}
-                              >
-                                {item.content.slice(0, 21)}
-                                {"... "}
-                                {item.content.slice(
-                                  item.content.length - 4,
-                                  item.content.length
-                                )}
-                              </p>
-                            ) : (
-                              <p
-                                style={{
-                                  color: "#000",
-                                  margin: "auto",
-                                  marginLeft: "5px",
-                                  width: "45%",
-                                }}
-                              >
-                                {item.content}
-                              </p>
-                            )}
-
-                            <p className="text-dark my-auto ">
-                              {formatBytes(item.size)}
-                            </p>
-                            <i
-                              className="dripicons-cross font-size-20 my-auto text-dark"
-                              onClick={() => {
-                                set_confirm_remove_file(true)
-
-                                // if (remove_file == true) {
-                                //   removeAudioBookFiles.bind(this, item);
-                                //   console.log("this is true");
-                                // } else {
-                                //   console.log("this is false");
-                                // }
-                              }}
-                              removeFile={(this, item)}
-                              style={{
-                                cursor: "pointer",
-                                margin: "auto",
-                                marginRight: "0",
-                              }}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-
-                    {provided.placeholder}
-                    {/* </Scrollbars> */}
-                  </div>
+                    {item.content.slice(0, 21)}
+                    {"... "}
+                    {item.content.slice(
+                      item.content.length - 4,
+                      item.content.length
+                    )}
+                  </p>
+                ) : (
+                  <p
+                    style={{
+                      color: "#000",
+                      margin: "auto",
+                      marginLeft: "5px",
+                      width: "45%",
+                    }}
+                  >
+                    {item.content}
+                  </p>
                 )}
-              </Droppable>
-            </DragDropContext>
+
+                <p className="text-dark my-auto ">{formatBytes(item.size)}</p>
+                <i
+                  className="dripicons-cross font-size-20 my-auto text-dark"
+                  onClick={() => {
+                    set_confirm_remove_file(true)
+                    set_remove_upload_file_name(item)
+                  }}
+                  removeFile={(this, item)}
+                  style={{
+                    cursor: "pointer",
+                    margin: "auto",
+                    marginRight: "0",
+                  }}
+                />
+              </div>
+            ))}
           </div>
 
-          <div className="table-responsive file-manager">
+          <div className="table-responsive file-manager border-top border-dark">
             <DragDropContext onDragEnd={oldOnDragEnd}>
               <Droppable droppableId="droppable">
                 {(provided, snapshot) => (
@@ -283,7 +256,7 @@ const Live = props => {
                           return val
                         } else if (
                           val.content
-                            .toLocalLowerCase()
+                            .toLocaleLowerCase()
                             .includes(searchItms.toLocaleLowerCase())
                         ) {
                           return val
@@ -305,9 +278,8 @@ const Live = props => {
                                 snapshot.isDragging,
                                 provided.draggableProps.style
                               )}
-                              onClick={() => changeProductName(index)}
                             >
-                              <i className="bx bxs-music w-10 font-size-22 text-danger mr-2" />
+                              <i className="bx bxs-music w-10 font-size-22 text-dark mr-2" />
 
                               {item.content.length > 25 ? (
                                 <p
@@ -345,6 +317,7 @@ const Live = props => {
                                 className="dripicons-cross font-size-20 my-auto text-dark"
                                 onClick={() => {
                                   set_confirm_remove_file(true)
+                                  set_remove_old_file_name(item)
                                 }}
                                 removeFile={(this, item)}
                                 style={{
@@ -369,15 +342,16 @@ const Live = props => {
                 title="Та итгэлтэй байна уу ?"
                 warning
                 showCancel
-                confirmButtonText="Тийм!"
+                confirmBtnText="Тийм!"
+                cancelBtnText="Болих"
                 confirmBtnBsStyle="success"
                 cancelBtnBsStyle="danger"
                 onConfirm={() => {
-                  set_remove_file(true)
+                  removeAudioBookFiles(remove_upload_file_name)
+                  removeOldAudioBookFiles(remove_old_file_name)
                   set_confirm_remove_file(false)
                 }}
                 onCancel={() => {
-                  set_remove_file(false)
                   set_confirm_remove_file(false)
                 }}
               ></SweetAlert>

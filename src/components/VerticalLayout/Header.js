@@ -15,7 +15,6 @@ import NotificationDropdown from "../CommonForBoth/TopbarDropdown/NotificationDr
 import ProfileMenu from "../CommonForBoth/TopbarDropdown/ProfileMenu"
 
 import megamenuImg from "../../assets/images/megamenu-img.png"
-import logo from "../../assets/images/logo.svg"
 import logoLightPng from "../../assets/images/logo-light.png"
 import logoLightSvg from "../../assets/images/logo-light.svg"
 import logoDark from "../../assets/images/logo-dark.png"
@@ -39,6 +38,7 @@ import {
 } from "../../store/actions"
 
 const Header = props => {
+  const [logo, set_logo] = useState("https://monnom.mn/logo.png")
   const [search, setsearch] = useState(false)
   const [megaMenu, setmegaMenu] = useState(false)
   const [socialDrp, setsocialDrp] = useState(false)
@@ -99,8 +99,14 @@ const Header = props => {
                 <span className="logo-sm">
                   <img src={logoLightSvg} alt="" height="22" />
                 </span>
-                <span className="logo-lg">
-                  <img src={logoLightPng} alt="" height="19" />
+                <span className="logo-lg text-light font-size-16 ">
+                  <img
+                    src="https://monnom.mn/logo.png"
+                    alt="MON|NOM"
+                    height="30"
+                    className="mr-2"
+                  />
+                  MON | NOM
                 </span>
               </Link>
             </div>

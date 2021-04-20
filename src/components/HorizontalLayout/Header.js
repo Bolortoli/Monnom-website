@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types"
 
 import { connect } from "react-redux"
 
@@ -16,7 +16,6 @@ import NotificationDropdown from "../CommonForBoth/TopbarDropdown/NotificationDr
 import ProfileMenu from "../CommonForBoth/TopbarDropdown/ProfileMenu"
 
 import megamenuImg from "../../assets/images/megamenu-img.png"
-import logo from "../../assets/images/logo-sm-light.png"
 import logoLight from "../../assets/images/logo-light.png"
 import logoLightSvg from "../../assets/images/logo-light.svg"
 import logoDark from "../../assets/images/logo-dark.png"
@@ -33,6 +32,7 @@ import slack from "../../assets/images/brands/slack.png"
 import { withTranslation } from "react-i18next"
 
 const Header = props => {
+  const [logo, set_logo] = useState("https://monnom.mn/logo.png")
   const [menu, setMenu] = useState(false)
   const [isSearch, setSearch] = useState(false)
   const [socialDrp, setsocialDrp] = useState(false)
@@ -74,16 +74,16 @@ const Header = props => {
                   <img src={logo} alt="" height="22" />
                 </span>
                 <span className="logo-lg">
-                  <img src={logoDark} alt="" height="17" />
+                  <img src={logo} alt="" height="17" />
                 </span>
               </Link>
 
               <Link to="/" className="logo logo-light">
                 <span className="logo-sm">
-                  <img src={logoLightSvg} alt="" height="22" />
+                  <img src={logo} alt="" height="22" />
                 </span>
                 <span className="logo-lg">
-                  <img src={logoLight} alt="" height="19" />
+                  <img src={logo} alt="" height="19" />
                 </span>
               </Link>
             </div>
@@ -97,7 +97,7 @@ const Header = props => {
               }}
               data-target="#topnav-menu-content"
             >
-              <i className="fa fa-fw fa-bars"/>
+              <i className="fa fa-fw fa-bars" />
             </button>
 
             <form className="app-search d-none d-lg-block">
@@ -107,7 +107,7 @@ const Header = props => {
                   className="form-control"
                   placeholder="Search..."
                 />
-                <span className="bx bx-search-alt"/>
+                <span className="bx bx-search-alt" />
               </div>
             </form>
 
@@ -121,7 +121,7 @@ const Header = props => {
                 caret
                 tag="button"
               >
-                {props.t("Mega Menu")} <i className="mdi mdi-chevron-down"/>
+                {props.t("Mega Menu")} <i className="mdi mdi-chevron-down" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-megamenu">
                 <Row>
@@ -267,7 +267,7 @@ const Header = props => {
                 id="page-header-search-dropdown"
                 onClick={() => setSearch(!isSearch)}
               >
-                <i className="mdi mdi-magnify"/>
+                <i className="mdi mdi-magnify" />
               </button>
               <div
                 className={
@@ -288,7 +288,7 @@ const Header = props => {
                       />
                       <div className="input-group-append">
                         <button className="btn btn-primary" type="submit">
-                          <i className="mdi mdi-magnify"/>
+                          <i className="mdi mdi-magnify" />
                         </button>
                       </div>
                     </div>
@@ -311,7 +311,7 @@ const Header = props => {
                 caret
                 tag="button"
               >
-                <i className="bx bx-customize"/>
+                <i className="bx bx-customize" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-lg" right>
                 <div className="px-lg-2">
@@ -368,7 +368,7 @@ const Header = props => {
                 }}
                 data-toggle="fullscreen"
               >
-                <i className="bx bx-fullscreen"/>
+                <i className="bx bx-fullscreen" />
               </button>
             </div>
 
@@ -384,7 +384,7 @@ const Header = props => {
                 type="button"
                 className="btn header-item noti-icon right-bar-toggle waves-effect"
               >
-                <i className="bx bx-cog bx-spin"/>
+                <i className="bx bx-cog bx-spin" />
               </button>
             </div>
           </div>
@@ -399,7 +399,7 @@ Header.propTypes = {
   showRightSidebar: PropTypes.any,
   showRightSidebarAction: PropTypes.func,
   t: PropTypes.any,
-  toggleLeftmenu: PropTypes.func
+  toggleLeftmenu: PropTypes.func,
 }
 
 const mapStatetoProps = state => {

@@ -10,7 +10,6 @@ import ForgetPwd from "../pages/Authentication/ForgetPassword"
 // Website auth routes
 import Dashboard from "../pages/Dashboard"
 import PodcastList from "../pages/PodcastChart"
-import BookLists from "../pages/Chart"
 import PodcastSinglePage from "../pages/PodcastSingle"
 import BookSinglePage from "../pages/BookAuthor"
 import Sales from "../pages/Sales"

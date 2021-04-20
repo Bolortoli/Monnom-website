@@ -16,6 +16,7 @@ import {
   Input,
 } from "reactstrap"
 import { map } from "lodash"
+import { Alert } from "reactstrap"
 import Dropzone from "react-dropzone"
 import { AvForm, AvField, AvInput } from "availity-reactstrap-validation"
 
@@ -25,7 +26,6 @@ import Breadcrumbs from "../../components/Common/Breadcrumb"
 //Import Card
 import CardContact from "./card-contact"
 import axios from "axios"
-import SweetAlert from "react-bootstrap-sweetalert"
 // import { response } from "express";
 
 // import { getUsers } from "../../store/contacts/actions";
@@ -572,7 +572,9 @@ const ManageAdmins = () => {
             breadcrumbItem="Ажилчдын жагсаалт"
           />
           {isNetworkError ? (
-            <h1>Дахин ачааллана уу</h1>
+            <Alert color="danger" role="alert">
+              Сүлжээ уналаа ! Дахин ачааллна уу ?
+            </Alert>
           ) : (
             <>
               {!isNetworkLoading ? (

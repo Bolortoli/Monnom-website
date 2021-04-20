@@ -76,13 +76,13 @@ const SidebarContent = props => {
           <li className="menu-title">{props.t("Статистик")} </li>
           <li>
             <Link to="/dashboard" className=" waves-effect">
-              <i className="bx bx-calendar"></i>
+              <i className="bx bxs-dashboard"></i>
               <span>{props.t("Хянах самбар")}</span>
             </Link>
           </li>
           <li>
             <Link to="/sales" className=" waves-effect">
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-package"></i>
               <span>{props.t("Борлуулалт")}</span>
             </Link>
           </li>
@@ -90,21 +90,21 @@ const SidebarContent = props => {
 
           <li>
             <Link to="/manage-admins" className=" waves-effect">
-              <i className="bx bx-calendar"></i>
+              <i className="dripicons-user-group"></i>
               <span>{props.t("Ажилчид")}</span>
             </Link>
           </li>
 
           <li>
             <Link to="/app-users" className=" waves-effect">
-              <i className="bx bx-calendar"></i>
+              <i className="dripicons-user"></i>
               <span>{props.t("Хэрэглэгчид")}</span>
             </Link>
           </li>
 
           <li>
             <Link to="/#" className=" waves-effect">
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-wrench"></i>
               <span>{props.t("Тохиргоо")}</span>
             </Link>
           </li>
@@ -113,21 +113,21 @@ const SidebarContent = props => {
 
           <li>
             <Link to="/books-list" className=" waves-effect">
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-book"></i>
               <span>{props.t("Ном")}</span>
             </Link>
           </li>
 
           <li>
             <Link to="/podcastsList" className=" waves-effect">
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-headphone"></i>
               <span>{props.t("Подкаст")}</span>
             </Link>
           </li>
 
           <li>
             <Link to="/live-list" className=" waves-effect">
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-radio"></i>
               <span>{props.t("Радио")}</span>
             </Link>
           </li>

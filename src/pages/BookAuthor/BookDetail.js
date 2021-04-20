@@ -1,4 +1,3 @@
-import axios from "axios"
 import React, { useState } from "react"
 import {
   Card,
@@ -8,20 +7,14 @@ import {
   Container,
   Row,
   Table,
-  Label,
-  Input,
 } from "reactstrap"
-import SweetAlert from "react-bootstrap-sweetalert"
 
 import BookAnalysis from "./BookAnalysis"
 import List from "./List"
 
-//Import Images
-// import profile1 from "../../assets";
 import profile1 from "../../assets/images/profile-img.png"
 
 const BookDetail = props => {
-  // props oos data awah usestate
   const [data, set_data] = useState(props.user)
 
   return (

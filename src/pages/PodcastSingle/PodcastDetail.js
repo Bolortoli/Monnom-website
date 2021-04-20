@@ -126,6 +126,7 @@ const PodcastDetail = props => {
             warning
             showCancel
             confirmButtonText="Тийм!"
+            cancelBtnText="Болих"
             confirmBtnBsStyle="success"
             cancelBtnBsStyle="danger"
             onConfirm={() => {
