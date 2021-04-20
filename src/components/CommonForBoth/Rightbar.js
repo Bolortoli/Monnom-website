@@ -1,5 +1,5 @@
 import React from "react"
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types"
 import { FormGroup } from "reactstrap"
 
 import { connect } from "react-redux"
@@ -39,16 +39,16 @@ const RightSidebar = props => {
                 }}
                 className="right-bar-toggle float-right"
               >
-                <i className="mdi mdi-close noti-icon"/>
+                <i className="mdi mdi-close noti-icon" />
               </Link>
-              <h5 className="m-0">Settings</h5>
+              <h5 className="m-0">Тохиргоо</h5>
             </div>
 
             <hr className="my-0" />
 
             <div className="p-4">
               <div className="radio-toolbar">
-                <span className="mb-2 d-block">Layouts</span>
+                <span className="mb-2 d-block">Байршил</span>
                 <input
                   type="radio"
                   id="radioVertical"
@@ -61,7 +61,7 @@ const RightSidebar = props => {
                     }
                   }}
                 />
-                <label htmlFor="radioVertical">Vertical</label>
+                <label htmlFor="radioVertical">Босоо</label>
                 {"   "}
                 <input
                   type="radio"
@@ -75,14 +75,14 @@ const RightSidebar = props => {
                     }
                   }}
                 />
-                <label htmlFor="radioHorizontal">Horizontal</label>
+                <label htmlFor="radioHorizontal">Хэвтээ</label>
               </div>
 
               <hr className="mt-1" />
 
               <div className="radio-toolbar">
                 <span className="mb-2 d-block" id="radio-title">
-                  Layout Width
+                  Байршлын хэмжээ
                 </span>
                 <input
                   type="radio"
@@ -96,7 +96,7 @@ const RightSidebar = props => {
                     }
                   }}
                 />
-                <label htmlFor="radioFluid">Fluid</label>
+                <label htmlFor="radioFluid">Бүтэн</label>
                 {"   "}
                 <input
                   type="radio"
@@ -110,8 +110,8 @@ const RightSidebar = props => {
                     }
                   }}
                 />
-                <label htmlFor="radioBoxed">Boxed</label>
-                <input
+                <label htmlFor="radioBoxed">Хайрцаглагдсан</label>
+                {/* <input
                   type="radio"
                   id="radioscrollable"
                   name="radioscrollable"
@@ -124,13 +124,13 @@ const RightSidebar = props => {
                     }
                   }}
                 />
-                <label htmlFor="radioscrollable">Scrollable</label>
+                <label htmlFor="radioscrollable">Scrollable</label> */}
               </div>
               <hr className="mt-1" />
 
               <div className="radio-toolbar">
                 <span className="mb-2 d-block" id="radio-title">
-                  Topbar Theme
+                  Толгой хэсгийн өнгө
                 </span>
                 <input
                   type="radio"
@@ -144,7 +144,7 @@ const RightSidebar = props => {
                     }
                   }}
                 />
-                <label htmlFor="radioThemeLight">Light</label>
+                <label htmlFor="radioThemeLight">Гэрэлтэй</label>
                 {"   "}
                 <input
                   type="radio"
@@ -159,7 +159,7 @@ const RightSidebar = props => {
                   }}
                 />
 
-                <label htmlFor="radioThemeDark">Dark</label>
+                <label htmlFor="radioThemeDark">Бараан</label>
                 {"   "}
                 {props.layoutType === "vertical" ? null : (
                   <>
@@ -176,7 +176,7 @@ const RightSidebar = props => {
                         }
                       }}
                     />
-                    <label htmlFor="radioThemeColored">Colored</label>{" "}
+                    <label htmlFor="radioThemeColored">Өнгөлөг</label>{" "}
                   </>
                 )}
               </div>
@@ -186,7 +186,7 @@ const RightSidebar = props => {
                   <hr className="mt-1" />
                   <div className="radio-toolbar">
                     <span className="mb-2 d-block" id="radio-title">
-                      Left Sidebar Type{" "}
+                      Хажуугийн самбарын төрөл{" "}
                     </span>
                     <input
                       type="radio"
@@ -200,7 +200,7 @@ const RightSidebar = props => {
                         }
                       }}
                     />
-                    <label htmlFor="sidebarDefault">Default</label>
+                    <label htmlFor="sidebarDefault">Анхдагч</label>
                     {"   "}
                     <input
                       type="radio"
@@ -214,7 +214,7 @@ const RightSidebar = props => {
                         }
                       }}
                     />
-                    <label htmlFor="sidebarCompact">Compact</label>
+                    <label htmlFor="sidebarCompact">Шахсан</label>
                     {"   "}
                     <input
                       type="radio"
@@ -228,14 +228,14 @@ const RightSidebar = props => {
                         }
                       }}
                     />
-                    <label htmlFor="sidebarIcon">Icon</label>
+                    <label htmlFor="sidebarIcon">Дүрс</label>
                   </div>
 
                   <hr className="mt-1" />
 
                   <div className="radio-toolbar">
                     <span className="mb-2 d-block" id="radio-title">
-                      Left Sidebar Color
+                      Хажуугийн самбарын өнгө
                     </span>
                     <input
                       type="radio"
@@ -250,7 +250,7 @@ const RightSidebar = props => {
                       }}
                     />
 
-                    <label htmlFor="leftsidebarThemelight">Light</label>
+                    <label htmlFor="leftsidebarThemelight">Гэрэлтэй</label>
                     {"   "}
                     <input
                       type="radio"
@@ -265,7 +265,7 @@ const RightSidebar = props => {
                       }}
                     />
 
-                    <label htmlFor="leftsidebarThemedark">Dark</label>
+                    <label htmlFor="leftsidebarThemedark">Бараан</label>
                     {"   "}
                     <input
                       type="radio"
@@ -280,13 +280,13 @@ const RightSidebar = props => {
                       }}
                     />
 
-                    <label htmlFor="leftsidebarThemecolored">Colored</label>
+                    <label htmlFor="leftsidebarThemecolored">Өнгөлөг</label>
                   </div>
-                  <hr className="mt-1" />
+                  {/* <hr className="mt-1" /> */}
                 </React.Fragment>
               ) : null}
 
-              <FormGroup>
+              {/* <FormGroup>
                 <span className="mb-2 d-block" id="radio-title">
                   Preloader
                 </span>
@@ -348,13 +348,13 @@ const RightSidebar = props => {
                 className="btn btn-primary btn-block mt-3"
                 target="_blank"
               >
-                <i className="mdi mdi-cart mr-1"/> Purchase Now
-              </Link>
+                <i className="mdi mdi-cart mr-1" /> Purchase Now
+              </Link> */}
             </div>
           </div>
         </SimpleBar>
       </div>
-      <div className="rightbar-overlay"/>
+      <div className="rightbar-overlay" />
     </React.Fragment>
   )
 }
@@ -372,7 +372,7 @@ RightSidebar.propTypes = {
   leftSideBarTheme: PropTypes.any,
   leftSideBarType: PropTypes.any,
   showRightSidebarAction: PropTypes.func,
-  topbarTheme: PropTypes.any
+  topbarTheme: PropTypes.any,
 }
 
 const mapStateToProps = state => {
