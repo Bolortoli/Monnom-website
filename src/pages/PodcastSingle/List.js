@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { MDBDataTable } from "mdbreact";
-import AddPodcast from "./AddPodcast";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react"
+import { MDBDataTable } from "mdbreact"
+import AddPodcast from "./AddPodcast"
+import { Link } from "react-router-dom"
 import {
   Row,
   Col,
@@ -12,29 +12,27 @@ import {
   Input,
   FormGroup,
   CardSubtitle,
-} from "reactstrap";
-import Switch from "react-switch";
-import SweetAlert from "react-bootstrap-sweetalert";
+} from "reactstrap"
+import Switch from "react-switch"
+import SweetAlert from "react-bootstrap-sweetalert"
 
-const List = (props) => {
-  const [data, set_data] = useState(props.podcasts);
-  console.log("hhhhaaa", data);
+const List = props => {
+  const [data, set_data] = useState(props.podcasts)
+  console.log("hhhhaaa", data)
 
-  const [editUserStep1, setEditUserStep1] = useState(false);
-  const [edit_podcast_name, set_edit_podcast_name] = useState("");
-  const [edit_podcast_desc, set_edit_podcast_desc] = useState("");
-  const [edit_podcast_file, set_edit_podcast_file] = useState("");
-  const [edit_podcast_listen_count, set_edit_podcast_listen_count] = useState(
-    0
-  );
-  const [edit_podcast_state, set_edit_podcast_state] = useState(false);
-  const [confirm_edit, set_confirm_edit] = useState(false);
-  const [success_dlg, setsuccess_dlg] = useState(false);
-  const [dynamic_title, setdynamic_title] = useState("");
-  const [dynamic_description, setdynamic_description] = useState("");
-  const [file_name, set_file_name] = useState("");
-  const [checked, set_checked] = useState(false);
-  const [coverImage, setCoverImage] = useState();
+  const [editUserStep1, setEditUserStep1] = useState(false)
+  const [edit_podcast_name, set_edit_podcast_name] = useState("")
+  const [edit_podcast_desc, set_edit_podcast_desc] = useState("")
+  const [edit_podcast_file, set_edit_podcast_file] = useState("")
+  const [edit_podcast_listen_count, set_edit_podcast_listen_count] = useState(0)
+  const [edit_podcast_state, set_edit_podcast_state] = useState(false)
+  const [confirm_edit, set_confirm_edit] = useState(false)
+  const [success_dlg, setsuccess_dlg] = useState(false)
+  const [dynamic_title, setdynamic_title] = useState("")
+  const [dynamic_description, setdynamic_description] = useState("")
+  const [file_name, set_file_name] = useState("")
+  const [checked, set_checked] = useState(false)
+  const [coverImage, setCoverImage] = useState()
 
   const columns = [
     {
@@ -47,7 +45,7 @@ const List = (props) => {
       },
     },
     {
-      label: "Бүлэг",
+      label: "Дугаар",
       field: "episode_number",
       width: 50,
       sort: "disabled",
@@ -70,22 +68,22 @@ const List = (props) => {
       sort: "disabled",
       width: 20,
     },
-  ];
+  ]
 
   // zurag oorchloh
-  const imageHandler = (e) => {
-    const reader = new FileReader();
+  const imageHandler = e => {
+    const reader = new FileReader()
     reader.onload = () => {
       if (reader.readyState === 2) {
-        setCoverImage(reader.result);
+        setCoverImage(reader.result)
       }
-    };
-    reader.readAsDataURL(e.target.files[0]);
-  };
+    }
+    reader.readAsDataURL(e.target.files[0])
+  }
 
   // table der nemj edit button, tolowiig haruulah
-  const initData = (data) => {
-    let tempInitialData = data.map((d) => {
+  const initData = data => {
+    let tempInitialData = data.map(d => {
       return {
         pod_name: d.podcast_name,
         podcast_state: d.podcast_state,
@@ -93,16 +91,16 @@ const List = (props) => {
         listen_count: d.listen_count,
         edit: (
           <>
-            <Link to="#">
+            <Link>
               <i
                 onClick={() => {
-                  console.log(d.podcast_name);
-                  setEditUserStep1(true);
-                  set_edit_podcast_name(d.podcast_name);
-                  set_edit_podcast_desc(d.podcast_desc);
-                  set_edit_podcast_file(d.podcast_file_name);
-                  set_edit_podcast_listen_count(d.listen_count);
-                  set_edit_podcast_state(d.podcast_state);
+                  console.log(d.podcast_name)
+                  setEditUserStep1(true)
+                  set_edit_podcast_name(d.podcast_name)
+                  set_edit_podcast_desc(d.podcast_desc)
+                  set_edit_podcast_file(d.podcast_file_name)
+                  set_edit_podcast_listen_count(d.listen_count)
+                  set_edit_podcast_state(d.podcast_state)
                 }}
                 className="bx bxs-edit text-dark d-block text-center font-size-20"
                 id="edittooltip"
@@ -125,21 +123,21 @@ const List = (props) => {
             )}
           </>
         ),
-      };
-    });
-    set_data(tempInitialData);
-  };
+      }
+    })
+    set_data(tempInitialData)
+  }
 
   // podcastiin tolow solih
-  const handleChange = (checked) => {
-    set_edit_podcast_state(checked);
-  };
+  const handleChange = checked => {
+    set_edit_podcast_state(checked)
+  }
 
-  const datatable = { columns: columns, rows: data };
+  const datatable = { columns: columns, rows: data }
 
   useEffect(() => {
-    initData(data);
-  }, []);
+    initData(data)
+  }, [])
 
   return (
     <React.Fragment>
@@ -156,11 +154,11 @@ const List = (props) => {
               borderRadius: "20px",
             }}
             onConfirm={() => {
-              setEditUserStep1(false);
-              set_confirm_edit(true);
+              setEditUserStep1(false)
+              set_confirm_edit(true)
             }}
             onCancel={() => {
-              setEditUserStep1(false);
+              setEditUserStep1(false)
             }}
           >
             <Row>
@@ -175,8 +173,8 @@ const List = (props) => {
                     <Input
                       type="text"
                       value={edit_podcast_name}
-                      onChange={(event) => {
-                        set_edit_podcast_name(event.target.value);
+                      onChange={event => {
+                        set_edit_podcast_name(event.target.value)
                       }}
                     />
                   </Col>
@@ -221,8 +219,8 @@ const List = (props) => {
                     class="custom-file-label"
                     for="customFile"
                     value={data.podcast_file_url}
-                    onChange={(ev) => {
-                      set_edit_podcast_file(ev.target.value);
+                    onChange={ev => {
+                      set_edit_podcast_file(ev.target.value)
                     }}
                   >
                     {edit_podcast_file.length > 35 ? (
@@ -260,15 +258,15 @@ const List = (props) => {
             confirmBtnBsStyle="success"
             cancelBtnBsStyle="danger"
             onConfirm={() => {
-              set_confirm_edit(false);
-              setEditUserStep1(false);
-              setsuccess_dlg(true);
-              setdynamic_title("Амжилттай");
-              setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.");
+              set_confirm_edit(false)
+              setEditUserStep1(false)
+              setsuccess_dlg(true)
+              setdynamic_title("Амжилттай")
+              setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
             }}
             onCancel={() => {
-              set_confirm_edit(false);
-              setEditUserStep1(true);
+              set_confirm_edit(false)
+              setEditUserStep1(true)
             }}
           ></SweetAlert>
         ) : null}
@@ -277,7 +275,7 @@ const List = (props) => {
             success
             title={dynamic_title}
             onConfirm={() => {
-              setsuccess_dlg(false);
+              setsuccess_dlg(false)
             }}
           >
             {dynamic_description}
@@ -288,7 +286,7 @@ const List = (props) => {
             success
             title={dynamic_title}
             onConfirm={() => {
-              setsuccess_dlg(false);
+              setsuccess_dlg(false)
             }}
           >
             {dynamic_description}
@@ -314,7 +312,7 @@ const List = (props) => {
         </Col>
       </Row>
     </React.Fragment>
-  );
-};
+  )
+}
 
-export default List;
+export default List

@@ -61,7 +61,7 @@ const PodcastSinglePage = () => {
     })
       .then(res => {
         console.log(res.data)
-        // set_data(res.data);
+        set_data(res.data)
       })
       .catch(err => {
         setIsNetworking(true)
