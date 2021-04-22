@@ -35,13 +35,13 @@ const PodcastList = () => {
   return (
     <React.Fragment>
       <div className="page-content">
+        <Breadcrumbs breadcrumbItem="Подкастын сувгууд" title="Подкаст" />
         {isNetworking ? (
           <Alert color="danger" role="alert">
             Сүлжээ уналаа ! Дахин ачааллна уу ?
           </Alert>
         ) : (
           <Container fluid>
-            <Breadcrumbs breadcrumbItem="Подкастын сувгууд" title="Подкаст" />
             {data.length != 0 ? <ContactsGrid podcast={data} /> : null}
           </Container>
         )}

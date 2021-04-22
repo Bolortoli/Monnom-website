@@ -7,9 +7,9 @@ import {
   CardBody,
   CardTitle,
   CardSubtitle,
+  Alert,
 } from "reactstrap"
 
-//Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb"
 
 import axios from "axios"
@@ -18,6 +18,7 @@ require("dotenv").config()
 
 const Customers = () => {
   const [tableRows, setTableRows] = useState([])
+  const [isNetworking, setIsNetworking] = useState(false)
 
   const data = {
     columns: [
@@ -72,8 +73,6 @@ const Customers = () => {
       url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/all-app-users`,
     })
       .then(res => {
-        console.log("users")
-        console.log(res.data)
         let tempRows = res.data.map(data => {
           return {
             id: data.id,
@@ -91,11 +90,10 @@ const Customers = () => {
           }
         })
         setTableRows(tempRows)
-        // SetIsNetworkLoading(false);
+        setIsNetworking(false)
       })
       .catch(err => {
-        console.log(err)
-        // SetIsNetworkError(true);
+        setIsNetworking(true)
         // SetIsNetworkLoading(false);
       })
   }
@@ -109,20 +107,26 @@ const Customers = () => {
       <div className="page-content">
         <Container fluid>
           <Breadcrumbs title="" breadcrumbItem="Хэрэглэгчдийн жагсаалт" />
-          <Row>
-            <Col className="col-12">
-              <Card>
-                <CardBody>
-                  <CardTitle>Хэрэглэгчдийн жагсаалт</CardTitle>
-                  <CardSubtitle className="mb-3">
-                    Хэрэглэгчдийн жагсаалт
-                  </CardSubtitle>
+          {isNetworking ? (
+            <Alert color="danger" role="alert">
+              Сүлжээ уналаа ! Дахин ачааллна уу ?
+            </Alert>
+          ) : (
+            <Row>
+              <Col className="col-12">
+                <Card>
+                  <CardBody>
+                    <CardTitle>Хэрэглэгчдийн жагсаалт</CardTitle>
+                    <CardSubtitle className="mb-3">
+                      Хэрэглэгчдийн жагсаалт
+                    </CardSubtitle>
 
-                  <MDBDataTable responsive striped bordered data={data} />
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
+                    <MDBDataTable responsive striped bordered data={data} />
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+          )}
         </Container>
       </div>
     </React.Fragment>

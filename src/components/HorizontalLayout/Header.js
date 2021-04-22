@@ -16,7 +16,6 @@ import NotificationDropdown from "../CommonForBoth/TopbarDropdown/NotificationDr
 import ProfileMenu from "../CommonForBoth/TopbarDropdown/ProfileMenu"
 
 import megamenuImg from "../../assets/images/megamenu-img.png"
-import logo from "../../assets/images/logo-sm-light.png"
 import logoLight from "../../assets/images/logo-light.png"
 import logoLightSvg from "../../assets/images/logo-light.svg"
 import logoDark from "../../assets/images/logo-dark.png"
@@ -25,6 +24,7 @@ import logoDark from "../../assets/images/logo-dark.png"
 import { withTranslation } from "react-i18next"
 
 const Header = props => {
+  const [logo, set_logo] = useState("https://monnom.mn/logo.png")
   const [menu, setMenu] = useState(false)
   const [isSearch, setSearch] = useState(false)
   const [socialDrp, setsocialDrp] = useState(false)
@@ -66,16 +66,16 @@ const Header = props => {
                   <img src={logo} alt="" height="22" />
                 </span>
                 <span className="logo-lg">
-                  <img src={logoDark} alt="" height="17" />
+                  <img src={logo} alt="" height="17" />
                 </span>
               </Link>
 
               <Link to="/" className="logo logo-light">
                 <span className="logo-sm">
-                  <img src={logoLightSvg} alt="" height="22" />
+                  <img src={logo} alt="" height="22" />
                 </span>
                 <span className="logo-lg">
-                  <img src={logoLight} alt="" height="19" />
+                  <img src={logo} alt="" height="19" />
                 </span>
               </Link>
             </div>
@@ -99,7 +99,7 @@ const Header = props => {
                   className="form-control"
                   placeholder="Search..."
                 />
-                <span className="bx bx-search-alt"/>
+                <span className="bx bx-search-alt" />
               </div>
             </form> */}
 
