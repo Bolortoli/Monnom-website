@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
 import axios from "axios"
 import Breadcrumb from "../../components/Common/Breadcrumb"
 import { Row, Col, Card, CardBody } from "reactstrap"
@@ -12,14 +11,12 @@ import Live from "./Live"
 import RightBar from "./RightBar"
 
 const LiveChannel = () => {
-  const { id } = useParams()
-
   // Check network
   const [isNetworking, setIsNetworking] = useState(false)
 
   async function makeGetReq() {
     await axios({
-      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels/${id}`,
+      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels/`,
       method: "GET",
       headers: {
         Authorization: `Bearer ${
@@ -28,10 +25,11 @@ const LiveChannel = () => {
       },
     })
       .then(res => {
+        setIsNetworking(false)
         set_data(res.data)
       })
       .catch(err => {
-        setIsNetworking(true)
+        setIsNetworking(false)
       })
   }
 

@@ -54,7 +54,7 @@ const PodcastDetail = props => {
             title="Ерөнхий мэдээлэл"
             cancelBtnBsStyle="danger"
             confirmBtnText="Хадгалах"
-            cancelBtnText="Цуцлах"
+            cancelBtnText="Болих"
             style={{
               padding: "2em",
               borderRadius: "20px",
@@ -86,33 +86,6 @@ const PodcastDetail = props => {
                         rows="5"
                         value={edit_podcast_desc}
                       />
-                    </Col>
-                    <Col lg={6}>
-                      <Label className="w-100 text-left">Нэмэгдсэн огноо</Label>
-                      <div className="form-group row">
-                        <div className="col-md-10">
-                          <input
-                            type="date"
-                            defaultValue="2019-08-19"
-                            id="example-date-input"
-                            onChange={() => set_edit_updated_date()}
-                          />
-                        </div>
-                      </div>
-                    </Col>
-                    <Col lg={6}>
-                      <Label className="w-100 text-left">
-                        Сүүлд шинэчлэгдсэн
-                      </Label>
-                      <div className="form-group row">
-                        <div className="col-md-10">
-                          <input
-                            type="date"
-                            defaultValue="2019-08-19"
-                            id="example-date-input"
-                          />
-                        </div>
-                      </div>
                     </Col>
                   </Row>
                 </Col>
@@ -172,6 +145,7 @@ const PodcastDetail = props => {
                   <Col sm="4">
                     <div className="avatar-md profile-user-wid mb-4">
                       <img
+                        style={{ width: "100%", height: "9.5vh" }}
                         src={
                           process.env.REACT_APP_STRAPI_BASE_URL +
                           data.channel_cover_pic

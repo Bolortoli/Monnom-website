@@ -17,6 +17,7 @@ import {
   Form,
   FormGroup,
 } from "reactstrap"
+import axios from "axios"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import Switch from "react-switch"
 import classnames from "classnames"
@@ -90,23 +91,53 @@ const AddBook = () => {
   )
   const [audio_book_files, set_audio_book_files] = useState([])
   const [book_files, set_book_files] = useState([])
-  const [has_sale, set_has_sale] = useState(false)
-  const [has_mp3, set_has_mp3] = useState(false)
-  const [has_pdf, set_has_pdf] = useState(false)
 
   // update and delete
-  async function accessAxios() {
-    await axios({
-      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-single-by-author/${id}`,
-      method: "POST",
+  const accessAxios = async () => {
+    const url = "http://192.168.1.10:3001/book-upload"
+    const formData = new FormData()
+    formData.append("book_name", book_name_value)
+    formData.append("book_author.name", book_author_value)
+    formData.append("has_sale", has_sale)
+    formData.append("has_mp3", has_mp3)
+    formData.append("has_pdf", has_pdf)
+
+    const config = {
       headers: {
+        "content-type": "multipart/form-data",
         Authorization: `Bearer ${
           JSON.parse(localStorage.getItem("user_information")).jwt
         }`,
       },
-    })
-      .then(res => {})
-      .catch(err => {})
+    }
+    await axios
+      .post(url, formData, config)
+      .then(async res => {
+        console.log("res =>", res.data)
+        let which_book = new FormData()
+        if (audio_book_files && !book_files) {
+          which_book.append("has_pdf", true)
+          which_book.append("has_mp3", false)
+        } else if (!audio_book_files && book_files) {
+          which_book.append("has_pdf", true)
+          which_book.append("has_mp3", false)
+        } else {
+          which_book.append("has_pdf", false)
+          which_book.append("has_mp3", false)
+        }
+
+        await axios
+          .post("http://192.168.1.10:3001/upload", which_book, config)
+          .then(res => {
+            console.log(res.data)
+          })
+          .catch(err => {
+            alert(err)
+          })
+      })
+      .catch(e => {
+        alert(e)
+      })
   }
 
   // Nomiig hudaldah esehiig asuuj input nemne
@@ -131,7 +162,7 @@ const AddBook = () => {
         }
         if (tab === 2) {
           setprogressValue(66)
-          set_next_button_label("Дараах")
+          set_next_button_label("Алгасах")
         }
         if (tab === 3) {
           setprogressValue(100)
@@ -176,13 +207,23 @@ const AddBook = () => {
     var files = e.target.files
 
     set_audio_book_files(getItems(files))
-    if (files.length > 0) set_audio_book_label("Цахим ном нэмэх")
+    if (files.length > 0) {
+      set_audio_book_label("Цахим ном нэмэх")
+      set_next_button_label("Дараах")
+    } else {
+      set_next_button_label("Алгасах")
+    }
   }
 
   // upload hiij bga mp3 file aa ustgah
   const removeAudioBookFiles = f => {
     set_audio_book_files(audio_book_files.filter(x => x !== f))
-    if (audio_book_files.length === 0) set_audio_book_label("pdf book")
+    if (audio_book_files.length === 0) {
+      set_audio_book_label("pdf book")
+      set_next_button_label("Дараах")
+    } else {
+      set_next_button_label("Алгасах")
+    }
   }
 
   // pdf file upload hiih
@@ -191,14 +232,24 @@ const AddBook = () => {
 
     set_book_files([files[0]])
 
-    if (files.length > 0) set_book_label("pdf book")
+    if (files.length > 0) {
+      set_book_label("pdf book")
+      set_next_button_label("Дараах")
+    } else {
+      set_next_button_label("Алгасах")
+    }
   }
 
   // upload hiisen pdf file aa ustgah
   const removeBookFiles = f => {
     set_progress_mp3(0)
     set_book_files(book_files.filter(x => x !== f))
-    if (book_files.length === 0) set_book_label("mp3 book")
+    if (book_files.length === 0) {
+      set_book_label("mp3 book")
+      set_next_button_label("Дараах")
+    } else {
+      set_next_button_label("Алгасах")
+    }
   }
 
   // upload hiisen file uudiin zooh, indexuudiig zaaj ogoh
@@ -611,16 +662,6 @@ const AddBook = () => {
                           if (next_button_label == "Дуусгах") {
                             accessAxios()
                             togglemodal()
-                          }
-                          if (checked === true) {
-                            set_has_sale(true)
-                          }
-                          if (activeTab === 2) {
-                            if (audio_book_files == "") {
-                              alert("Audio file aa oruulna uu ?")
-                            } else {
-                              console.log("zail zaill")
-                            }
                           }
                         }}
                       >

@@ -87,7 +87,7 @@ const ContactsGrid = props => {
                               <h3 className="mr-2">
                                 {podcast.podcast_name.slice(0, 30)}
                               </h3>
-                              <h3>{podcast.episode_count}</h3>
+                              <h3>- {podcast.episode_count}</h3>
                             </CardTitle>
                             <CardText>
                               <Row>

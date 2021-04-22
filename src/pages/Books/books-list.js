@@ -99,7 +99,7 @@ const Books = () => {
                           height: "30vh",
                           resize: "both",
                           overflow: "visible",
-                          width: "100%",
+                          width: "98%",
                         }}
                         alt={book.book_name}
                       />

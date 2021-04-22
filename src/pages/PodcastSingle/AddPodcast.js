@@ -20,6 +20,7 @@ import {
 import Switch from "react-switch"
 import classnames from "classnames"
 import { Link } from "react-router-dom"
+import axios from "axios"
 
 //Dropzone
 import Dropzone from "react-dropzone"
@@ -36,7 +37,7 @@ const AddPodcast = () => {
   ] = useState("")
   const [next_button_label, set_next_button_label] = useState("Дараах")
 
-  // axios -oor damjuulah state set
+  // axios -oor damjuulah state uud
   const [podcast_name_value, set_podcast_name_value] = useState("")
   const [podcast_description_value, set_podcast_description_value] = useState(
     ""
@@ -48,18 +49,29 @@ const AddPodcast = () => {
   const [selectedFiles, set_selectedFiles] = useState([])
 
   // update and delete
-  async function accessAxios() {
-    await axios({
-      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-single-by-author/${id}`,
-      method: "POST",
+  const accessAxios = async () => {
+    const url = "http://192.168.1.10:3001/book-upload"
+    const formData = new FormData()
+    formData.append("podcast_name", podcast_name_value)
+    formData.append("podcast_desc", podcast_description_value)
+    formData.append("podcast_file_name", selectedFiles)
+
+    const config = {
       headers: {
+        "content-type": "multipart/form-data",
         Authorization: `Bearer ${
           JSON.parse(localStorage.getItem("user_information")).jwt
         }`,
       },
-    })
-      .then(res => {})
-      .catch(err => {})
+    }
+    await axios
+      .post(url, formData, config)
+      .then(async res => {
+        console.log("res =>", res.data)
+      })
+      .catch(e => {
+        alert(e)
+      })
   }
 
   // podcastiin tolowiig oorchloh
@@ -84,7 +96,7 @@ const AddPodcast = () => {
         }
         if (tab === 2) {
           setprogressValue(66)
-          set_next_button_label("Дараах")
+          set_next_button_label("Алгасах")
         }
         if (tab === 3) {
           setprogressValue(100)
@@ -104,6 +116,11 @@ const AddPodcast = () => {
     )
 
     set_selectedFiles(files)
+    if (selectedFiles.length === 0) {
+      set_next_button_label("Алгасах")
+    } else {
+      set_next_button_label("Дараах")
+    }
   }
 
   // file iin formatuud
@@ -397,12 +414,8 @@ const AddPodcast = () => {
                             toggleTab(activeTab + 1)
                           }
                           if (next_button_label == "Дуусгах") {
+                            accessAxios()
                             togglemodal()
-                          }
-                          if (selectedFiles !== null) {
-                            console.log("ZAAAAAAAAAAIIIIIIIIIIIIIIIIL")
-                          } else {
-                            console.log("ZAAAAAAAAAAIIIIIIIIIIIIIIIIL")
                           }
                         }}
                       >
