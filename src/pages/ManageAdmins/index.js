@@ -106,13 +106,7 @@ const ManageAdmins = () => {
   const [usersList, setUsersList] = useState([])
   const [addAdminStep1, setAddAdminStep1] = useState(false)
   const [addAdminStep1_txt, setAddAdminStep1_txt] = useState("")
-  const [addAdminStep2, setAddAdminStep2] = useState(false)
-  const [addAdminStep2_txt, setAddAdminStep2_txt] = useState("")
-  const [addAdminStep3, setAddAdminStep3] = useState(false)
-  const [addAdminStep3_txt, setAddAdminStep3_txt] = useState("")
-  const [final_step, setfinal_step] = useState(false)
   const [profile_picture_create, set_profile_picture_create] = useState({})
-  const [adminTypeErrorMessage, setAdminTypeErrorMessage] = useState("")
 
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
@@ -154,19 +148,19 @@ const ManageAdmins = () => {
   }
 
   function handleStepChange(e) {
-    console.log(e.target)
     switch (e.target.name) {
       case "username":
         // alert("username");
         setUsername(e.target.value)
         break
-      case "profile_picture_create":
+      case "profile_picture":
         set_profile_picture_create(e.target.files[0])
         break
       case "email":
         setEmail(e.target.value)
         break
       case "userType":
+        console.log(e.target.value)
         setUserType(userTypes[e.target.value])
         break
       case "fullname":
@@ -185,11 +179,9 @@ const ManageAdmins = () => {
         setPasswordAgain(e.target.value)
         break
     }
-    console.log(e.target.name)
+    // console.log(e.target.name)
     setAddAdminStep1_txt(e.target.value)
   }
-
-  function addAdminSubmit() {}
 
   const initializeUsersList = data => {
     let usersTempList = data.map(user => {
@@ -218,21 +210,20 @@ const ManageAdmins = () => {
         allData: user,
       }
     })
-    setUsersList([...usersTempList])
-  }
-
-  function handleSelectGroup(userRoleAddAdmin) {
-    setUserRoleAddAdmin(userRoleAddAdmin)
+    // console.log("usersTempList")
+    // console.log(usersTempList)
+    let tempReverseArray = []
+    usersTempList.map(user => {
+      tempReverseArray.unshift(user)
+    })
+    setUsersList([...tempReverseArray, ...usersList])
+    // console.log(usersList.length)
   }
 
   const createUser = async () => {
-    const url = "http://127.0.0.1:3001/create-admin"
+    SetIsNetworkLoading(true)
+    const url = "http://127.0.0.1:1337/users"
     const formData = new FormData()
-    formData.append(
-      "profile_picture",
-      profile_picture_create,
-      "profile_picture"
-    )
     formData.append("username", username)
     formData.append("password", password)
     formData.append("email", email)
@@ -240,7 +231,9 @@ const ManageAdmins = () => {
     formData.append("gender", gender)
     formData.append("fullname", fullname)
     formData.append("user_role", userType)
-    formData.append("")
+
+    // console.log(profile_picture_create)
+
     const config = {
       headers: {
         "content-type": "multipart/form-data",
@@ -251,28 +244,34 @@ const ManageAdmins = () => {
     }
     await axios
       .post(url, formData, config)
-      .then(res => {
-        alert(JSON.stringify(res.data))
+      .then(async res => {
+        console.log("res.data")
+        console.log(res.data)
+        let tempResponse = res.data
+        let imageData = new FormData()
+
+        imageData.append(`files`, profile_picture_create)
+
+        imageData.append("refId", res.data.id)
+        imageData.append("ref", "user")
+        imageData.append("field", "profile_picture")
+        imageData.append("source", "users-permissions")
+
+        await axios
+          .post("http://127.0.0.1:1337/upload", imageData, config)
+          .then(res => {
+            tempResponse.profile_picture = res.data[0]
+            SetIsNetworkLoading(false)
+          })
+          .catch(err => {
+            SetIsNetworkError(true)
+          })
+        console.log(tempResponse)
+        initializeUsersList([tempResponse])
       })
       .catch(err => {
-        alert("error")
+        SetIsNetworkError(true)
       })
-    // await axios({
-    // 	method: "POST",
-    // 	headers: {
-    // 		Authorization: `Bearer ${
-    // 			JSON.parse(localStorage.getItem("user_information")).jwt
-    // 		}`,
-    // 	},
-    // 	url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/all-admins-list`,
-    // 	body: {
-    // 		username,
-    // 		email,
-    // 		fullname,
-    // 		phone,
-    // 		gender,
-    // 	},
-    // });
   }
 
   const fetchUsers = async () => {
@@ -509,7 +508,7 @@ const ManageAdmins = () => {
                           // style={{ visibility: "hidden" }}
                           accept="image/*"
                           type="file"
-                          name="profile_picture_create"
+                          name="profile_picture"
                           onChange={e => handleStepChange(e)}
                         />
                       </FormGroup>
