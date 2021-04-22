@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import {
   Row,
   Col,
@@ -16,114 +16,131 @@ import {
   Form,
   FormGroup,
   Progress,
-} from "reactstrap";
-import Switch from "react-switch";
-import classnames from "classnames";
-import { Link } from "react-router-dom";
+} from "reactstrap"
+import Switch from "react-switch"
+import classnames from "classnames"
+import { Link } from "react-router-dom"
 
 //Dropzone
-import Dropzone from "react-dropzone";
+import Dropzone from "react-dropzone"
 
 const AddPodcast = () => {
-  const [modal, setModal] = useState(false);
-  const [activeTab, set_activeTab] = useState(1);
-  const [progressValue, setprogressValue] = useState(33);
-  const [selectedFiles, set_selectedFiles] = useState([]);
-  const [count, setCount] = useState(0);
-  const [podcast_name_message, set_podcast_name_message] = useState("");
-  const [podcast_name_value, set_podcast_name_value] = useState("");
-  const [podcast_description_value, set_podcast_description_value] = useState(
-    ""
-  );
+  const [modal, setModal] = useState(false)
+  const [activeTab, set_activeTab] = useState(1)
+  const [progressValue, setprogressValue] = useState(33)
+  const [count, setCount] = useState(0)
+  const [podcast_name_message, set_podcast_name_message] = useState("")
   const [
     podcast_description_message,
     set_podcast_description_message,
-  ] = useState("");
-  const [next_button_label, set_next_button_label] = useState("Дараах");
-  const [checked, set_checked] = useState(false);
+  ] = useState("")
+  const [next_button_label, set_next_button_label] = useState("Дараах")
+
+  // axios -oor damjuulah state set
+  const [podcast_name_value, set_podcast_name_value] = useState("")
+  const [podcast_description_value, set_podcast_description_value] = useState(
+    ""
+  )
+  const [checked, set_checked] = useState(false)
   const [profileImage, set_profileImage] = useState(
     "https://www.pngitem.com/pimgs/m/97-972731_podcast-podcasting-icon-hd-png-download.png"
-  );
+  )
+  const [selectedFiles, set_selectedFiles] = useState([])
+
+  // update and delete
+  async function accessAxios() {
+    await axios({
+      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-single-by-author/${id}`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
+      .then(res => {})
+      .catch(err => {})
+  }
 
   // podcastiin tolowiig oorchloh
-  const handleChange = (checked) => {
-    set_checked(checked);
-  };
+  const handleChange = checked => {
+    set_checked(checked)
+  }
 
   // popup garch ireh, ustgah
   const togglemodal = () => {
-    setModal(!modal);
-  };
+    setModal(!modal)
+  }
 
   // popup iin huudas ru usreh
-  const toggleTab = (tab) => {
+  const toggleTab = tab => {
     if (activeTab !== tab) {
       if (tab >= 1 && tab <= 3) {
-        set_activeTab(tab);
+        set_activeTab(tab)
 
         if (tab === 1) {
-          setprogressValue(33);
-          set_next_button_label("Дараах");
+          setprogressValue(33)
+          set_next_button_label("Дараах")
         }
         if (tab === 2) {
-          setprogressValue(66);
-          set_next_button_label("Дараах");
+          setprogressValue(66)
+          set_next_button_label("Дараах")
         }
         if (tab === 3) {
-          setprogressValue(100);
-          set_next_button_label("Дуусгах");
+          setprogressValue(100)
+          set_next_button_label("Дуусгах")
         }
       }
     }
-  };
+  }
 
   // file upload hiih
-  const handleAcceptedFiles = (files) => {
-    files.map((file) =>
+  const handleAcceptedFiles = files => {
+    files.map(file =>
       Object.assign(file, {
         preview: URL.createObjectURL(file),
         formattedSize: formatBytes(file.size),
       })
-    );
+    )
 
-    set_selectedFiles(files);
-  };
+    set_selectedFiles(files)
+  }
 
   // file iin formatuud
   const formatBytes = (bytes, decimals = 2) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    if (bytes === 0) return "0 Bytes"
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-  };
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
+  }
 
   // zurag oorchloh
-  const imageHandler = (e) => {
-    const reader = new FileReader();
+  const imageHandler = e => {
+    const reader = new FileReader()
     reader.onload = () => {
       if (reader.readyState === 2) {
-        set_profileImage(reader.result);
+        set_profileImage(reader.result)
       }
-    };
-    reader.readAsDataURL(e.target.files[0]);
-  };
+    }
+    reader.readAsDataURL(e.target.files[0])
+  }
 
   // input textuudiin hooson utgiig shalgana
-  const handle = (event) => {
+  const handle = event => {
     if (podcast_name_value === "") {
-      set_podcast_name_message("Хоосон утгатай байна !");
+      set_podcast_name_message("Хоосон утгатай байна !")
     } else {
-      set_podcast_name_message("");
+      set_podcast_name_message("")
     }
     if (podcast_description_value === "") {
-      set_podcast_description_message("Хоосон утгатай байна !");
+      set_podcast_description_message("Хоосон утгатай байна !")
     } else {
-      set_podcast_description_message("");
+      set_podcast_description_message("")
     }
-  };
+  }
 
   return (
     <React.Fragment>
@@ -206,8 +223,8 @@ const AddPodcast = () => {
                                 className="podcast_channel"
                                 required
                                 value={podcast_name_value}
-                                onChange={(e) => {
-                                  set_podcast_name_value(e.target.value);
+                                onChange={e => {
+                                  set_podcast_name_value(e.target.value)
                                 }}
                               />
                               <p class="text-danger">{podcast_name_message}</p>
@@ -221,10 +238,10 @@ const AddPodcast = () => {
                                     id="productdesc"
                                     rows="5"
                                     value={podcast_description_value}
-                                    onChange={(e) => {
+                                    onChange={e => {
                                       set_podcast_description_value(
                                         e.target.value
-                                      );
+                                      )
                                     }}
                                   />
                                   <p class="text-danger">
@@ -269,7 +286,7 @@ const AddPodcast = () => {
                                   className="image-upload d-flex justify-content-center"
                                 >
                                   <i className="bx bx-image-add font-size-20 mr-2"></i>
-                                  <p>Choose your photo</p>
+                                  <p>Зураг оруулах</p>
                                 </label>
                               </div>
                             </FormGroup>
@@ -283,10 +300,10 @@ const AddPodcast = () => {
                       </h5>
                       <div className="kyc-doc-verification mb-3">
                         <Dropzone
-                          onDrop={(acceptedFiles) =>
+                          onDrop={acceptedFiles =>
                             handleAcceptedFiles(acceptedFiles)
                           }
-                          accept="audio/*"
+                          accept=".mp3"
                         >
                           {({ getRootProps, getInputProps }) => (
                             <div className="dropzone">
@@ -329,7 +346,7 @@ const AddPodcast = () => {
                                   </Row>
                                 </div>
                               </Card>
-                            );
+                            )
                           })}
                         </div>
                       </div>
@@ -362,7 +379,7 @@ const AddPodcast = () => {
                       <Link
                         to="#"
                         onClick={() => {
-                          toggleTab(activeTab - 1);
+                          toggleTab(activeTab - 1)
                         }}
                       >
                         Өмнөх
@@ -371,13 +388,21 @@ const AddPodcast = () => {
                     <li className={activeTab === 4 ? "next disabled" : "next"}>
                       <Link
                         to="#"
-                        onClick={(e) => {
-                          handle(e);
+                        onClick={e => {
+                          handle(e)
                           if (
                             podcast_name_value !== "" &&
                             podcast_description_value !== ""
                           ) {
-                            toggleTab(activeTab + 1);
+                            toggleTab(activeTab + 1)
+                          }
+                          if (next_button_label == "Дуусгах") {
+                            togglemodal()
+                          }
+                          if (selectedFiles !== null) {
+                            console.log("ZAAAAAAAAAAIIIIIIIIIIIIIIIIL")
+                          } else {
+                            console.log("ZAAAAAAAAAAIIIIIIIIIIIIIIIIL")
                           }
                         }}
                       >
@@ -392,7 +417,7 @@ const AddPodcast = () => {
         </Card>
       </Col>
     </React.Fragment>
-  );
-};
+  )
+}
 
-export default AddPodcast;
+export default AddPodcast

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import {
   Row,
   Col,
@@ -21,6 +21,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import Switch from "react-switch"
 import classnames from "classnames"
 import { Link } from "react-router-dom"
+import { set } from "lodash"
 
 // file  generator
 const getItems = files => {
@@ -65,29 +66,48 @@ const AddBook = () => {
   const [modal, setModal] = useState(false)
   const [activeTab, set_activeTab] = useState(1)
   const [progressValue, setprogressValue] = useState(33)
-  const [podcast_name_message, set_podcast_name_message] = useState("")
-  const [podcast_name_value, set_podcast_name_value] = useState("")
+  const [book_name_message, set_book_name_message] = useState("")
+  const [book_author_message, set_book_author_message] = useState("")
   const [checked, set_checked] = useState(false)
-  const [audio_book_files, set_audio_book_files] = useState([])
-  const [book_files, set_book_files] = useState([])
-  const [item, set_item] = useState()
-  const [pdf_file, set_pdf_file] = useState(false)
-  const [mp3_file, set_mp3_file] = useState(false)
   const [book_label, set_book_label] = useState("pdf book")
   const [progress_mp3, set_progress_mp3] = useState(0)
   const [progress_pdf, set_progress_pdf] = useState(0)
   const [page, setPage] = useState(1)
   const [users, setUsers] = useState([])
   const [next_button_label, set_next_button_label] = useState("Дараах")
-  const [podcast_description_value, set_podcast_description_value] = useState(
-    ""
-  )
   const [
     podcast_description_message,
     set_podcast_description_message,
   ] = useState("")
   const [profileImage, set_profileImage] = useState("")
   const [audio_book_label, set_audio_book_label] = useState("mp3 book")
+
+  // axios -oor damjuulah state set
+  const [book_name_value, set_book_name_value] = useState("")
+  const [book_author_value, set_book_author_value] = useState("")
+  const [podcast_description_value, set_podcast_description_value] = useState(
+    ""
+  )
+  const [audio_book_files, set_audio_book_files] = useState([])
+  const [book_files, set_book_files] = useState([])
+  const [has_sale, set_has_sale] = useState(false)
+  const [has_mp3, set_has_mp3] = useState(false)
+  const [has_pdf, set_has_pdf] = useState(false)
+
+  // update and delete
+  async function accessAxios() {
+    await axios({
+      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-single-by-author/${id}`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
+      .then(res => {})
+      .catch(err => {})
+  }
 
   // Nomiig hudaldah esehiig asuuj input nemne
   const handleChange = checked => {
@@ -134,15 +154,20 @@ const AddBook = () => {
 
   // inputiin utga hooson esehiig shalgah
   const handle = event => {
-    if (podcast_name_value === "") {
-      set_podcast_name_message("Хоосон утгатай байна !")
+    if (book_name_value === "") {
+      set_book_name_message("Хоосон утгатай байна !")
     } else {
-      set_podcast_name_message("")
+      set_book_name_message("")
     }
     if (podcast_description_value === "") {
       set_podcast_description_message("Хоосон утгатай байна !")
     } else {
       set_podcast_description_message("")
+    }
+    if (book_author_value === "") {
+      set_book_author_message("Хоосон утгатай байна !")
+    } else {
+      set_book_author_message("")
     }
   }
 
@@ -267,16 +292,17 @@ const AddBook = () => {
                         <Row>
                           <Col lg="6">
                             <FormGroup>
-                              <Label for="kycfirstname-input">Нэр</Label>
+                              <Label for="kycfirstname-input">Номын нэр</Label>
                               <Input
                                 type="text"
                                 className="podcast_channel"
                                 required
-                                value={podcast_name_value}
+                                value={book_name_value}
                                 onChange={e => {
-                                  set_podcast_name_value(e.target.value)
+                                  set_book_name_value(e.target.value)
                                 }}
                               />
+                              <p class="text-danger">{book_name_message}</p>
                             </FormGroup>
                           </Col>
                           <Col lg="6">
@@ -286,12 +312,12 @@ const AddBook = () => {
                                 type="text"
                                 className="podcast_channel"
                                 required
-                                value={podcast_name_value}
+                                value={book_author_value}
                                 onChange={e => {
-                                  set_podcast_name_value(e.target.value)
+                                  set_book_author_value(e.target.value)
                                 }}
                               />
-                              <p class="text-danger">{podcast_name_message}</p>
+                              <p class="text-danger">{book_author_message}</p>
                             </FormGroup>
                           </Col>
                         </Row>
@@ -365,7 +391,7 @@ const AddBook = () => {
                                   </Label>
                                 </Col>
                                 <Col lg={4}>
-                                  <Input type="number" />
+                                  <Input type="number" value="0" />
                                 </Col>
                               </Row>
                             ) : null}
@@ -577,10 +603,24 @@ const AddBook = () => {
                         onClick={e => {
                           handle(e)
                           if (
-                            podcast_name_value !== "" &&
+                            book_name_value !== "" &&
                             podcast_description_value !== ""
                           ) {
                             toggleTab(activeTab + 1)
+                          }
+                          if (next_button_label == "Дуусгах") {
+                            accessAxios()
+                            togglemodal()
+                          }
+                          if (checked === true) {
+                            set_has_sale(true)
+                          }
+                          if (activeTab === 2) {
+                            if (audio_book_files == "") {
+                              alert("Audio file aa oruulna uu ?")
+                            } else {
+                              console.log("zail zaill")
+                            }
                           }
                         }}
                       >
