@@ -14,6 +14,7 @@ import PodcastSinglePage from "../pages/PodcastSingle"
 import BookSinglePage from "../pages/BookAuthor"
 import Sales from "../pages/Sales"
 import LiveChannel from "../pages/LiveChannel"
+import Settings from "../pages/Settings"
 
 import ManageAdmins from "../pages/ManageAdmins"
 // import Login from "../pages/Authentication/Login"
@@ -23,6 +24,7 @@ import Books from "../pages/Books/books-list"
 
 const userRoutes = [
   { path: "/app-users", component: Customers },
+  { path: "/settings", component: Settings },
   {
     path: "/manage-admins",
     component: ManageAdmins,

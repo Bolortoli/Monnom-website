@@ -1,3 +1,4 @@
+import axios from "axios"
 import React, { useState } from "react"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { Link } from "react-router-dom"
@@ -27,6 +28,29 @@ const LeftBar = () => {
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
 
+  // shine live channel uusgeh
+  const [create_live_name, set_create_live_name] = useState("")
+  const [create_live_desc, set_create_live_desc] = useState("")
+
+  // axios ruu form ywuulah
+  const createLive = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}`
+    const formData = new FormData()
+    formData.append("live_name", create_live_name)
+    formData.append("live_desc", create_live_desc)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem("").jwt)}`,
+      },
+    }
+
+    await axios.post(url, formData, config).then(async res => {
+      console.log(res.data)
+    })
+  }
+
   const toggle = () => setIsOpen(!isOpen)
   return (
     <React.Fragment>
@@ -49,11 +73,21 @@ const LeftBar = () => {
           <Row className="my-4">
             <Col lg={6}>
               <Label className="w-100 text-left">Лайв нэр</Label>
-              <Input type="text" value="" />
+              <Input
+                type="text"
+                onChange={e => {
+                  set_create_live_name(e.target.value)
+                }}
+              />
             </Col>
             <Col lg={6}>
               <Label className="w-100 text-left">Тайлбар</Label>
-              <Input type="textarea" />
+              <Input
+                type="textarea"
+                onChange={e => {
+                  set_create_live_desc(e.target.value)
+                }}
+              />
             </Col>
           </Row>
         </SweetAlert>
@@ -68,6 +102,7 @@ const LeftBar = () => {
           confirmBtnBsStyle="success"
           cancelBtnBsStyle="danger"
           onConfirm={() => {
+            createLive()
             set_confirm_add(false)
             setsuccess_dlg(true)
             setdynamic_title("Амжилттай")

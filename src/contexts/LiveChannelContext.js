@@ -5,6 +5,8 @@ const demoData = [
   {
     id: 1,
     live_name: "Live 1",
+    live_desc:
+      "Ene live ni niigmiin tulgamdaj bui asuudliig olon niited hurgeh tuunees sergiileh talaar zowolgoo ogoh ym",
     state: true,
     lives: [
       {
@@ -21,6 +23,7 @@ const demoData = [
   },
   {
     live_name: "Live 2",
+    live_desc: "Ene live aar MonnoM iig magtah bolno oo bayrlalaa :)",
     state: false,
     id: 2,
     lives: [
@@ -33,6 +36,11 @@ const demoData = [
         id: 2,
         name: "dsgsdgsdgsdgfsd.com",
         size: 345435,
+      },
+      {
+        id: 3,
+        name: "Http & Https protocol",
+        size: 940349305,
       },
     ],
   },

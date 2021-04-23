@@ -44,8 +44,8 @@ const List = props => {
   const [edit_book_img, set_edit_book_img] = useState("")
 
   // axios oor huselt ywuulj update hiih
-  const accessAxios = async () => {
-    const url = "http://192.168.1.10:3001/book-upload"
+  const updateBook = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-upload`
     const formData = new FormData()
     formData.set("book_name", edit_book_name)
     formData.set("book_author.name", edit_book_author_name)
@@ -404,7 +404,7 @@ const List = props => {
               setsuccess_dlg(true)
               setdynamic_title("Амжилттай")
               setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
-              accessAxios()
+              updateBook()
             }}
             onCancel={() => {
               set_confirm_edit(false)
@@ -414,8 +414,16 @@ const List = props => {
         ) : null}
         {success_dlg ? (
           <SweetAlert
-            success
             title={dynamic_title}
+            timeout={1500}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
             onConfirm={() => {
               setsuccess_dlg(false)
             }}

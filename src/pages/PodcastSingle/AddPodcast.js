@@ -49,8 +49,8 @@ const AddPodcast = () => {
   const [selectedFiles, set_selectedFiles] = useState([])
 
   // update and delete
-  const accessAxios = async () => {
-    const url = "http://192.168.1.10:3001/book-upload"
+  const createPodcast = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-upload`
     const formData = new FormData()
     formData.append("podcast_name", podcast_name_value)
     formData.append("podcast_desc", podcast_description_value)
@@ -414,7 +414,7 @@ const AddPodcast = () => {
                             toggleTab(activeTab + 1)
                           }
                           if (next_button_label == "Дуусгах") {
-                            accessAxios()
+                            createPodcast()
                             togglemodal()
                           }
                         }}

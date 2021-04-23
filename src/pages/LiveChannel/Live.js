@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
 import { Row, Col, Form, Container, Button } from "reactstrap"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import { useLiveChannelStates } from "../../contexts/LiveChannelContext"
+import axios from "axios"
 // fake data generator
 const getItems = files => {
   // return [];
@@ -43,7 +43,7 @@ const getListStyle = isDraggingOver => ({
   padding: grid,
 })
 
-const Live = props => {
+const Live = () => {
   // const { liveState, setLiveState, setSelectedCard } = useLiveChannelStates();
 
   const {
@@ -58,11 +58,51 @@ const Live = props => {
   // const [old_files, set_old_files] = useState(getItems(liveState.lives));
 
   const [searchItms, setSearchItms] = useState("")
-  const [remove_old_file_name, set_remove_old_file_name] = useState("")
   const [remove_upload_file_name, set_remove_upload_file_name] = useState("")
-
-  const [upload_files, set_upload_files] = useState([])
   const [confirm_remove_file, set_confirm_remove_file] = useState(false)
+
+  // huuchin file ustgah state
+  const [remove_old_file_name, set_remove_old_file_name] = useState("")
+  // shine file lived nemeh state
+  const [upload_files, set_upload_files] = useState([])
+
+  // delete old file
+  const deleteFile = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}`
+    const formData = new FormData()
+    formData.delete("lives", remove_old_file_name)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${JSON.parse(
+          localStorage.getItem("user_information").jwt
+        )}`,
+      },
+    }
+    await axios.post(url, formData, config).then(async res => {
+      console.log(res.data)
+    })
+  }
+
+  // add file from live
+  const createFile = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}`
+    const formData = new FormData()
+    formData.append("lives", upload_files)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${JSON.parse(
+          localStorage.getItem("user_information").jwt
+        )}`,
+      },
+    }
+    await axios.post(url, formData, config).then(async res => {
+      console.log(res.data)
+    })
+  }
 
   // mp3 file upload hiih, nemeh
   const uploadLiveFiles = e => {
@@ -350,6 +390,7 @@ const Live = props => {
                   removeAudioBookFiles(remove_upload_file_name)
                   removeOldAudioBookFiles(remove_old_file_name)
                   set_confirm_remove_file(false)
+                  deleteFile()
                 }}
                 onCancel={() => {
                   set_confirm_remove_file(false)

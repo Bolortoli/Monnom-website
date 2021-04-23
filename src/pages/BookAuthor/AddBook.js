@@ -92,9 +92,9 @@ const AddBook = () => {
   const [audio_book_files, set_audio_book_files] = useState([])
   const [book_files, set_book_files] = useState([])
 
-  // update and delete
-  const accessAxios = async () => {
-    const url = "http://192.168.1.10:3001/book-upload"
+  // create
+  const createBook = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-upload`
     const formData = new FormData()
     formData.append("book_name", book_name_value)
     formData.append("book_author.name", book_author_value)
@@ -127,7 +127,11 @@ const AddBook = () => {
         }
 
         await axios
-          .post("http://192.168.1.10:3001/upload", which_book, config)
+          .post(
+            `${process.env.REACT_APP_EXPRESS_BASE_URL}/upload`,
+            which_book,
+            config
+          )
           .then(res => {
             console.log(res.data)
           })
@@ -660,7 +664,7 @@ const AddBook = () => {
                             toggleTab(activeTab + 1)
                           }
                           if (next_button_label == "Дуусгах") {
-                            accessAxios()
+                            createBook()
                             togglemodal()
                           }
                         }}

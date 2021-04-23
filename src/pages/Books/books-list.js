@@ -90,7 +90,7 @@ const Books = () => {
                     <Card>
                       <CardImg
                         top
-                        className="img-fluid"
+                        className="img-fluid mx-auto"
                         src={
                           process.env.REACT_APP_STRAPI_BASE_URL +
                           book.book_pic_url

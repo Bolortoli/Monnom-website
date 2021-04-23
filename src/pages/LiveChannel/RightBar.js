@@ -7,22 +7,48 @@ import { useLiveChannelStates } from "../../contexts/LiveChannelContext"
 const RighBar = props => {
   const { selectedCard, setSelectedCard } = useLiveChannelStates()
   const { edit_live_channel, set_edit_live_channel } = useLiveChannelStates()
-  const [edit_file_name, set_edit_file_name] = useState("")
-  const [switch_live_state, set_switch_live_state] = useState(false)
 
   const [confirm_edit, set_confirm_edit] = useState(false)
   const [success_dlg, setsuccess_dlg] = useState(false)
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
 
+  // edit hiih state
+  const [edit_live_name, set_edit_live_name] = useState("")
+  const [edit_live_desc, set_edit_live_desc] = useState("")
+  const [edit_live_state, set_edit_live_state] = useState(false)
+
+  const editLiveInfo = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}`
+    const formData = new FormData()
+    formData.append("live_name", edit_live_name)
+    formData.append("live_desc", edit_live_desc)
+    formData.append("state", edit_live_state)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+    await axios.post(url, formData, config).then(async res => {
+      console.log(res.data)
+    })
+  }
+
   // live iin tolow solih
   const handleChange = checked => {
-    set_switch_live_state(checked)
+    set_edit_live_state(checked)
   }
 
   useEffect(() => {
-    if (selectedCard[edit_live_channel])
-      set_switch_live_state(selectedCard[edit_live_channel].state)
+    if (selectedCard[edit_live_channel]) {
+      set_edit_live_state(selectedCard[edit_live_channel].state)
+      set_edit_live_name(selectedCard[edit_live_channel].live_name)
+      set_edit_live_desc(selectedCard[edit_live_channel].live_desc)
+    }
   }, [edit_live_channel])
 
   return (
@@ -36,17 +62,24 @@ const RighBar = props => {
           <Input
             className="mb-3"
             type="text"
-            value={
-              selectedCard[edit_live_channel]
-                ? selectedCard[edit_live_channel].live_name
-                : null
-            }
-            onChange={e => set_edit_file_name(e.target.value)}
+            value={edit_live_name}
+            onChange={e => set_edit_live_name(e.target.value)}
           />
-          <div className="d-flex justify-content-between align-items-center mb-3">
+          <Label>Тайлбар</Label>
+          <Input
+            type="textarea"
+            style={{
+              minHeight: "100px",
+            }}
+            value={edit_live_desc}
+            onChange={e => {
+              set_edit_live_desc(e.target.value)
+            }}
+          />
+          <div className="d-flex justify-content-between align-items-center my-3">
             <Label className="my-auto">Төлөв</Label>
             <label className="d-flex w-50 my-auto justify-content-around">
-              <Switch onChange={handleChange} checked={switch_live_state} />
+              <Switch onChange={handleChange} checked={edit_live_state} />
             </label>
           </div>
           <Button
@@ -69,7 +102,7 @@ const RighBar = props => {
           confirmBtnBsStyle="success"
           cancelBtnBsStyle="danger"
           onConfirm={() => {
-            // setSelectedCard(edit_file_name);
+            // setSelectedCard(edit_live_name);
             set_confirm_edit(false)
             setsuccess_dlg(true)
             setdynamic_title("Амжилттай")

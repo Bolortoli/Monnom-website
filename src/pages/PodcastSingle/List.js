@@ -32,8 +32,8 @@ const List = props => {
   const [edit_podcast_file, set_edit_podcast_file] = useState("")
 
   // axios oor huselt ywuulj update hiih
-  const accessAxios = async () => {
-    const url = "http://192.168.1.10:3001/book-upload"
+  const updatePodcast = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podacst-upload`
     const formData = new FormData()
     formData.set("podcast_name", edit_podcast_name)
     formData.set("podcast_desc", edit_podcast_desc)
@@ -264,7 +264,7 @@ const List = props => {
               setsuccess_dlg(true)
               setdynamic_title("Амжилттай")
               setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
-              accessAxios()
+              updatePodcast()
             }}
             onCancel={() => {
               set_confirm_edit(false)
@@ -274,8 +274,16 @@ const List = props => {
         ) : null}
         {success_dlg ? (
           <SweetAlert
-            success
             title={dynamic_title}
+            timeout={1500}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
             onConfirm={() => {
               setsuccess_dlg(false)
             }}

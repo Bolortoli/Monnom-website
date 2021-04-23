@@ -6,6 +6,7 @@ import {
   CardBody,
   Col,
   CardTitle,
+  CardImg,
   CardText,
   Row,
   Alert,
@@ -68,21 +69,23 @@ const ContactsGrid = props => {
                 .map(podcast => {
                   try {
                     return (
-                      <Col xl={3} lg={4} md={4} sm={4}>
+                      <Col xl={3} lg={4} md={4} sm={4} xs={6}>
                         <Card>
+                          <CardImg
+                            top
+                            src={
+                              process.env.REACT_APP_STRAPI_BASE_URL +
+                              podcast.podcast_pic_url
+                            }
+                            alt={podcast.podcast_name}
+                            className="img-fluid mx-auto"
+                            style={{
+                              width: "98%",
+                              height: "30vh",
+                              overflow: "visible",
+                            }}
+                          />
                           <CardBody>
-                            <img
-                              src={
-                                process.env.REACT_APP_STRAPI_BASE_URL +
-                                podcast.podcast_pic_url
-                              }
-                              alt={podcast.podcast_name}
-                              className="img-thumbnail mx-auto"
-                              style={{
-                                width: "98%",
-                                height: "30vh",
-                              }}
-                            />
                             <CardTitle className="mt-0 d-flex">
                               <h3 className="mr-2">
                                 {podcast.podcast_name.slice(0, 30)}
