@@ -1,31 +1,226 @@
 import React, { useState, useEffect } from "react"
-import { MDBDataTable } from "mdbreact"
+import axios from "axios"
 import { Link } from "react-router-dom"
-import {
-  Form,
-  Card,
-  CardBody,
-  Col,
-  Row,
-  CardTitle,
-  CardSubtitle,
-  Button,
-} from "reactstrap"
+import SweetAlert from "react-bootstrap-sweetalert"
+import { Form, Card, CardBody, Col, Row, CardTitle, Button } from "reactstrap"
 import { Editor } from "react-draft-wysiwyg"
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
+import { EditorState, convertToRaw } from "draft-js"
 
 const SettingsForm = () => {
   const [profileImage, set_profileImage] = useState(
     "https://monnom.mn/logo.png"
   )
-  const [data, set_data] = useState([
+  const [allow, set_allow] = useState(true)
+  const [book_data, set_book_data] = useState([
     {
       book_name: "Mongoliin nuuts towchoo",
       book_author: "M4gii",
-      book_added_date: "2021/4/23",
+      book_added_date: "2021-04-23",
       has_sale: false,
       has_mp3: true,
       has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+    {
+      book_name: "Mongoliin nuuts towchoo",
+      book_author: "M4gii",
+      book_added_date: "2021-04-23",
+      has_sale: false,
+      has_mp3: true,
+      has_pdf: true,
+      allow: true,
+    },
+  ])
+  const [confirm_terms, set_confirm_terms] = useState(false)
+  const [success_dlg, setsuccess_dlg] = useState(false)
+  const [dynamic_title, setdynamic_title] = useState("")
+  const [dynamic_description, setdynamic_description] = useState("")
+  const [wysiwyg_content, set_wysiwyg_content] = useState(
+    EditorState.createEmpty()
+  )
+
+  // axios ruu ywuulah string
+  const updateTerms = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}`
+    const formData = new FormData()
+    formData.append("", wysiwyg_content)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem("").jwt)}`,
+      },
+    }
+    await axios
+      .post(url, formData, config)
+      .then(async res => {
+        console.log(res.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
+  const [podcast_data, set_podcast_data] = useState([
+    {
+      podcast_name: "Mongoliin nuuts towchoo",
+      episode_num: 4,
+      podcast_added_date: "2021-04-23",
+      allow: true,
     },
   ])
 
@@ -40,24 +235,55 @@ const SettingsForm = () => {
     reader.readAsDataURL(e.target.files[0])
   }
 
-  const columns = [
+  const toggleAllow = checked => {
+    set_allow(checked)
+  }
+
+  const podcastColumns = [
+    {
+      label: "Нэр",
+      field: "podcxast_name",
+      sort: "asc",
+      width: 80,
+    },
+    {
+      label: "Дугаар",
+      field: "episode_num",
+      sort: "asc",
+      width: 90,
+    },
+    {
+      label: "Нийтлэгдсэн огноо",
+      field: "podcast_date",
+      sort: "disabled",
+      width: 70,
+    },
+    {
+      label: "Зөвшөөрөх",
+      field: "allow",
+      sort: "disabled",
+      width: "30",
+    },
+  ]
+
+  const bookColumns = [
     {
       label: "Нэр",
       field: "book_name",
       sort: "asc",
-      width: 150,
+      width: 80,
     },
     {
       label: "Зохиолч",
       field: "book_author",
       sort: "asc",
-      width: 100,
+      width: 90,
     },
     {
       label: "Нийтлэгдсэн огноо",
       field: "book_date",
       sort: "disabled",
-      width: 100,
+      width: 70,
     },
     {
       label: "Төрөл",
@@ -69,12 +295,35 @@ const SettingsForm = () => {
       label: "Зөвшөөрөх",
       field: "allow",
       sort: "disabled",
-      width: "50",
+      width: "30",
     },
   ]
 
-  const initCol = data => {
-    let tempInitialData = data.map(d => {
+  const initPodcast = podcast => {
+    let tempInitialData = podcast.map(d => {
+      return {
+        podcast_name: d.podcast_name,
+        episode_num: d.episode_num,
+        podcast_date: new Date(d.podcast_date).toLocaleDateString(),
+        allow: (
+          <div className="text-center">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="checkboxNoLabel"
+              onChange={toggleAllow}
+              value=""
+              aria-label="..."
+            />
+          </div>
+        ),
+      }
+    })
+    set_podcast_data(tempInitialData)
+  }
+
+  const initBook = book => {
+    let tempInitialData = book.map(d => {
       return {
         book_name: d.book_name,
         book_author: d.book_author,
@@ -96,9 +345,8 @@ const SettingsForm = () => {
           </Link>
         ),
         allow: (
-          <div>
+          <div className="text-center">
             <input
-              className="mx-auto d-block p-2"
               class="form-check-input"
               type="checkbox"
               id="checkboxNoLabel"
@@ -109,16 +357,22 @@ const SettingsForm = () => {
         ),
       }
     })
-    set_data(tempInitialData)
+    set_book_data(tempInitialData)
   }
 
   const book_datatable = {
-    columns: columns,
-    rows: data,
+    columns: bookColumns,
+    rows: book_data,
+  }
+
+  const podcast_datatable = {
+    columns: podcastColumns,
+    rows: podcast_data,
   }
 
   useEffect(() => {
-    initCol(data)
+    initBook(book_data)
+    initPodcast(podcast_data)
   }, [])
 
   return (
@@ -127,36 +381,38 @@ const SettingsForm = () => {
         <Card>
           <CardBody>
             <CardTitle>Үйлчилгээний нөхцөл</CardTitle>
-            <CardSubtitle className="mb-3">
-              Bootstrap-wysihtml5 is a javascript plugin that makes it easy to
-              create simple, beautiful wysiwyg editors with the help of
-              wysihtml5 and Twitter Bootstrap.
-            </CardSubtitle>
-
             <Form method="post" style={{}}>
               <Editor
+                onEditorStateChange={e => {
+                  set_wysiwyg_content(e)
+                }}
+                toolbarOnFocus
+                toolbar={{
+                  options: [
+                    "inline",
+                    "blockType",
+                    "fontSize",
+                    "list",
+                    "textAlign",
+                    "colorPicker",
+                    "link",
+                    "embedded",
+                    "emoji",
+                    "image",
+                    "remove",
+                    "history",
+                  ],
+                }}
                 toolbarClassName="toolbarClassName"
                 wrapperClassName="wrapperClassName"
                 editorClassName="editorClassName"
-                value="hehe"
               />
             </Form>
           </CardBody>
         </Card>
       </Col>
 
-      <Col lg={12}>
-        <MDBDataTable
-          proSelect
-          responsive
-          striped
-          bordered
-          data={book_datatable}
-          proSelect
-        />
-      </Col>
-
-      <Col lg={2}>
+      {/* <Col lg={2}>
         <div
           className="bg-dark p-2"
           style={{
@@ -184,21 +440,61 @@ const SettingsForm = () => {
               className="image-upload d-flex justify-content-center"
             >
               <i className="bx bx-image-add font-size-20 mr-2 text-light"></i>
-              <p className="text-light">Зураг оруулах</p>
+              <p className="text-light">Лого солих</p>
             </label>
           </div>
         </div>
-      </Col>
+      </Col> */}
 
-      <Col lg={12} className="mt-5 mb-3">
+      <Col lg={12} className="text-right">
         <Button
-          type="button"
-          className="w-100 text-dark"
-          style={{ height: "30px" }}
+          className="btn btn-success text-dark"
+          style={{ height: "40px" }}
           color="success"
+          onClick={() => set_confirm_terms(true)}
         >
-          Х а д г а л а х
+          Хадгалах
         </Button>
+        {confirm_terms ? (
+          <SweetAlert
+            title="Та үйлчилгээний нөхцөлөө өөрчлөх гэж байна ?"
+            info
+            showCancel
+            confirmBtnText="Тийм!"
+            cancelBtnText="Болих"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              updateTerms()
+              set_confirm_terms(false)
+              setsuccess_dlg(true)
+              setdynamic_title("Амжилттай")
+              setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
+            }}
+            onCancel={() => {
+              set_confirm_terms(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {success_dlg ? (
+          <SweetAlert
+            title={dynamic_title}
+            timeout={1500}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
+            onConfirm={() => {
+              setsuccess_dlg(false)
+            }}
+          >
+            {dynamic_description}
+          </SweetAlert>
+        ) : null}
       </Col>
     </Row>
   )

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import SweetAlert from "react-bootstrap-sweetalert"
 import { Link } from "react-router-dom"
 import { Alert } from "reactstrap"
 import {
@@ -21,6 +22,15 @@ const Books = () => {
   const [booksList, setBooksList] = useState([])
   const [searchItms, setSearchItms] = useState("")
   const [isNetworking, setIsNetworking] = useState(false)
+  const [allow, set_allow] = useState(false)
+  const [confirm_allow, set_confirm_allow] = useState(false)
+  const [success_dlg, setsuccess_dlg] = useState(false)
+  const [dynamic_title, setdynamic_title] = useState("")
+  const [dynamic_description, setdynamic_description] = useState("")
+
+  const toggleAllow = checked => {
+    set_allow(!checked)
+  }
 
   const fetchData = async () => {
     await axios({
@@ -86,7 +96,7 @@ const Books = () => {
                   }
                 })
                 .map(book => (
-                  <Col xl={3} lg={3} md={4} sm={4}>
+                  <Col xl={3} lg={4} md={4} sm={4}>
                     <Card>
                       <CardImg
                         top
@@ -130,6 +140,70 @@ const Books = () => {
                               </b>
                             </Col>
                           </Row>
+                          <Row>
+                            <Col xl={12} className="text-right mt-2">
+                              <div class="form-check" className="ml-5">
+                                <input
+                                  class="form-check-input"
+                                  type="checkbox"
+                                  value=""
+                                  onClick={() => {
+                                    set_confirm_allow(true)
+                                  }}
+                                  checked={allow}
+                                  id="flexCheckDefault"
+                                />
+                                <label
+                                  class="form-check-label"
+                                  for="flexCheckDefault"
+                                >
+                                  <b className="text-dark">Онцлох</b>
+                                </label>
+                              </div>
+                            </Col>
+                            {confirm_allow ? (
+                              <SweetAlert
+                                title="Та итгэлтэй байна уу ?"
+                                warning
+                                showCancel
+                                confirmBtnText="Тийм"
+                                cancelBtnText="Болих"
+                                confirmBtnBsStyle="success"
+                                cancelBtnBsStyle="danger"
+                                onConfirm={() => {
+                                  toggleAllow(allow)
+                                  set_confirm_allow(false)
+                                  setsuccess_dlg(true)
+                                  setdynamic_title("Амжилттай")
+                                  setdynamic_description(
+                                    "Шинэчлэлт амжилттай хийгдлээ."
+                                  )
+                                }}
+                                onCancel={() => {
+                                  set_confirm_allow(false)
+                                }}
+                              ></SweetAlert>
+                            ) : null}
+                            {success_dlg ? (
+                              <SweetAlert
+                                success
+                                title={dynamic_title}
+                                timeout={1500}
+                                style={{
+                                  position: "absolute",
+                                  top: "center",
+                                  right: "center",
+                                }}
+                                showCloseButton={false}
+                                showConfirm={false}
+                                onConfirm={() => {
+                                  setsuccess_dlg(false)
+                                }}
+                              >
+                                {dynamic_description}
+                              </SweetAlert>
+                            ) : null}
+                          </Row>
                         </CardText>
                         <Row>
                           <Col xl={6} className="text-left">
@@ -146,7 +220,7 @@ const Books = () => {
                                 color: book.has_sale ? "#24ea75" : "#767676",
                                 fontSize: "30px",
                               }}
-                              className="bx bxs-book-open"
+                              className="bx bxs-book-open font-size-30"
                             />
                             <i
                               style={{
