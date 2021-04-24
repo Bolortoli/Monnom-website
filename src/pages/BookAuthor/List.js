@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { MDBDataTable } from "mdbreact";
-import AddBook from "./AddBook";
+import React, { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
+import { MDBDataTable } from "mdbreact"
+import AddBook from "./AddBook"
 import {
   Row,
   Col,
@@ -12,35 +12,63 @@ import {
   Label,
   Input,
   FormGroup,
-} from "reactstrap";
-import Switch from "react-switch";
-import SweetAlert from "react-bootstrap-sweetalert";
+} from "reactstrap"
+import Switch from "react-switch"
+import SweetAlert from "react-bootstrap-sweetalert"
+import axios from "axios"
 
-const List = (props) => {
-  const [data, set_data] = useState(props.books.user_books);
-  console.log("props utga ", props.books.user_books);
+const List = props => {
+  const [data, set_data] = useState(props.books.user_books)
+  console.log("props utga ", props.books.user_books)
 
-  const [edit_user_step, set_edit_user_step] = useState(false);
-  const [book_author_info, set_book_author_info] = useState(false);
-  const [edit_book_name, set_edit_book_name] = useState("");
-  const [edit_book_author_name, set_edit_book_author_name] = useState("");
-  const [edit_book_author_desc, set_edit_book_author_desc] = useState("");
-  const [edit_book_author_img, set_edit_book_author_img] = useState("");
-  const [edit_book_desc, set_edit_book_desc] = useState("");
-  const [edit_book_img, set_edit_book_img] = useState("");
-  const [edit_has_sale, set_edit_has_sale] = useState(false);
-  const [edit_has_mp3, set_edit_has_mp3] = useState(false);
-  const [edit_has_pdf, set_edit_has_pdf] = useState(false);
-  const [edit_podcast_state, set_edit_podcast_state] = useState(false);
-  const [checked, set_checked] = useState(false);
-  const [file_name, set_file_name] = useState("");
-  const [coverImage, setCoverImage] = useState(
-    "https://www.pngitem.com/pimgs/m/97-972731_podcast-podcasting-icon-hd-png-download.png"
-  );
-  const [confirm_edit, set_confirm_edit] = useState(false);
-  const [success_dlg, setsuccess_dlg] = useState(false);
-  const [dynamic_title, setdynamic_title] = useState("");
-  const [dynamic_description, setdynamic_description] = useState("");
+  const [edit_user_step, set_edit_user_step] = useState(false)
+  const [book_author_info, set_book_author_info] = useState(false)
+  const [edit_has_sale, set_edit_has_sale] = useState(false)
+  const [edit_has_mp3, set_edit_has_mp3] = useState(false)
+  const [edit_has_pdf, set_edit_has_pdf] = useState(false)
+  const [edit_podcast_state, set_edit_podcast_state] = useState(false)
+  const [checked, set_checked] = useState(false)
+  const [file_name, set_file_name] = useState("")
+  const [coverImage, setCoverImage] = useState("")
+  const [confirm_edit, set_confirm_edit] = useState(false)
+  const [success_dlg, setsuccess_dlg] = useState(false)
+  const [dynamic_title, setdynamic_title] = useState("")
+  const [dynamic_description, setdynamic_description] = useState("")
+
+  // update hiih state uud
+  const [edit_book_name, set_edit_book_name] = useState("")
+  const [edit_book_author_name, set_edit_book_author_name] = useState("")
+  const [edit_book_author_desc, set_edit_book_author_desc] = useState("")
+  const [edit_book_author_img, set_edit_book_author_img] = useState("")
+  const [edit_book_desc, set_edit_book_desc] = useState("")
+  const [edit_book_img, set_edit_book_img] = useState("")
+
+  // axios oor huselt ywuulj update hiih
+  const updateBook = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-upload`
+    const formData = new FormData()
+    formData.set("book_name", edit_book_name)
+    formData.set("book_author.name", edit_book_author_name)
+    formData.set("book_author.description", edit_book_author_desc)
+    formData.set("book_author.profile_pic", edit_book_author_img)
+
+    const config = {
+      headers: {
+        "content-type": "multiplart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+    await axios
+      .post(url, formData, config)
+      .then(async res => {
+        console.log(res.data)
+      })
+      .catch(e => {
+        alert(e)
+      })
+  }
 
   // book section
   const columns = [
@@ -80,10 +108,10 @@ const List = (props) => {
       sort: "disabled",
       width: 20,
     },
-  ];
+  ]
 
-  const initData = (booksData) => {
-    let tempInitialData = booksData.map((d) => {
+  const initData = booksData => {
+    let tempInitialData = booksData.map(d => {
       return {
         book_name: d.book_name,
         // book_author: d.book_author.name,
@@ -108,10 +136,13 @@ const List = (props) => {
         book: (
           <Link
             onClick={() => {
-              set_book_author_info(true);
-              set_edit_book_author_name(d.book_author.name);
-              set_edit_book_author_desc(d.book_author.description);
-              set_edit_book_author_img(d.book_author.profile_pic);
+              if (!d.book_author) {
+              } else {
+                set_book_author_info(true)
+                set_edit_book_author_name(d.book_author.name)
+                set_edit_book_author_desc(d.book_author.description)
+                set_edit_book_author_img(d.book_author.profile_pic)
+              }
             }}
           >
             {d.book_author.name}
@@ -121,14 +152,17 @@ const List = (props) => {
           <Link to="#">
             <i
               onClick={() => {
-                set_edit_user_step(true);
-                set_edit_book_name(d.book_name);
-                set_edit_book_author_name(d.book_author.name);
-                set_edit_book_desc(d.book_author.description);
-                set_edit_book_img(d.book_author.profile_pic);
-                set_edit_has_pdf(d.has_pdf);
-                set_edit_has_mp3(d.has_mp3);
-                set_edit_has_sale(d.has_sale);
+                set_edit_user_step(true)
+                set_edit_book_name(d.book_name)
+                set_edit_book_author_name(d.book_author.name)
+                set_edit_book_desc(d.book_author.description)
+                set_edit_book_img(d.book_author.profile_pic)
+                set_edit_has_pdf(d.has_pdf)
+                set_edit_has_mp3(d.has_mp3)
+                set_edit_has_sale(d.has_sale)
+                setCoverImage(
+                  process.env.REACT_APP_STRAPI_BASE_URL + edit_book_img
+                )
                 //   set_edit_podcast_state(d.podcast_state);
               }}
               className="bx bxs-edit text-dark font-size-20 d-block text-center"
@@ -152,35 +186,35 @@ const List = (props) => {
             />
           </Link>
         ),
-      };
-    });
-    set_data(tempInitialData);
-  };
+      }
+    })
+    set_data(tempInitialData)
+  }
 
   const book_datatable = {
     columns: columns,
     rows: data,
-  };
+  }
 
   useEffect(() => {
-    initData(data);
-  }, []);
+    initData(data)
+  }, [])
 
   // nomiin zurag solih
-  const imageHandler = (e) => {
-    const reader = new FileReader();
+  const imageHandler = e => {
+    const reader = new FileReader()
     reader.onload = () => {
       if (reader.readyState === 2) {
-        setCoverImage(reader.result);
+        setCoverImage(reader.result)
       }
-    };
-    reader.readAsDataURL(e.target.files[0]);
-  };
+    }
+    reader.readAsDataURL(e.target.files[0])
+  }
 
   // nomiin tolowiig toggledoh
-  const handleChange = (checked) => {
-    set_edit_podcast_state(checked);
-  };
+  const handleChange = checked => {
+    set_edit_podcast_state(checked)
+  }
 
   return (
     <React.Fragment>
@@ -194,7 +228,7 @@ const List = (props) => {
               borderRadius: "20px",
             }}
             onConfirm={() => {
-              set_book_author_info(false);
+              set_book_author_info(false)
             }}
           >
             <Row className="mt-1">
@@ -213,7 +247,7 @@ const List = (props) => {
                 />
               </Col>
               <Col lg={12} className="mt-4">
-                <Label className="text-dark font-size-18">Товч түүх</Label>
+                <Label className="text-dark font-size-18">Танилцуулга</Label>
                 <Label style={{ textAlign: "justify" }}>
                   {edit_book_author_desc}
                 </Label>
@@ -233,11 +267,11 @@ const List = (props) => {
               borderRadius: "20px",
             }}
             onConfirm={() => {
-              set_edit_user_step(false);
-              set_confirm_edit(true);
+              set_edit_user_step(false)
+              set_confirm_edit(true)
             }}
             onCancel={() => {
-              set_edit_user_step(false);
+              set_edit_user_step(false)
             }}
           >
             <Row>
@@ -255,8 +289,8 @@ const List = (props) => {
                     <Input
                       type="text"
                       value={edit_book_name}
-                      onChange={(event) => {
-                        set_edit_book_name(event.target.value);
+                      onChange={event => {
+                        set_edit_book_name(event.target.value)
                       }}
                     />
                   </Col>
@@ -274,8 +308,8 @@ const List = (props) => {
                     <Input
                       type="text"
                       value={edit_book_author_name}
-                      onChange={(event) => {
-                        set_edit_book_author_name(event.target.value);
+                      onChange={event => {
+                        set_edit_book_author_name(event.target.value)
                       }}
                     />
                   </Col>
@@ -290,8 +324,8 @@ const List = (props) => {
                       id="productdesc"
                       rows="5"
                       value={edit_book_desc}
-                      onChange={(event) => {
-                        set_edit_book_desc(event.target.value);
+                      onChange={event => {
+                        set_edit_book_desc(event.target.value)
                       }}
                     />
                   </FormGroup>
@@ -309,9 +343,7 @@ const List = (props) => {
                       className="rounded"
                       alt="Skote"
                       width="150"
-                      src={
-                        process.env.REACT_APP_STRAPI_BASE_URL + edit_book_img
-                      }
+                      src={coverImage}
                       //   onClick={() => {}}
                     />
                   </Row>
@@ -324,7 +356,7 @@ const List = (props) => {
                   />
                 </Col>
               </Row>
-              <Col lg={12}>
+              {/* <Col lg={12}>
                 <Label className="text-center">Номын төрөл</Label>
                 <Link className="d-flex justify-content-around align-items-center w-50 mx-auto">
                   <i
@@ -340,7 +372,7 @@ const List = (props) => {
                     className="bx bxs-file-pdf font-size-20"
                   />
                 </Link>
-              </Col>
+              </Col> */}
               {/* <Col lg={6} className="my-auto">
                   <label className="d-flex">
                     <span className="d-block my-auto mr-3">Төлөв</span>
@@ -362,28 +394,38 @@ const List = (props) => {
             title="Та итгэлтэй байна уу ?"
             warning
             showCancel
-            confirmButtonText="Тийм!"
+            confirmBtnText="Тийм"
+            cancelBtnText="Болих"
             confirmBtnBsStyle="success"
             cancelBtnBsStyle="danger"
             onConfirm={() => {
-              set_confirm_edit(false);
-              set_edit_user_step(false);
-              setsuccess_dlg(true);
-              setdynamic_title("Амжилттай");
-              setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.");
+              set_confirm_edit(false)
+              set_edit_user_step(false)
+              setsuccess_dlg(true)
+              setdynamic_title("Амжилттай")
+              setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
+              updateBook()
             }}
             onCancel={() => {
-              set_confirm_edit(false);
-              set_edit_user_step(true);
+              set_confirm_edit(false)
+              set_edit_user_step(true)
             }}
           ></SweetAlert>
         ) : null}
         {success_dlg ? (
           <SweetAlert
-            success
             title={dynamic_title}
+            timeout={1500}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
             onConfirm={() => {
-              setsuccess_dlg(false);
+              setsuccess_dlg(false)
             }}
           >
             {dynamic_description}
@@ -411,7 +453,7 @@ const List = (props) => {
         </Col>
       </Row>
     </React.Fragment>
-  );
-};
+  )
+}
 
-export default List;
+export default List

@@ -21,18 +21,41 @@ const List = props => {
   console.log("hhhhaaa", data)
 
   const [editUserStep1, setEditUserStep1] = useState(false)
-  const [edit_podcast_name, set_edit_podcast_name] = useState("")
-  const [edit_podcast_desc, set_edit_podcast_desc] = useState("")
-  const [edit_podcast_file, set_edit_podcast_file] = useState("")
-  const [edit_podcast_listen_count, set_edit_podcast_listen_count] = useState(0)
-  const [edit_podcast_state, set_edit_podcast_state] = useState(false)
   const [confirm_edit, set_confirm_edit] = useState(false)
   const [success_dlg, setsuccess_dlg] = useState(false)
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
-  const [file_name, set_file_name] = useState("")
-  const [checked, set_checked] = useState(false)
-  const [coverImage, setCoverImage] = useState()
+
+  // update hiih state uud
+  const [edit_podcast_name, set_edit_podcast_name] = useState("")
+  const [edit_podcast_desc, set_edit_podcast_desc] = useState("")
+  const [edit_podcast_file, set_edit_podcast_file] = useState("")
+
+  // axios oor huselt ywuulj update hiih
+  const updatePodcast = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podacst-upload`
+    const formData = new FormData()
+    formData.set("podcast_name", edit_podcast_name)
+    formData.set("podcast_desc", edit_podcast_desc)
+    formData.set("podcast_file_name", edit_podcast_file)
+
+    const config = {
+      headers: {
+        "content-type": "multiplart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+    await axios
+      .post(url, formData, config)
+      .then(async res => {
+        console.log(res.data)
+      })
+      .catch(e => {
+        alert(e)
+      })
+  }
 
   const columns = [
     {
@@ -94,13 +117,10 @@ const List = props => {
             <Link>
               <i
                 onClick={() => {
-                  console.log(d.podcast_name)
                   setEditUserStep1(true)
                   set_edit_podcast_name(d.podcast_name)
                   set_edit_podcast_desc(d.podcast_desc)
                   set_edit_podcast_file(d.podcast_file_name)
-                  set_edit_podcast_listen_count(d.listen_count)
-                  set_edit_podcast_state(d.podcast_state)
                 }}
                 className="bx bxs-edit text-dark d-block text-center font-size-20"
                 id="edittooltip"
@@ -162,7 +182,7 @@ const List = props => {
             }}
           >
             <Row>
-              <Col xs="12" className="mb-3 mt-2">
+              <Col xs="12" className="mb-3 mt-3">
                 <Row>
                   <Col lg={2} className="m-auto">
                     <Label className="m-auto" for="kyclastname-input">
@@ -180,7 +200,7 @@ const List = props => {
                   </Col>
                 </Row>
               </Col>
-              <Col lg="7">
+              <Col lg="12">
                 <FormGroup>
                   <Label className="text-left w-100" htmlFor="productdesc">
                     Тайлбар
@@ -192,26 +212,6 @@ const List = props => {
                     value={edit_podcast_desc}
                   />
                 </FormGroup>
-              </Col>
-              <Col lg={5}>
-                <Row>
-                  <Col lg={12}>
-                    <Label>Сонсогчдын тоо</Label>
-                    <Input
-                      type="text"
-                      value={edit_podcast_listen_count}
-                    ></Input>
-                  </Col>
-                  {/* <Col lg={12} className="mt-4">
-                    <label className="d-flex w-50 mx-auto justify-content-around">
-                      <span className="d-block my-auto mr-2">Төлөв</span>
-                      <Switch
-                        onChange={handleChange}
-                        checked={edit_podcast_state}
-                      />
-                    </label>
-                  </Col> */}
-                </Row>
               </Col>
               <Col lg={12}>
                 <div class="custom-file mt-2 mb-3">
@@ -254,7 +254,8 @@ const List = props => {
             title="Та итгэлтэй байна уу ?"
             warning
             showCancel
-            confirmButtonText="Тийм!"
+            confirmBtnText="Тийм"
+            cancelBtnText="Болих"
             confirmBtnBsStyle="success"
             cancelBtnBsStyle="danger"
             onConfirm={() => {
@@ -263,6 +264,7 @@ const List = props => {
               setsuccess_dlg(true)
               setdynamic_title("Амжилттай")
               setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
+              updatePodcast()
             }}
             onCancel={() => {
               set_confirm_edit(false)
@@ -272,8 +274,16 @@ const List = props => {
         ) : null}
         {success_dlg ? (
           <SweetAlert
-            success
             title={dynamic_title}
+            timeout={1500}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
             onConfirm={() => {
               setsuccess_dlg(false)
             }}

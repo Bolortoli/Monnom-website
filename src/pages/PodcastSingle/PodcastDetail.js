@@ -16,6 +16,7 @@ import SweetAlert from "react-bootstrap-sweetalert"
 import profile1 from "../../assets/images/profile-img.png"
 import PodcastAnalysis from "./PodcastAnalysis.js"
 import List from "./List"
+import axios from "axios"
 
 const PodcastDetail = props => {
   const [data, set_data] = useState(props.user)
@@ -26,24 +27,31 @@ const PodcastDetail = props => {
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
 
+  // update hiih state
   const [edit_podcast_channel, set_edit_podcast_channel] = useState(
     data.channel_name
   )
   const [edit_podcast_desc, set_edit_podcast_desc] = useState(
     data.channel_description
   )
-  const [edit_created_date, sset_edit_created_date] = useState(
-    data.channel_created_at
-  )
-  const [edit_updated_date, set_edit_updated_date] = useState(
-    data.channel_updated_at
-  )
-  const [edit_user_firstname, set_edit_user_firstname] = useState(
-    data.user_firstname
-  )
-  const [edit_user_lastname, set_edit_user_lastname] = useState(
-    data.user_lastname
-  )
+
+  // update using formdata
+  const updatePodcastInfo = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}`
+    const formData = new FormData()
+    formData.append("channel_name", edit_podcast_channel)
+    formData.append("channel_description", edit_podcast_desc)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${JSON.parse(localStorage.getItem("").jwt)}`,
+      },
+    }
+    await axios.post(url, formData, config).then(async res => {
+      console.log(res.data)
+    })
+  }
 
   return (
     <React.Fragment>
@@ -54,7 +62,7 @@ const PodcastDetail = props => {
             title="Ерөнхий мэдээлэл"
             cancelBtnBsStyle="danger"
             confirmBtnText="Хадгалах"
-            cancelBtnText="Цуцлах"
+            cancelBtnText="Болих"
             style={{
               padding: "2em",
               borderRadius: "20px",
@@ -87,33 +95,6 @@ const PodcastDetail = props => {
                         value={edit_podcast_desc}
                       />
                     </Col>
-                    <Col lg={6}>
-                      <Label className="w-100 text-left">Нэмэгдсэн огноо</Label>
-                      <div className="form-group row">
-                        <div className="col-md-10">
-                          <input
-                            type="date"
-                            defaultValue="2019-08-19"
-                            id="example-date-input"
-                            onChange={() => set_edit_updated_date()}
-                          />
-                        </div>
-                      </div>
-                    </Col>
-                    <Col lg={6}>
-                      <Label className="w-100 text-left">
-                        Сүүлд шинэчлэгдсэн
-                      </Label>
-                      <div className="form-group row">
-                        <div className="col-md-10">
-                          <input
-                            type="date"
-                            defaultValue="2019-08-19"
-                            id="example-date-input"
-                          />
-                        </div>
-                      </div>
-                    </Col>
                   </Row>
                 </Col>
               </Card>
@@ -142,8 +123,16 @@ const PodcastDetail = props => {
         ) : null}
         {success_dlg ? (
           <SweetAlert
-            success
             title={dynamic_title}
+            timeout={1500}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
             onConfirm={() => {
               setsuccess_dlg(false)
             }}
@@ -172,6 +161,7 @@ const PodcastDetail = props => {
                   <Col sm="4">
                     <div className="avatar-md profile-user-wid mb-4">
                       <img
+                        style={{ width: "100%", height: "9.5vh" }}
                         src={
                           process.env.REACT_APP_STRAPI_BASE_URL +
                           data.channel_cover_pic

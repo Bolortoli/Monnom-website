@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import {
   Row,
   Col,
@@ -17,10 +17,12 @@ import {
   Form,
   FormGroup,
 } from "reactstrap"
+import axios from "axios"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import Switch from "react-switch"
 import classnames from "classnames"
 import { Link } from "react-router-dom"
+import { set } from "lodash"
 
 // file  generator
 const getItems = files => {
@@ -65,29 +67,82 @@ const AddBook = () => {
   const [modal, setModal] = useState(false)
   const [activeTab, set_activeTab] = useState(1)
   const [progressValue, setprogressValue] = useState(33)
-  const [podcast_name_message, set_podcast_name_message] = useState("")
-  const [podcast_name_value, set_podcast_name_value] = useState("")
+  const [book_name_message, set_book_name_message] = useState("")
+  const [book_author_message, set_book_author_message] = useState("")
   const [checked, set_checked] = useState(false)
-  const [audio_book_files, set_audio_book_files] = useState([])
-  const [book_files, set_book_files] = useState([])
-  const [item, set_item] = useState()
-  const [pdf_file, set_pdf_file] = useState(false)
-  const [mp3_file, set_mp3_file] = useState(false)
   const [book_label, set_book_label] = useState("pdf book")
   const [progress_mp3, set_progress_mp3] = useState(0)
   const [progress_pdf, set_progress_pdf] = useState(0)
   const [page, setPage] = useState(1)
   const [users, setUsers] = useState([])
   const [next_button_label, set_next_button_label] = useState("Дараах")
-  const [podcast_description_value, set_podcast_description_value] = useState(
-    ""
-  )
   const [
     podcast_description_message,
     set_podcast_description_message,
   ] = useState("")
   const [profileImage, set_profileImage] = useState("")
   const [audio_book_label, set_audio_book_label] = useState("mp3 book")
+
+  // axios -oor damjuulah state set
+  const [book_name_value, set_book_name_value] = useState("")
+  const [book_author_value, set_book_author_value] = useState("")
+  const [podcast_description_value, set_podcast_description_value] = useState(
+    ""
+  )
+  const [audio_book_files, set_audio_book_files] = useState([])
+  const [book_files, set_book_files] = useState([])
+
+  // create
+  const createBook = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-upload`
+    const formData = new FormData()
+    formData.append("book_name", book_name_value)
+    formData.append("book_author.name", book_author_value)
+    formData.append("has_sale", has_sale)
+    formData.append("has_mp3", has_mp3)
+    formData.append("has_pdf", has_pdf)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+    await axios
+      .post(url, formData, config)
+      .then(async res => {
+        console.log("res =>", res.data)
+        let which_book = new FormData()
+        if (audio_book_files && !book_files) {
+          which_book.append("has_pdf", true)
+          which_book.append("has_mp3", false)
+        } else if (!audio_book_files && book_files) {
+          which_book.append("has_pdf", true)
+          which_book.append("has_mp3", false)
+        } else {
+          which_book.append("has_pdf", false)
+          which_book.append("has_mp3", false)
+        }
+
+        await axios
+          .post(
+            `${process.env.REACT_APP_EXPRESS_BASE_URL}/upload`,
+            which_book,
+            config
+          )
+          .then(res => {
+            console.log(res.data)
+          })
+          .catch(err => {
+            alert(err)
+          })
+      })
+      .catch(e => {
+        alert(e)
+      })
+  }
 
   // Nomiig hudaldah esehiig asuuj input nemne
   const handleChange = checked => {
@@ -111,7 +166,7 @@ const AddBook = () => {
         }
         if (tab === 2) {
           setprogressValue(66)
-          set_next_button_label("Дараах")
+          set_next_button_label("Алгасах")
         }
         if (tab === 3) {
           setprogressValue(100)
@@ -134,15 +189,20 @@ const AddBook = () => {
 
   // inputiin utga hooson esehiig shalgah
   const handle = event => {
-    if (podcast_name_value === "") {
-      set_podcast_name_message("Хоосон утгатай байна !")
+    if (book_name_value === "") {
+      set_book_name_message("Хоосон утгатай байна !")
     } else {
-      set_podcast_name_message("")
+      set_book_name_message("")
     }
     if (podcast_description_value === "") {
       set_podcast_description_message("Хоосон утгатай байна !")
     } else {
       set_podcast_description_message("")
+    }
+    if (book_author_value === "") {
+      set_book_author_message("Хоосон утгатай байна !")
+    } else {
+      set_book_author_message("")
     }
   }
 
@@ -151,13 +211,23 @@ const AddBook = () => {
     var files = e.target.files
 
     set_audio_book_files(getItems(files))
-    if (files.length > 0) set_audio_book_label("Цахим ном нэмэх")
+    if (files.length > 0) {
+      set_audio_book_label("Цахим ном нэмэх")
+      set_next_button_label("Дараах")
+    } else {
+      set_next_button_label("Алгасах")
+    }
   }
 
   // upload hiij bga mp3 file aa ustgah
   const removeAudioBookFiles = f => {
     set_audio_book_files(audio_book_files.filter(x => x !== f))
-    if (audio_book_files.length === 0) set_audio_book_label("pdf book")
+    if (audio_book_files.length === 0) {
+      set_audio_book_label("pdf book")
+      set_next_button_label("Дараах")
+    } else {
+      set_next_button_label("Алгасах")
+    }
   }
 
   // pdf file upload hiih
@@ -166,14 +236,24 @@ const AddBook = () => {
 
     set_book_files([files[0]])
 
-    if (files.length > 0) set_book_label("pdf book")
+    if (files.length > 0) {
+      set_book_label("pdf book")
+      set_next_button_label("Дараах")
+    } else {
+      set_next_button_label("Алгасах")
+    }
   }
 
   // upload hiisen pdf file aa ustgah
   const removeBookFiles = f => {
     set_progress_mp3(0)
     set_book_files(book_files.filter(x => x !== f))
-    if (book_files.length === 0) set_book_label("mp3 book")
+    if (book_files.length === 0) {
+      set_book_label("mp3 book")
+      set_next_button_label("Дараах")
+    } else {
+      set_next_button_label("Алгасах")
+    }
   }
 
   // upload hiisen file uudiin zooh, indexuudiig zaaj ogoh
@@ -267,16 +347,17 @@ const AddBook = () => {
                         <Row>
                           <Col lg="6">
                             <FormGroup>
-                              <Label for="kycfirstname-input">Нэр</Label>
+                              <Label for="kycfirstname-input">Номын нэр</Label>
                               <Input
                                 type="text"
                                 className="podcast_channel"
                                 required
-                                value={podcast_name_value}
+                                value={book_name_value}
                                 onChange={e => {
-                                  set_podcast_name_value(e.target.value)
+                                  set_book_name_value(e.target.value)
                                 }}
                               />
+                              <p class="text-danger">{book_name_message}</p>
                             </FormGroup>
                           </Col>
                           <Col lg="6">
@@ -286,12 +367,12 @@ const AddBook = () => {
                                 type="text"
                                 className="podcast_channel"
                                 required
-                                value={podcast_name_value}
+                                value={book_author_value}
                                 onChange={e => {
-                                  set_podcast_name_value(e.target.value)
+                                  set_book_author_value(e.target.value)
                                 }}
                               />
-                              <p class="text-danger">{podcast_name_message}</p>
+                              <p class="text-danger">{book_author_message}</p>
                             </FormGroup>
                           </Col>
                         </Row>
@@ -365,7 +446,7 @@ const AddBook = () => {
                                   </Label>
                                 </Col>
                                 <Col lg={4}>
-                                  <Input type="number" />
+                                  <Input type="number" value="0" />
                                 </Col>
                               </Row>
                             ) : null}
@@ -577,10 +658,14 @@ const AddBook = () => {
                         onClick={e => {
                           handle(e)
                           if (
-                            podcast_name_value !== "" &&
+                            book_name_value !== "" &&
                             podcast_description_value !== ""
                           ) {
                             toggleTab(activeTab + 1)
+                          }
+                          if (next_button_label == "Дуусгах") {
+                            createBook()
+                            togglemodal()
                           }
                         }}
                       >

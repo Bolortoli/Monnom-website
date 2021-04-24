@@ -103,7 +103,7 @@ const SidebarContent = props => {
           </li>
 
           <li>
-            <Link to="/#" className=" waves-effect">
+            <Link to="/settings" className=" waves-effect">
               <i className="bx bx-wrench"></i>
               <span>{props.t("Тохиргоо")}</span>
             </Link>
