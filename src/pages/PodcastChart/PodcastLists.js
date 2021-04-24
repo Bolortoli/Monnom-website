@@ -1,6 +1,6 @@
 import React, { useState } from "react"
+import SweetAlert from "react-bootstrap-sweetalert"
 import { Link } from "react-router-dom"
-import { useEffect } from "react/cjs/react.development"
 import {
   Card,
   CardBody,
@@ -14,10 +14,18 @@ import {
 require("dotenv").config()
 const ContactsGrid = props => {
   const [data, set_data] = useState(props.podcast.podcastChannels)
-  console.log("child => ", data)
 
   const [searchItms, setSearchItms] = useState("")
   const [load, setLoad] = useState(false)
+  const [allow, set_allow] = useState(false)
+  const [confirm_allow, set_confirm_allow] = useState(false)
+  const [success_dlg, setsuccess_dlg] = useState(false)
+  const [dynamic_title, setdynamic_title] = useState("")
+  const [dynamic_description, setdynamic_description] = useState("")
+
+  const toggleAllow = checked => {
+    set_allow(!checked)
+  }
 
   return (
     <React.Fragment>
@@ -128,6 +136,71 @@ const ContactsGrid = props => {
                                   Дэлгэрэнгүй
                                 </Link>
                               </Col>
+                              <Col
+                                xl={6}
+                                className="text-right d-flex align-items-center justify-content-center"
+                              >
+                                <div class="form-check" className="ml-5">
+                                  <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    value=""
+                                    id="flexCheckDefault"
+                                    onClick={() => {
+                                      set_confirm_allow(true)
+                                    }}
+                                    checked={allow}
+                                  />
+                                  <label
+                                    class="form-check-label"
+                                    for="flexCheckDefault"
+                                  >
+                                    <b className="text-dark">Онцлох</b>
+                                  </label>
+                                </div>
+                              </Col>
+                              {confirm_allow ? (
+                                <SweetAlert
+                                  title="Та итгэлтэй байна уу ?"
+                                  warning
+                                  showCancel
+                                  confirmBtnText="Тийм"
+                                  cancelBtnText="Болих"
+                                  confirmBtnBsStyle="success"
+                                  cancelBtnBsStyle="danger"
+                                  onConfirm={() => {
+                                    toggleAllow(allow)
+                                    set_confirm_allow(false)
+                                    setsuccess_dlg(true)
+                                    setdynamic_title("Амжилттай")
+                                    setdynamic_description(
+                                      "Шинэчлэлт амжилттай хийгдлээ."
+                                    )
+                                  }}
+                                  onCancel={() => {
+                                    set_confirm_allow(false)
+                                  }}
+                                ></SweetAlert>
+                              ) : null}
+                              {success_dlg ? (
+                                <SweetAlert
+                                  success
+                                  title={dynamic_title}
+                                  timeout={1500}
+                                  style={{
+                                    position: "absolute",
+                                    top: "center",
+                                    right: "center",
+                                  }}
+                                  showCloseButton={false}
+                                  showConfirm={false}
+                                  onConfirm={() => {
+                                    setsuccess_dlg(false)
+                                  }}
+                                >
+                                  {dynamic_description}
+                                </SweetAlert>
+                              ) : null}
                             </Row>
                           </CardBody>
                         </Card>
