@@ -185,7 +185,7 @@ const PodcastDetail = props => {
                         </Col>
                         <Col xs={12} className="text-right mt-2">
                           <strong className="py-1 px-3 font-size-15">
-                            {data.channel_name.length}
+                            {data.user_podcasts.length}
                           </strong>
                         </Col>
                       </Row>

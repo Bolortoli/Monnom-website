@@ -447,6 +447,14 @@ const List = props => {
                 bordered
                 data={book_datatable}
                 proSelect
+                noBottomColumns
+                noRecordsFoundLabel={"Подкастын дугаар байхгүй"}
+                infoLabel={["", "-ээс", "дахь подкаст. Нийт", ""]}
+                entries={5}
+                entriesOptions={[5, 10, 20]}
+                paginationLabel={["Өмнөх", "Дараах"]}
+                searchingLabel={"Хайх"}
+                searching
               />
             </CardBody>
           </Card>

@@ -56,7 +56,6 @@ const List = props => {
         alert(e)
       })
   }
-
   const columns = [
     {
       label: "Подкастын нэр",
@@ -316,6 +315,14 @@ const List = props => {
                 striped
                 bordered
                 data={datatable}
+                noBottomColumns
+                noRecordsFoundLabel={"Подкастын дугаар байхгүй"}
+                infoLabel={["", "-ээс", "дахь подкаст. Нийт", ""]}
+                entries={5}
+                entriesOptions={[5, 10, 20]}
+                paginationLabel={["Өмнөх", "Дараах"]}
+                searchingLabel={"Хайх"}
+                searching
               />
             </CardBody>
           </Card>
