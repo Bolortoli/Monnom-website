@@ -1,250 +1,224 @@
-import PropTypes from 'prop-types'
-import React from "react"
+import React, { useEffect, useState } from "react"
 
-import { Row, Col, CardBody, Card, Alert, Container } from "reactstrap"
+import { Row, Col, Container, Form, Label, Input, FormGroup } from "reactstrap"
 
-// Redux
-import { connect } from "react-redux"
-import { withRouter, Link } from "react-router-dom"
+import { withRouter, Link, useHistory } from "react-router-dom"
 
-// availity-reactstrap-validation
-import { AvForm, AvField } from "availity-reactstrap-validation"
+import CarouselPage from "./CarouselPage"
+import axios from "axios"
 
-//Social Media Imports
-import { GoogleLogin } from "react-google-login"
-// import TwitterLogin from "react-twitter-auth"
-import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props"
-
-// actions
-import { loginUser, apiError, socialLogin } from "store/actions"
-
-// import images
-import profile from "assets/images/profile-img.png"
-import logo from "assets/images/logo.svg"
-
-//Import config
-import { facebook, google } from "../../config"
+import logo from "../../assets/images/logo.png"
+import ReactSwitch from "react-switch"
+require("dotenv").config()
 
 const Login = props => {
-  // handleValidSubmit
-  const handleValidSubmit = (event, values) => {
-    props.loginUser(values, props.history)
+  const history = useHistory()
+  const [errorMessage, setErrorMessage] = useState("")
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [rememberMe, setRememberMe] = useState(false)
+
+  const redirectTo = () => {
+    history.push("/dashboard")
   }
 
-  const signIn = (res, type) => {
-    const { socialLogin } = props
-    if (type === "google" && res) {
-      const postData = {
-        name: res.profileObj.name,
-        email: res.profileObj.email,
-        token: res.tokenObj.access_token,
-        idToken: res.tokenId,
-      }
-      socialLogin(postData, props.history, type)
-    } else if (type === "facebook" && res) {
-      const postData = {
-        name: res.name,
-        email: res.email,
-        token: res.accessToken,
-        idToken: res.tokenId,
-      }
-      socialLogin(postData, props.history, type)
-    }
+  const login = e => {
+    // setSessionPeriod();
+    e.preventDefault()
+    console.log(`${process.env.REACT_APP_EXPRESS_BASE_URL}/admin-login`)
+    axios({
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "post",
+      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/admin-login`,
+      data: {
+        identifier: username,
+        password: password,
+      },
+    })
+      .then(res => {
+        console.log("res.data")
+        console.log(res.data)
+        // setSessionPeriod();
+        if (res.data.response == "error") {
+          throw new Error("fuck you")
+        }
+        setAuthenticated(res.data)
+        redirectTo()
+        setSessionPeriod()
+        // document.cookie =
+        // 	"username=John Doe; expires=Thu, 18 Dec 2013 12:00:00 UTC";
+        // redirectTo(res.data.data.role);
+      })
+      .catch(error => {
+        console.log("error")
+        console.log(error.message)
+        setUsername("")
+        setPassword("")
+        setErrorMessage("Нэвтрэх нэр эсвэл нууц үг буруу")
+      })
   }
 
-  //handleGoogleLoginResponse
-  const googleResponse = response => {
-    signIn(response, "google")
+  // Set authenticated status
+  const setAuthenticated = obj => {
+    localStorage.setItem("isAuthenticated", true)
+    localStorage.setItem("user_information", JSON.stringify(obj))
+    console.log(JSON.parse(localStorage.getItem("user_information")))
+    // localStorage.setItem("authFullname", obj.data.fullname);
+    // localStorage.setItem("authToken", obj.token);
+    // localStorage.setItem("isAuthenticated", true);
+    // localStorage.setItem("authRole", obj.data.role);
+    // localStorage.setItem("authID", obj.data.id);
   }
 
-  //handleTwitterLoginResponse
-  // const twitterResponse = e => {}
+  // Set session delete period after 1 day
 
-  //handleFacebookLoginResponse
-  const facebookResponse = response => {
-    signIn(response, "facebook")
+  const setSessionPeriod = () => {
+    var a = new Date()
+    a.setDate(a.getDate() + 1)
+
+    localStorage.setItem(
+      "deleteAt",
+      a.toLocaleString("mn-MN", { timeZone: "Asia/Ulaanbaatar" })
+    )
   }
+
+  useEffect(() => {
+    setPassword("")
+    setUsername("")
+  }, [])
 
   return (
     <React.Fragment>
-      <div className="home-btn d-none d-sm-block">
-        <Link to="/" className="text-dark">
-          <i className="fas fa-home h2" />
-        </Link>
-      </div>
-      <div className="account-pages my-5 pt-sm-5">
-        <Container>
-          <Row className="justify-content-center">
-            <Col md={8} lg={6} xl={5}>
-              <Card className="overflow-hidden">
-                <div className="bg-soft-primary">
-                  <Row>
-                    <Col className="col-7">
-                      <div className="text-primary p-4">
-                        <h5 className="text-primary">Welcome Back !</h5>
-                        <p>Sign in to continue to Skote.</p>
+      <div>
+        <Container fluid className="p-0">
+          <Row className="no-gutters">
+            <CarouselPage />
+
+            <Col xl={3}>
+              <div className="auth-full-page-content p-md-5 p-4">
+                <div className="w-100">
+                  <div className="d-flex flex-column h-100">
+                    <div className="mb-4 mb-md-5">
+                      <Link to="dashboard" className="d-block-logo">
+                        <img
+                          src={logo}
+                          alt=""
+                          height="200"
+                          className="auth-logo-dark"
+                          // style={{ color: "#000" }}
+                        />
+                        {/* <img
+													src={logo}
+													alt=""
+													height="100"
+													className="auth-logo-light"
+												/> */}
+                      </Link>
+                    </div>
+                    <div className="my-auto">
+                      <div>
+                        <h5 className="text-primary">Тавтай морил !</h5>
+                        <p className="text-muted">
+                          Админы удирдлагын вэб нэвтрэх
+                          <br />
+                          {username}
+                          <br />
+                          {password}
+                        </p>
                       </div>
-                    </Col>
-                    <Col className="col-5 align-self-end">
-                      <img src={profile} alt="" className="img-fluid" />
-                    </Col>
-                  </Row>
+
+                      <div className="mt-4">
+                        <Form onSubmit={login}>
+                          <FormGroup>
+                            <Label for="username">Нэвтрэх нэр</Label>
+                            <Input
+                              type="text"
+                              className="form-control"
+                              id="username"
+                              placeholder="Нэвтрэх нэр оруулах"
+                              onChange={e => setUsername(e.target.value)}
+                              required
+                            />
+                          </FormGroup>
+
+                          <FormGroup>
+                            {/* <div className="float-right">
+															<Link
+																to="auth-recoverpw-2"
+																className="text-muted"
+															>
+																Forgot password?
+															</Link>
+														</div> */}
+                            <Label for="userpassword">Нууц үг</Label>
+                            <Input
+                              type="password"
+                              className="form-control"
+                              id="userpassword"
+                              placeholder="Нууц үг оруулах"
+                              onChange={e => setPassword(e.target.value)}
+                              required
+                            />
+                          </FormGroup>
+
+                          <div className="mt-3">
+                            {errorMessage != "" ? (
+                              <p className="text-danger">{errorMessage}</p>
+                            ) : null}
+                          </div>
+
+                          {/* <div className="custom-control custom-checkbox">
+														<Input
+															type="checkbox"
+															className="custom-control-input"
+															id="auth-remember-check"
+															onChange={() => setRememberMe(!rememberMe)}
+														/>
+														<label
+															className="custom-control-label"
+															htmlFor="auth-remember-check"
+														>
+															Нэвтрэх нэр сануулах
+														</label>
+													</div> */}
+
+                          <div className="mt-3">
+                            <button
+                              className="btn btn-primary btn-block waves-effect waves-light"
+                              type="submit"
+                            >
+                              Нэвтрэх
+                            </button>
+                          </div>
+                        </Form>
+                        {/* <div className="mt-5 text-center">
+													<p>
+														Don't have an account ?{" "}
+														<Link
+															to="page-register-2"
+															className="font-weight-medium text-primary"
+														>
+															{" "}
+															Signup now{" "}
+														</Link>{" "}
+													</p>
+												</div> */}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 mt-md-5 text-center">
+                      <p className="mb-0">
+                        {new Date().getFullYear()} Удирдлагын вэб{" "}
+                        <i className="mdi mdi-book text-danger"></i> by{" "}
+                        <a href="https://www.facebook.com/aidiversesolutions">
+                          Diverse Solutions LLC
+                        </a>
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <CardBody className="pt-0">
-                  <div>
-                    <Link to="/">
-                      <div className="avatar-md profile-user-wid mb-4">
-                        <span className="avatar-title rounded-circle bg-light">
-                          <img
-                            src={logo}
-                            alt=""
-                            className="rounded-circle"
-                            height="34"
-                          />
-                        </span>
-                      </div>
-                    </Link>
-                  </div>
-                  <div className="p-2">
-                    <AvForm
-                      className="form-horizontal"
-                      onValidSubmit={(e, v) => {
-                        handleValidSubmit(e, v)
-                      }}
-                    >
-                      {props.error && typeof props.error === "string" ? (
-                        <Alert color="danger">{props.error}</Alert>
-                      ) : null}
-
-                      <div className="form-group">
-                        <AvField
-                          name="email"
-                          label="Email"
-                          value="admin@themesbrand.com"
-                          className="form-control"
-                          placeholder="Enter email"
-                          type="email"
-                          required
-                        />
-                      </div>
-
-                      <div className="form-group">
-                        <AvField
-                          name="password"
-                          label="Password"
-                          value="123456"
-                          type="password"
-                          required
-                          placeholder="Enter Password"
-                        />
-                      </div>
-
-                      <div className="custom-control custom-checkbox">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input"
-                          id="customControlInline"
-                        />
-                        <label
-                          className="custom-control-label"
-                          htmlFor="customControlInline"
-                        >
-                          Remember me
-                        </label>
-                      </div>
-
-                      <div className="mt-3">
-                        <button
-                          className="btn btn-primary btn-block waves-effect waves-light"
-                          type="submit"
-                        >
-                          Log In
-                        </button>
-                      </div>
-
-                      <div className="mt-4 text-center">
-                        <h5 className="font-size-14 mb-3">Sign in with</h5>
-
-                        <ul className="list-inline">
-                          <li className="list-inline-item">
-                            <FacebookLogin
-                              appId={facebook.APP_ID}
-                              autoLoad={false}
-                              callback={facebookResponse}
-                              render={renderProps => (
-                                <Link
-                                  className="social-list-item bg-primary text-white border-primary"
-                                  onClick={renderProps.onClick}
-                                >
-                                  <i className="mdi mdi-facebook" />
-                                </Link>
-                              )}
-                            />
-                          </li>
-                          {/*<li className="list-inline-item">*/}
-                          {/*  <TwitterLogin*/}
-                          {/*    loginUrl={*/}
-                          {/*      "http://localhost:4000/api/v1/auth/twitter"*/}
-                          {/*    }*/}
-                          {/*    onSuccess={this.twitterResponse}*/}
-                          {/*    onFailure={this.onFailure}*/}
-                          {/*    requestTokenUrl={*/}
-                          {/*      "http://localhost:4000/api/v1/auth/twitter/revers"*/}
-                          {/*    }*/}
-                          {/*    showIcon={false}*/}
-                          {/*    tag={"div"}*/}
-                          {/*  >*/}
-                          {/*    <a*/}
-                          {/*      href=""*/}
-                          {/*      className="social-list-item bg-info text-white border-info"*/}
-                          {/*    >*/}
-                          {/*      <i className="mdi mdi-twitter"/>*/}
-                          {/*    </a>*/}
-                          {/*  </TwitterLogin>*/}
-                          {/*</li>*/}
-                          <li className="list-inline-item">
-                            <GoogleLogin
-                              clientId={google.CLIENT_ID}
-                              render={renderProps => (
-                                <Link
-                                  className="social-list-item bg-danger text-white border-danger"
-                                  onClick={renderProps.onClick}
-                                >
-                                  <i className="mdi mdi-google" />
-                                </Link>
-                              )}
-                              onSuccess={googleResponse}
-                              onFailure={() => {}}
-                            />
-                          </li>
-                        </ul>
-                      </div>
-
-                      <div className="mt-4 text-center">
-                        <Link to="/forgot-password" className="text-muted">
-                          <i className="mdi mdi-lock mr-1" />
-                          Forgot your password?
-                        </Link>
-                      </div>
-                    </AvForm>
-                  </div>
-                </CardBody>
-              </Card>
-              <div className="mt-5 text-center">
-                <p>
-                  Don&#39;t have an account ?{" "}
-                  <Link
-                    to="register"
-                    className="font-weight-medium text-primary"
-                  >
-                    {" "}
-                    Signup now{" "}
-                  </Link>{" "}
-                </p>
-                <p>
-                  © {new Date().getFullYear()} Skote. Crafted with{" "}
-                  <i className="mdi mdi-heart text-danger" /> by Themesbrand
-                </p>
               </div>
             </Col>
           </Row>
@@ -253,19 +227,4 @@ const Login = props => {
     </React.Fragment>
   )
 }
-
-const mapStateToProps = state => {
-  const { error } = state.Login
-  return { error }
-}
-
-export default withRouter(
-  connect(mapStateToProps, { loginUser, apiError, socialLogin })(Login)
-)
-
-Login.propTypes = {
-  error: PropTypes.any,
-  history: PropTypes.object,
-  loginUser: PropTypes.func,
-  socialLogin: PropTypes.func
-}
+export default withRouter(Login)

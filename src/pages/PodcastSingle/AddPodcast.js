@@ -50,7 +50,7 @@ const AddPodcast = () => {
 
   // update and delete
   const createPodcast = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-upload`
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast`
     const formData = new FormData()
     formData.append("podcast_name", podcast_name_value)
     formData.append("podcast_desc", podcast_description_value)

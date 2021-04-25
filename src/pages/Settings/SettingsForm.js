@@ -5,9 +5,16 @@ import SweetAlert from "react-bootstrap-sweetalert"
 import { Form, Card, CardBody, Col, Row, CardTitle, Button } from "reactstrap"
 import { Editor } from "react-draft-wysiwyg"
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
-import { EditorState, convertToRaw } from "draft-js"
+import { EditorState, convertToRaw, convertFromRaw } from "draft-js"
+import draftToHtml from "draftjs-to-html"
+import htmlToDraft from "html-to-draftjs"
+
+let tempData = JSON.parse(
+  '{"blocks":[{"key":"94s3b","text":"sasdfa","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}'
+)
 
 const SettingsForm = () => {
+  // console.log(tempData)
   const [profileImage, set_profileImage] = useState(
     "https://monnom.mn/logo.png"
   )
@@ -190,25 +197,34 @@ const SettingsForm = () => {
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
   const [wysiwyg_content, set_wysiwyg_content] = useState(
+    // convertFromRaw(tempData)
+    // EditorState.createWithContent(tempData)
     EditorState.createEmpty()
   )
 
   // axios ruu ywuulah string
   const updateTerms = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}`
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/terms-and-conditions`
     const formData = new FormData()
-    formData.append("", wysiwyg_content)
+    formData.append(
+      "terms",
+      JSON.stringify(convertToRaw(wysiwyg_content.getCurrentContent()))
+    )
+    // draftToHtml(convertToRaw(wysiwyg_content.getCurrentContent()))
 
     const config = {
       headers: {
-        "content-type": "multipart/form-data",
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("").jwt)}`,
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
       },
     }
-    await axios
-      .post(url, formData, config)
-      .then(async res => {
+    axios
+      .put(url, formData, config)
+      .then(res => {
         console.log(res.data)
+        set_wysiwyg_content(JSON.parse(res.data.TermsAndConditions))
       })
       .catch(err => {
         console.log(err)
@@ -329,7 +345,10 @@ const SettingsForm = () => {
         book_author: d.book_author,
         book_date: new Date(d.book_added_date).toLocaleDateString(),
         type: (
-          <Link className="d-flex justify-content-around align-items-center">
+          <Link
+            to="#"
+            className="d-flex justify-content-around align-items-center"
+          >
             <i
               style={{ color: d.has_sale ? "#24ea75" : "#767676" }}
               className="bx bxs-book-open font-size-20"
@@ -370,7 +389,31 @@ const SettingsForm = () => {
     rows: podcast_data,
   }
 
+  const fetchData = () => {
+    console.log("fetchData")
+    axios.get(`${process.env.REACT_APP_STRAPI_BASE_URL}/settings`).then(res => {
+      console.log(
+        convertFromRaw(
+          JSON.parse(JSON.parse(JSON.stringify(res.data.TermsAndConditions)))
+        )
+      )
+      set_wysiwyg_content(
+        new EditorState(
+          convertFromRaw(
+            JSON.parse(JSON.parse(JSON.stringify(res.data.TermsAndConditions)))
+          )
+        )
+      )
+      // console.log(
+      //   EditorState.create(
+      //     JSON.parse(JSON.parse(JSON.stringify(res.data.TermsAndConditions)))
+      //   )
+      // )
+    })
+  }
+
   useEffect(() => {
+    // fetchData()
     initBook(book_data)
     initPodcast(podcast_data)
   }, [])
@@ -381,33 +424,33 @@ const SettingsForm = () => {
         <Card>
           <CardBody>
             <CardTitle>Үйлчилгээний нөхцөл</CardTitle>
-            <Form method="post" style={{}}>
-              <Editor
-                onEditorStateChange={e => {
-                  set_wysiwyg_content(e)
-                }}
-                toolbarOnFocus
-                toolbar={{
-                  options: [
-                    "inline",
-                    "blockType",
-                    "fontSize",
-                    "list",
-                    "textAlign",
-                    "colorPicker",
-                    "link",
-                    "embedded",
-                    "emoji",
-                    "image",
-                    "remove",
-                    "history",
-                  ],
-                }}
-                toolbarClassName="toolbarClassName"
-                wrapperClassName="wrapperClassName"
-                editorClassName="editorClassName"
-              />
-            </Form>
+            <Editor
+              // initialContentState={wysiwyg_content}
+              onEditorStateChange={e => {
+                console.log(e)
+                set_wysiwyg_content(e)
+              }}
+              toolbarOnFocus
+              toolbar={{
+                options: [
+                  "inline",
+                  "blockType",
+                  "fontSize",
+                  "list",
+                  "textAlign",
+                  "colorPicker",
+                  "link",
+                  "embedded",
+                  "emoji",
+                  "image",
+                  "remove",
+                  "history",
+                ],
+              }}
+              toolbarClassName="toolbarClassName"
+              wrapperClassName="wrapperClassName"
+              editorClassName="editorClassName"
+            />
           </CardBody>
         </Card>
       </Col>
