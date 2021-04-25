@@ -172,7 +172,7 @@ const Books = () => {
                           </Row>
                           <Row>
                             <Col xl={12} className="text-right mt-2">
-                              <div class="form-check" className="ml-5">
+                              {/* <div class="form-check" className="ml-5">
                                 <input
                                   class="form-check-input"
                                   type="checkbox"
@@ -188,6 +188,23 @@ const Books = () => {
                                   for="flexCheckDefault"
                                 >
                                   <b className="text-dark">Онцлох</b>
+                                </label>
+                              </div> */}
+                              <div class="custom-control custom-checkbox">
+                                <input
+                                  type="checkbox"
+                                  class="custom-control-input"
+                                  id="customCheck1"
+                                  onClick={() => {
+                                    set_confirm_allow(true)
+                                  }}
+                                  checked={allow}
+                                />
+                                <label
+                                  class="custom-control-label"
+                                  for="customCheck1"
+                                >
+                                  Онцлох
                                 </label>
                               </div>
                             </Col>

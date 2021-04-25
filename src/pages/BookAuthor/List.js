@@ -195,7 +195,7 @@ const List = props => {
                 )
                 //   set_edit_podcast_state(d.podcast_state);
               }}
-              className="bx bxs-edit text-dark font-size-20"
+              className="bx bxs-edit text-primary font-size-20"
               id="edittooltip"
             />
             <i
@@ -212,7 +212,7 @@ const List = props => {
                   process.env.REACT_APP_STRAPI_BASE_URL + edit_book_img
                 )
               }}
-              className="bx bxs-trash text-dark font-size-20"
+              className="bx bxs-trash text-danger font-size-20"
             />
           </Link>
         ),
@@ -501,12 +501,12 @@ const List = props => {
         <Col className="col-12">
           <Card>
             <CardBody>
-              <CardTitle className="d-flex justify-content-between">
-                Номны жагсаалт
-              </CardTitle>
-              <CardSubtitle className="mb-3 text-right">
-                <AddBook />
-              </CardSubtitle>
+              <div className="d-flex justify-content-between m-0 p-0">
+                <CardTitle>Номны жагсаалт</CardTitle>
+                <CardTitle>
+                  <AddBook data={data} />
+                </CardTitle>
+              </div>
               <MDBDataTable
                 proSelect
                 responsive
@@ -514,6 +514,14 @@ const List = props => {
                 bordered
                 data={book_datatable}
                 proSelect
+                noBottomColumns
+                noRecordsFoundLabel={"Подкастын дугаар байхгүй"}
+                infoLabel={["", "-ээс", "дахь подкаст. Нийт", ""]}
+                entries={5}
+                entriesOptions={[5, 10, 20]}
+                paginationLabel={["Өмнөх", "Дараах"]}
+                searchingLabel={"Хайх"}
+                searching
               />
             </CardBody>
           </Card>

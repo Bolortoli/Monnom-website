@@ -10,6 +10,7 @@ import MostPopularPodcast from "./MostPopularPodcast"
 import MostPopularBook from "./MostPopularBook"
 
 import { Row, Col, Card, CardBody, CardTitle, Media } from "reactstrap"
+import axios from "axios"
 
 const Dashboard = () => {
   const reports1 = [
@@ -40,6 +41,28 @@ const Dashboard = () => {
       description: "1000",
     },
   ]
+  // headers: {
+  //   Authorization: "Basic S0tUVF9URVNUOjEyMzQ1Ng==",
+  // },
+  const testQPayAuthorization = () => {
+    axios
+      .post(
+        "https://merchant-sandbox.qpay.mn/v2/auth/token",
+        {},
+        {
+          auth: {
+            username: "TEST_MERCHANT",
+            password: "123456",
+          },
+        }
+      )
+      .then(res => {
+        console.log(res.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
 
   return (
     <React.Fragment>
@@ -48,6 +71,13 @@ const Dashboard = () => {
         href="https://cdnjs.cloudflare.com/ajax/libs/react-datepicker/2.14.1/react-datepicker.min.css"
       />
       <div className="page-content">
+        <button
+          onClick={() => {
+            testQPayAuthorization()
+          }}
+        >
+          test qpay authorization
+        </button>
         <Container fluid>
           <Row>
             {reports1.map((report, key) => (

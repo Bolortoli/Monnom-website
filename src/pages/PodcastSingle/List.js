@@ -371,16 +371,26 @@ const List = props => {
         <Col xl="12">
           <Card>
             <CardBody>
-              <CardTitle>Жагсаалтууд</CardTitle>
-              <CardSubtitle className="text-right">
-                <AddPodcast data={data} />
-              </CardSubtitle>
+              <div className="d-flex justify-content-between">
+                <CardTitle>Жагсаалтууд</CardTitle>
+                <CardTitle className="text-right">
+                  <AddPodcast data={data} />
+                </CardTitle>
+              </div>
               <MDBDataTable
                 proSelect
                 responsive
                 striped
                 bordered
                 data={datatable}
+                noBottomColumns
+                noRecordsFoundLabel={"Подкастын дугаар байхгүй"}
+                infoLabel={["", "-ээс", "дахь подкаст. Нийт", ""]}
+                entries={5}
+                entriesOptions={[5, 10, 20]}
+                paginationLabel={["Өмнөх", "Дараах"]}
+                searchingLabel={"Хайх"}
+                searching
               />
             </CardBody>
           </Card>

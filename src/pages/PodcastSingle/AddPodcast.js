@@ -21,6 +21,7 @@ import Switch from "react-switch"
 import classnames from "classnames"
 import { Link } from "react-router-dom"
 import axios from "axios"
+import SweetAlert from "react-bootstrap-sweetalert"
 
 //Dropzone
 import Dropzone from "react-dropzone"
@@ -35,7 +36,9 @@ const AddPodcast = () => {
     podcast_description_message,
     set_podcast_description_message,
   ] = useState("")
+  const [file_upload_name_message, set_file_upload_name_message] = useState("")
   const [next_button_label, set_next_button_label] = useState("Дараах")
+  const [success_dlg, setsuccess_dlg] = useState(false)
 
   // axios -oor damjuulah state uud
   const [podcast_name_value, set_podcast_name_value] = useState("")
@@ -96,7 +99,7 @@ const AddPodcast = () => {
         }
         if (tab === 2) {
           setprogressValue(66)
-          set_next_button_label("Алгасах")
+          set_next_button_label("Дараах")
         }
         if (tab === 3) {
           setprogressValue(100)
@@ -116,11 +119,7 @@ const AddPodcast = () => {
     )
 
     set_selectedFiles(files)
-    if (selectedFiles.length === 0) {
-      set_next_button_label("Алгасах")
-    } else {
-      set_next_button_label("Дараах")
-    }
+    set_file_upload_name_message("")
   }
 
   // file iin formatuud
@@ -168,6 +167,26 @@ const AddPodcast = () => {
         />
       </Button>
       <Col xs={1} class="position-relative">
+        {success_dlg ? (
+          <SweetAlert
+            title={"Амжилттай"}
+            timeout={1500}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
+            onConfirm={() => {
+              createPodcast()
+              setsuccess_dlg(false)
+            }}
+          >
+            {"Та шинэ ном амжилттай нэмлээ."}
+          </SweetAlert>
+        ) : null}
         <Card>
           <Modal
             isOpen={modal}
@@ -317,9 +336,9 @@ const AddPodcast = () => {
                       </h5>
                       <div className="kyc-doc-verification mb-3">
                         <Dropzone
-                          onDrop={acceptedFiles =>
+                          onDrop={acceptedFiles => {
                             handleAcceptedFiles(acceptedFiles)
-                          }
+                          }}
                           accept=".mp3"
                         >
                           {({ getRootProps, getInputProps }) => (
@@ -337,6 +356,9 @@ const AddPodcast = () => {
                             </div>
                           )}
                         </Dropzone>
+                        <p className="text-danger">
+                          {file_upload_name_message}
+                        </p>
                         <div
                           className="dropzone-previews mt-3"
                           id="file-previews"
@@ -407,15 +429,24 @@ const AddPodcast = () => {
                         to="#"
                         onClick={e => {
                           handle(e)
+
                           if (
+                            activeTab === 1 &&
                             podcast_name_value !== "" &&
                             podcast_description_value !== ""
                           ) {
                             toggleTab(activeTab + 1)
                           }
+                          if (activeTab === 2 && selectedFiles != "") {
+                            toggleTab(activeTab + 1)
+                          } else {
+                            set_file_upload_name_message(
+                              "Хоосон утгатай байна !"
+                            )
+                          }
                           if (next_button_label == "Дуусгах") {
-                            createPodcast()
                             togglemodal()
+                            setsuccess_dlg(true)
                           }
                         }}
                       >

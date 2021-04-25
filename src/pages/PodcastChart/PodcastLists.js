@@ -170,22 +170,21 @@ const ContactsGrid = props => {
                                 xl={6}
                                 className="text-right d-flex align-items-center justify-content-center"
                               >
-                                <div class="form-check" className="ml-5">
+                                <div class="custom-control custom-checkbox">
                                   <input
-                                    class="form-check-input"
                                     type="checkbox"
-                                    value=""
-                                    id="flexCheckDefault"
+                                    class="custom-control-input"
+                                    id="customCheck1"
                                     onClick={() => {
                                       set_confirm_allow(true)
                                     }}
                                     checked={allow}
                                   />
                                   <label
-                                    class="form-check-label"
-                                    for="flexCheckDefault"
+                                    class="custom-control-label"
+                                    for="customCheck1"
                                   >
-                                    <b className="text-dark">Онцлох</b>
+                                    Онцлох
                                   </label>
                                 </div>
                               </Col>

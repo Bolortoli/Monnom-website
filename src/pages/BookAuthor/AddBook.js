@@ -22,7 +22,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import Switch from "react-switch"
 import classnames from "classnames"
 import { Link } from "react-router-dom"
-import { set } from "lodash"
+import SweetAlert from "react-bootstrap-sweetalert"
 
 // file  generator
 const getItems = files => {
@@ -82,6 +82,7 @@ const AddBook = () => {
   ] = useState("")
   const [profileImage, set_profileImage] = useState("")
   const [audio_book_label, set_audio_book_label] = useState("mp3 book")
+  const [success_dlg, setsuccess_dlg] = useState(false)
 
   // axios -oor damjuulah state set
   const [book_name_value, set_book_name_value] = useState("")
@@ -98,9 +99,9 @@ const AddBook = () => {
     const formData = new FormData()
     formData.append("book_name", book_name_value)
     formData.append("book_author.name", book_author_value)
-    formData.append("has_sale", has_sale)
-    formData.append("has_mp3", has_mp3)
-    formData.append("has_pdf", has_pdf)
+    // formData.append("has_sale", has_sale)
+    // formData.append("has_mp3", has_mp3)
+    // formData.append("has_pdf", has_pdf)
 
     const config = {
       headers: {
@@ -281,6 +282,26 @@ const AddBook = () => {
         />
       </Button>
       <Col xs={1} class="position-relative">
+        {success_dlg ? (
+          <SweetAlert
+            title={"Амжилттай"}
+            timeout={1500}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
+            onConfirm={() => {
+              createBook()
+              setsuccess_dlg(false)
+            }}
+          >
+            {"Та шинэ подкаст амжилттай нэмлээ."}
+          </SweetAlert>
+        ) : null}
         <Card>
           <Modal
             isOpen={modal}
@@ -664,8 +685,8 @@ const AddBook = () => {
                             toggleTab(activeTab + 1)
                           }
                           if (next_button_label == "Дуусгах") {
-                            createBook()
                             togglemodal()
+                            setsuccess_dlg(true)
                           }
                         }}
                       >
