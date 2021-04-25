@@ -8,9 +8,11 @@ import {
   CardTitle,
   CardImg,
   CardText,
+  CardFooter,
   Row,
   Alert,
 } from "reactstrap"
+import AddPodcast from "./AddPodcast"
 require("dotenv").config()
 const ContactsGrid = props => {
   const [data, set_data] = useState(props.podcast.podcastChannels)
@@ -60,6 +62,34 @@ const ContactsGrid = props => {
         </Row>
       ) : (
         <Row>
+          <Col xl={3} lg={4} md={4} sm={4}>
+            <Card className="text-center" style={{ background: "#ccf0e3" }}>
+              <CardBody
+                style={{
+                  height: "24rem",
+                  marginLeft: "30px",
+                }}
+                className="d-flex align-items-center justify-content-center"
+              >
+                {/* <i
+                      className="bx bx-plus position-relative"
+                      style={{
+                        fontSize: "157px",
+                        color: "#34c38f",
+                        cursor: "pointer",
+                      }}
+                    /> */}
+                <AddPodcast />
+              </CardBody>
+              <CardFooter className="bg-transparent border-top">
+                <div className="contact-links d-flex font-size-20">
+                  <div className="flex-fill" style={{ color: "#34c38f" }}>
+                    Ном нэмэх
+                  </div>
+                </div>
+              </CardFooter>
+            </Card>
+          </Col>
           {data.length != 0
             ? data
                 .filter(val => {

@@ -185,7 +185,7 @@ const PodcastDetail = props => {
                         </Col>
                         <Col xs={12} className="text-right mt-2">
                           <strong className="py-1 px-3 font-size-15">
-                            {data.channel_name.length}
+                            {data.user_podcasts.length}
                           </strong>
                         </Col>
                       </Row>
@@ -198,7 +198,7 @@ const PodcastDetail = props => {
             <Card>
               <CardBody>
                 <CardTitle className="d-flex justify-content-between">
-                  <p>Подкаст дэлгэрэнгүй</p>
+                  <p>Сувгийн дэлгэрэнгүй</p>
                   <i
                     className="bx bx-edit font-size-20 text-primary"
                     style={{ cursor: "pointer" }}

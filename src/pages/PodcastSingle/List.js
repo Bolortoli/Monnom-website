@@ -18,15 +18,15 @@ import SweetAlert from "react-bootstrap-sweetalert"
 
 const List = props => {
   const [data, set_data] = useState(props.podcasts)
-  console.log("hhhhaaa", data)
 
   const [editUserStep1, setEditUserStep1] = useState(false)
   const [confirm_edit, set_confirm_edit] = useState(false)
+  const [confirm_delete, set_confirm_delete] = useState(false)
   const [success_dlg, setsuccess_dlg] = useState(false)
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
 
-  // update hiih state uud
+  // update, delete hiih state uud
   const [edit_podcast_name, set_edit_podcast_name] = useState("")
   const [edit_podcast_desc, set_edit_podcast_desc] = useState("")
   const [edit_podcast_file, set_edit_podcast_file] = useState("")
@@ -38,6 +38,32 @@ const List = props => {
     formData.set("podcast_name", edit_podcast_name)
     formData.set("podcast_desc", edit_podcast_desc)
     formData.set("podcast_file_name", edit_podcast_file)
+
+    const config = {
+      headers: {
+        "content-type": "multiplart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+    await axios
+      .post(url, formData, config)
+      .then(async res => {
+        console.log(res.data)
+      })
+      .catch(e => {
+        alert(e)
+      })
+  }
+
+  // axios oor huselt ywuulj delete hiih
+  const deletePodcast = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podacst-upload`
+    const formData = new FormData()
+    formData.delete("podcast_name", edit_podcast_name)
+    formData.delete("podcast_desc", edit_podcast_desc)
+    formData.delete("podcast_file_name", edit_podcast_file)
 
     const config = {
       headers: {
@@ -86,7 +112,7 @@ const List = props => {
     //   width: 50,
     // },
     {
-      label: "Засах",
+      label: "Үйлдэл",
       field: "edit",
       sort: "disabled",
       width: 20,
@@ -114,7 +140,7 @@ const List = props => {
         listen_count: d.listen_count,
         edit: (
           <>
-            <Link>
+            <Link to="#" className="d-flex justify-content-around">
               <i
                 onClick={() => {
                   setEditUserStep1(true)
@@ -122,8 +148,17 @@ const List = props => {
                   set_edit_podcast_desc(d.podcast_desc)
                   set_edit_podcast_file(d.podcast_file_name)
                 }}
-                className="bx bxs-edit text-dark d-block text-center font-size-20"
+                className="bx bxs-edit text-primary font-size-20"
                 id="edittooltip"
+              />
+              <i
+                onClick={() => {
+                  set_confirm_delete(true)
+                  set_edit_podcast_name(d.podcast_name)
+                  set_edit_podcast_desc(d.podcast_desc)
+                  set_edit_podcast_file(d.podcast_file_name)
+                }}
+                className="bx bxs-trash text-danger font-size-20"
               />
             </Link>
           </>
@@ -200,7 +235,7 @@ const List = props => {
                   </Col>
                 </Row>
               </Col>
-              <Col lg="12">
+              <Col lg="7">
                 <FormGroup>
                   <Label className="text-left w-100" htmlFor="productdesc">
                     Тайлбар
@@ -213,6 +248,7 @@ const List = props => {
                   />
                 </FormGroup>
               </Col>
+              <Col lg={5}></Col>
               <Col lg={12}>
                 <div class="custom-file mt-2 mb-3">
                   <label
@@ -293,14 +329,43 @@ const List = props => {
         ) : null}
         {success_dlg ? (
           <SweetAlert
-            success
             title={dynamic_title}
+            timeout={1500}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
             onConfirm={() => {
               setsuccess_dlg(false)
             }}
           >
             {dynamic_description}
           </SweetAlert>
+        ) : null}
+        {confirm_delete ? (
+          <SweetAlert
+            title="Та энэ номыг устгах гэж байна !"
+            warning
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Болих"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              deletePodcast()
+              set_confirm_delete(false)
+              setsuccess_dlg(true)
+              setdynamic_title("Амжилттай")
+              setdynamic_description("Энэ подкастыг амжилттай устгалаа.")
+            }}
+            onCancel={() => {
+              set_confirm_delete(false)
+            }}
+          ></SweetAlert>
         ) : null}
         <Col xl={12}></Col>
         <Col xl="12">

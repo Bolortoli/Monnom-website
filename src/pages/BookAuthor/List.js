@@ -12,10 +12,12 @@ import {
   Label,
   Input,
   FormGroup,
+  Button,
 } from "reactstrap"
 import Switch from "react-switch"
 import SweetAlert from "react-bootstrap-sweetalert"
 import axios from "axios"
+import { update } from "lodash"
 
 const List = props => {
   const [data, set_data] = useState(props.books.user_books)
@@ -31,11 +33,12 @@ const List = props => {
   const [file_name, set_file_name] = useState("")
   const [coverImage, setCoverImage] = useState("")
   const [confirm_edit, set_confirm_edit] = useState(false)
+  const [confirm_delete, set_confirm_delete] = useState(false)
   const [success_dlg, setsuccess_dlg] = useState(false)
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
 
-  // update hiih state uud
+  // update, delete hiih state uud
   const [edit_book_name, set_edit_book_name] = useState("")
   const [edit_book_author_name, set_edit_book_author_name] = useState("")
   const [edit_book_author_desc, set_edit_book_author_desc] = useState("")
@@ -51,6 +54,33 @@ const List = props => {
     formData.set("book_author.name", edit_book_author_name)
     formData.set("book_author.description", edit_book_author_desc)
     formData.set("book_author.profile_pic", edit_book_author_img)
+
+    const config = {
+      headers: {
+        "content-type": "multiplart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+    await axios
+      .post(url, formData, config)
+      .then(async res => {
+        console.log(res.data)
+      })
+      .catch(e => {
+        alert(e)
+      })
+  }
+
+  // axios oor huselt ywuulj delete hiih
+  const deleteBook = async () => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-upload`
+    const formData = new FormData()
+    formData.delete("book_name", edit_book_name)
+    formData.delete("book_author.name", edit_book_author_name)
+    formData.delete("book_author.description", edit_book_author_desc)
+    formData.delete("book_author.profile_pic", edit_book_author_img)
 
     const config = {
       headers: {
@@ -103,7 +133,7 @@ const List = props => {
     //   width: 50,
     // },
     {
-      label: "Засах",
+      label: "Үйлдэл",
       field: "book_edit",
       sort: "disabled",
       width: 20,
@@ -149,7 +179,7 @@ const List = props => {
           </Link>
         ),
         book_edit: (
-          <Link to="#">
+          <Link to="#" className="d-flex justify-content-around">
             <i
               onClick={() => {
                 set_edit_user_step(true)
@@ -165,8 +195,24 @@ const List = props => {
                 )
                 //   set_edit_podcast_state(d.podcast_state);
               }}
-              className="bx bxs-edit text-dark font-size-20 d-block text-center"
+              className="bx bxs-edit text-dark font-size-20"
               id="edittooltip"
+            />
+            <i
+              onClick={() => {
+                set_confirm_delete(true)
+                set_edit_book_name(d.book_name)
+                set_edit_book_author_name(d.book_author.name)
+                set_edit_book_desc(d.book_author.description)
+                set_edit_book_img(d.book_author.profile_pic)
+                set_edit_has_pdf(d.has_pdf)
+                set_edit_has_mp3(d.has_mp3)
+                set_edit_has_sale(d.has_sale)
+                setCoverImage(
+                  process.env.REACT_APP_STRAPI_BASE_URL + edit_book_img
+                )
+              }}
+              className="bx bxs-trash text-dark font-size-20"
             />
           </Link>
         ),
@@ -399,12 +445,12 @@ const List = props => {
             confirmBtnBsStyle="success"
             cancelBtnBsStyle="danger"
             onConfirm={() => {
+              updateBook()
               set_confirm_edit(false)
               set_edit_user_step(false)
               setsuccess_dlg(true)
               setdynamic_title("Амжилттай")
               setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
-              updateBook()
             }}
             onCancel={() => {
               set_confirm_edit(false)
@@ -430,6 +476,27 @@ const List = props => {
           >
             {dynamic_description}
           </SweetAlert>
+        ) : null}
+        {confirm_delete ? (
+          <SweetAlert
+            title="Та энэ подкастыг устгах гэж байна !"
+            warning
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Болих"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              set_confirm_delete(false)
+              setsuccess_dlg(true)
+              setdynamic_title("Амжилттай")
+              setdynamic_description("Энэ подкастыг амжилттай устгалаа.")
+              deleteBook()
+            }}
+            onCancel={() => {
+              set_confirm_delete(false)
+            }}
+          ></SweetAlert>
         ) : null}
         <Col className="col-12">
           <Card>

@@ -274,12 +274,15 @@ const AddBook = () => {
 
   return (
     <React.Fragment>
-      <Button type="button" color="success" onClick={togglemodal}>
-        <i
-          className="bx bx-plus-medical font-size-18 text-center"
-          id="edittooltip"
-        />
-      </Button>
+      <i
+        className="bx bx-plus position-relative"
+        style={{
+          fontSize: "157px",
+          color: "#34c38f",
+          cursor: "pointer",
+        }}
+        onClick={togglemodal}
+      />
       <Col xs={1} class="position-relative">
         <Card>
           <Modal
