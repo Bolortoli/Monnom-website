@@ -11,9 +11,7 @@ import {
   Label,
   Input,
   FormGroup,
-  CardSubtitle,
 } from "reactstrap"
-import Switch from "react-switch"
 import SweetAlert from "react-bootstrap-sweetalert"
 
 const List = props => {
@@ -25,6 +23,7 @@ const List = props => {
   const [success_dlg, setsuccess_dlg] = useState(false)
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
+  const [coverImage, setCoverImage] = useState("")
 
   // update, delete hiih state uud
   const [edit_podcast_name, set_edit_podcast_name] = useState("")
@@ -147,6 +146,7 @@ const List = props => {
                   set_edit_podcast_name(d.podcast_name)
                   set_edit_podcast_desc(d.podcast_desc)
                   set_edit_podcast_file(d.podcast_file_name)
+                  setCoverImage()
                 }}
                 className="bx bxs-edit text-primary font-size-20"
                 id="edittooltip"
@@ -181,11 +181,6 @@ const List = props => {
       }
     })
     set_data(tempInitialData)
-  }
-
-  // podcastiin tolow solih
-  const handleChange = checked => {
-    set_edit_podcast_state(checked)
   }
 
   const datatable = { columns: columns, rows: data }
@@ -248,7 +243,31 @@ const List = props => {
                   />
                 </FormGroup>
               </Col>
-              <Col lg={5}></Col>
+              <Col lg={5}>
+                <Label
+                  htmlFor="input"
+                  className="image-upload d-flex justify-content-center"
+                >
+                  Зураг
+                  <i className="bx bx-image-add font-size-20 ml-2"></i>
+                </Label>
+                <Row>
+                  <img
+                    className="rounded"
+                    alt="Skote"
+                    width="150"
+                    src={coverImage}
+                    //   onClick={() => {}}
+                  />
+                </Row>
+                <input
+                  type="file"
+                  id="input"
+                  accept="image/*"
+                  className="invisible"
+                  onChange={imageHandler}
+                />
+              </Col>
               <Col lg={12}>
                 <div class="custom-file mt-2 mb-3">
                   <label
@@ -264,8 +283,8 @@ const List = props => {
                         {edit_podcast_file.slice(0, 30)}
                         {"..."}
                         {edit_podcast_file.slice(
-                          edit_podcast_file.length - 4,
-                          edit_podcast_file
+                          edit_podcast_file.length - 3,
+                          edit_podcast_file.length
                         )}
                       </p>
                     ) : (
