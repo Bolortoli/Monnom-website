@@ -198,7 +198,7 @@ const PodcastDetail = props => {
             <Card>
               <CardBody>
                 <CardTitle className="d-flex justify-content-between">
-                  <p>Подкаст дэлгэрэнгүй</p>
+                  <p>Сувгийн дэлгэрэнгүй</p>
                   <i
                     className="bx bx-edit font-size-20 text-primary"
                     style={{ cursor: "pointer" }}

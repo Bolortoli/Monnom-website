@@ -53,7 +53,7 @@ const AddPodcast = () => {
 
   // update and delete
   const createPodcast = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast`
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-upload`
     const formData = new FormData()
     formData.append("podcast_name", podcast_name_value)
     formData.append("podcast_desc", podcast_description_value)
@@ -117,7 +117,6 @@ const AddPodcast = () => {
         formattedSize: formatBytes(file.size),
       })
     )
-
     set_selectedFiles(files)
     set_file_upload_name_message("")
   }
@@ -130,6 +129,7 @@ const AddPodcast = () => {
     const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
 
     const i = Math.floor(Math.log(bytes) / Math.log(k))
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
   }
 
@@ -160,12 +160,15 @@ const AddPodcast = () => {
 
   return (
     <React.Fragment>
-      <Button type="button" color="success" onClick={togglemodal}>
-        <i
-          className="bx bx-plus-medical font-size-18 d-block text-center"
-          id="edittooltip"
-        />
-      </Button>
+      <i
+        className="bx bx-plus position-relative"
+        style={{
+          fontSize: "157px",
+          color: "#34c38f",
+          cursor: "pointer",
+        }}
+        onClick={togglemodal}
+      />
       <Col xs={1} class="position-relative">
         {success_dlg ? (
           <SweetAlert
@@ -429,7 +432,6 @@ const AddPodcast = () => {
                         to="#"
                         onClick={e => {
                           handle(e)
-
                           if (
                             activeTab === 1 &&
                             podcast_name_value !== "" &&

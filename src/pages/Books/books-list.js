@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { Link } from "react-router-dom"
+import AddBook from "./AddBook"
 import { Alert } from "reactstrap"
 import {
   Container,
@@ -11,6 +12,7 @@ import {
   CardTitle,
   CardImg,
   CardText,
+  CardFooter,
 } from "reactstrap"
 
 import Breadcrumbs from "../../components/Common/Breadcrumb"
@@ -83,6 +85,34 @@ const Books = () => {
               </Col>
             </Row>
             <Row>
+              <Col xl={3} lg={4} md={4} sm={4}>
+                <Card className="text-center" style={{ background: "#ccf0e3" }}>
+                  <CardBody
+                    style={{
+                      height: "24rem",
+                      marginLeft: "30px",
+                    }}
+                    className="d-flex align-items-center justify-content-center"
+                  >
+                    {/* <i
+                      className="bx bx-plus position-relative"
+                      style={{
+                        fontSize: "157px",
+                        color: "#34c38f",
+                        cursor: "pointer",
+                      }}
+                    /> */}
+                    <AddBook />
+                  </CardBody>
+                  <CardFooter className="bg-transparent border-top">
+                    <div className="contact-links d-flex font-size-20">
+                      <div className="flex-fill" style={{ color: "#34c38f" }}>
+                        Ном нэмэх
+                      </div>
+                    </div>
+                  </CardFooter>
+                </Card>
+              </Col>
               {booksList
                 .filter(val => {
                   if (searchItms === "") {
@@ -142,7 +172,7 @@ const Books = () => {
                           </Row>
                           <Row>
                             <Col xl={12} className="text-right mt-2">
-                              <div class="form-check" className="ml-5">
+                              {/* <div class="form-check" className="ml-5">
                                 <input
                                   class="form-check-input"
                                   type="checkbox"
@@ -158,6 +188,23 @@ const Books = () => {
                                   for="flexCheckDefault"
                                 >
                                   <b className="text-dark">Онцлох</b>
+                                </label>
+                              </div> */}
+                              <div class="custom-control custom-checkbox">
+                                <input
+                                  type="checkbox"
+                                  class="custom-control-input"
+                                  id="customCheck1"
+                                  onClick={() => {
+                                    set_confirm_allow(true)
+                                  }}
+                                  checked={allow}
+                                />
+                                <label
+                                  class="custom-control-label"
+                                  for="customCheck1"
+                                >
+                                  Онцлох
                                 </label>
                               </div>
                             </Col>
@@ -214,25 +261,28 @@ const Books = () => {
                               Дэлгэрэнгүй
                             </Link>
                           </Col>
-                          <Col xl={6} className="text-right">
+                          <Col
+                            xl={6}
+                            className="d-flex align-items-center justify-content-around"
+                          >
                             <i
                               style={{
                                 color: book.has_sale ? "#24ea75" : "#767676",
-                                fontSize: "30px",
+                                fontSize: "28px",
                               }}
                               className="bx bxs-book-open font-size-30"
                             />
                             <i
                               style={{
                                 color: book.has_pdf ? "#fe2379" : "#767676",
-                                fontSize: "30px",
+                                fontSize: "28px",
                               }}
                               className="bx bxs-music"
                             />
                             <i
                               style={{
                                 color: book.has_audio ? "#ffd722" : "#767676",
-                                fontSize: "30px",
+                                fontSize: "28px",
                               }}
                               className="bx bxs-file-pdf"
                             />
