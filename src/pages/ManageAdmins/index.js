@@ -222,8 +222,9 @@ const ManageAdmins = () => {
 
   const createUser = async () => {
     SetIsNetworkLoading(true)
-    const url = "http://127.0.0.1:1337/users"
+    const url = "http://127.0.0.1:3001/create-admin"
     const formData = new FormData()
+    console.log(typeof username)
     formData.append("username", username)
     formData.append("password", password)
     formData.append("email", email)
