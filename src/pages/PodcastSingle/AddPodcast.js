@@ -25,8 +25,10 @@ import SweetAlert from "react-bootstrap-sweetalert"
 
 //Dropzone
 import Dropzone from "react-dropzone"
+import { useParams } from "react-router-dom"
 
 const AddPodcast = () => {
+  const { id } = useParams()
   const [modal, setModal] = useState(false)
   const [activeTab, set_activeTab] = useState(1)
   const [progressValue, setprogressValue] = useState(33)
@@ -53,7 +55,8 @@ const AddPodcast = () => {
 
   // update and delete
   const createPodcast = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast`
+    const url = `http://127.0.0.1:3001/podcast`
+    console.log(url)
     const formData = new FormData()
     formData.append("podcast_name", podcast_name_value)
     formData.append("podcast_desc", podcast_description_value)
@@ -67,6 +70,7 @@ const AddPodcast = () => {
         }`,
       },
     }
+
     await axios
       .post(url, formData, config)
       .then(async res => {

@@ -1,17 +1,17 @@
-import React from "react";
-import { Card, CardBody, CardTitle, Table, CardSubtitle } from "reactstrap";
+import React from "react"
+import { Card, CardBody, CardTitle, Table, CardSubtitle } from "reactstrap"
 
 const MostPopularPodcast = () => {
   return (
     <Card>
       <CardBody>
-        <CardTitle>Хамгийн эрэлттэй подкастууд</CardTitle>
+        {/* <CardTitle>Хамгийн эрэлттэй подкастууд</CardTitle> */}
         <CardSubtitle className="mb-3">
-          For basic styling—light padding and only horizontal dividers—add the
-          base className .table to any &lt;table&gt;.
+          {/* For basic styling—light padding and only horizontal dividers—add the
+          base className .table to any &lt;table&gt;. */}
         </CardSubtitle>
 
-        <div className="table-responsive">
+        {/* <div className="table-responsive">
           <Table className="table mb-0">
             <thead>
               <tr>
@@ -96,10 +96,10 @@ const MostPopularPodcast = () => {
               </tr>
             </tbody>
           </Table>
-        </div>
+        </div> */}
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default MostPopularPodcast;
+export default MostPopularPodcast

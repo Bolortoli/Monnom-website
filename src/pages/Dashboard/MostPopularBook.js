@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import {
   Row,
   Col,
@@ -13,16 +13,16 @@ import {
   Nav,
   NavItem,
   NavLink,
-} from "reactstrap";
+} from "reactstrap"
 
-import classnames from "classnames";
+import classnames from "classnames"
 
 const MostPopularBook = () => {
-  const [activeTab, setactiveTab] = useState("1");
+  const [activeTab, setactiveTab] = useState("1")
 
   function toggle(tab) {
     if (activeTab !== tab) {
-      setactiveTab(tab);
+      setactiveTab(tab)
     }
   }
 
@@ -31,10 +31,10 @@ const MostPopularBook = () => {
       <CardBody>
         <CardTitle>Хамгийн эрэлттэй ном</CardTitle>
         <CardSubtitle className="mb-3">
-          Use the tab JavaScript plugin—include it individually or through the
+          {/* Use the tab JavaScript plugin—include it individually or through the
           compiled <code className="highlighter-rouge">bootstrap.js</code>{" "}
           file—to extend our navigational tabs and pills to create tabbable
-          panes of local content, even via dropdown menus.
+          panes of local content, even via dropdown menus. */}
         </CardSubtitle>
 
         <Nav pills className="navtab-bg nav-justified">
@@ -45,7 +45,7 @@ const MostPopularBook = () => {
                 active: activeTab === "1",
               })}
               onClick={() => {
-                toggle("1");
+                toggle("1")
               }}
             >
               Ном
@@ -58,7 +58,7 @@ const MostPopularBook = () => {
                 active: activeTab === "2",
               })}
               onClick={() => {
-                toggle("2");
+                toggle("2")
               }}
             >
               Аудио ном
@@ -71,7 +71,7 @@ const MostPopularBook = () => {
                 active: activeTab === "3",
               })}
               onClick={() => {
-                toggle("3");
+                toggle("3")
               }}
             >
               Цахим ном
@@ -359,7 +359,7 @@ const MostPopularBook = () => {
         </TabContent>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default MostPopularBook;
+export default MostPopularBook

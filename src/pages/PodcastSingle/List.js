@@ -14,7 +14,53 @@ import {
 } from "reactstrap"
 import SweetAlert from "react-bootstrap-sweetalert"
 
+const config = {
+  headers: {
+    "content-type": "multipart/form-data",
+    // Authorization: `Bearer ${
+    //   JSON.parse(localStorage.getItem("user_information")).jwt
+    // }`,
+  },
+}
+
+const columns = [
+  {
+    label: "Подкастын нэр",
+    field: "pod_name",
+    width: 150,
+    attributes: {
+      "aria-controls": "DataTable",
+      "aria-label": "Name",
+    },
+  },
+  {
+    label: "Дугаар",
+    field: "episode_number",
+    width: 50,
+    sort: "disabled",
+  },
+  {
+    label: "Хандалт",
+    field: "listen_count",
+    sort: "disabled",
+    width: 50,
+  },
+  // {
+  //   label: "Төлөв",
+  //   field: "state",
+  //   sort: "disabled",
+  //   width: 50,
+  // },
+  {
+    label: "Үйлдэл",
+    field: "edit",
+    sort: "disabled",
+    width: 20,
+  },
+]
+
 const List = props => {
+  console.log(props)
   const [data, set_data] = useState(props.podcasts)
 
   const [editUserStep1, setEditUserStep1] = useState(false)
@@ -32,22 +78,14 @@ const List = props => {
 
   // axios oor huselt ywuulj update hiih
   const updatePodcast = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podacst-upload`
-    const formData = new FormData()
-    formData.set("podcast_name", edit_podcast_name)
-    formData.set("podcast_desc", edit_podcast_desc)
-    formData.set("podcast_file_name", edit_podcast_file)
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-upload`
+    const updateForm = new FormData()
+    updateForm.append("podcast_name", edit_podcast_name)
+    updateForm.append("podcast_desc", edit_podcast_desc)
+    updateForm.append("podcast_file_name", edit_podcast_file)
 
-    const config = {
-      headers: {
-        "content-type": "multiplart/form-data",
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    }
     await axios
-      .post(url, formData, config)
+      .post(url, updateForm, config)
       .then(async res => {
         console.log(res.data)
       })
@@ -58,20 +96,13 @@ const List = props => {
 
   // axios oor huselt ywuulj delete hiih
   const deletePodcast = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podacst-upload`
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-upload`
     const formData = new FormData()
-    formData.delete("podcast_name", edit_podcast_name)
-    formData.delete("podcast_desc", edit_podcast_desc)
-    formData.delete("podcast_file_name", edit_podcast_file)
+    formData.append("podcast_name", edit_podcast_name)
+    formData.append("podcast_name", edit_podcast_name)
+    formData.append("podcast_desc", edit_podcast_desc)
+    formData.append("podcast_file_name", edit_podcast_file)
 
-    const config = {
-      headers: {
-        "content-type": "multiplart/form-data",
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    }
     await axios
       .post(url, formData, config)
       .then(async res => {
@@ -81,42 +112,6 @@ const List = props => {
         alert(e)
       })
   }
-
-  const columns = [
-    {
-      label: "Подкастын нэр",
-      field: "pod_name",
-      width: 150,
-      attributes: {
-        "aria-controls": "DataTable",
-        "aria-label": "Name",
-      },
-    },
-    {
-      label: "Дугаар",
-      field: "episode_number",
-      width: 50,
-      sort: "disabled",
-    },
-    {
-      label: "Хандалт",
-      field: "listen_count",
-      sort: "disabled",
-      width: 50,
-    },
-    // {
-    //   label: "Төлөв",
-    //   field: "state",
-    //   sort: "disabled",
-    //   width: 50,
-    // },
-    {
-      label: "Үйлдэл",
-      field: "edit",
-      sort: "disabled",
-      width: 20,
-    },
-  ]
 
   // zurag oorchloh
   const imageHandler = e => {
@@ -183,7 +178,7 @@ const List = props => {
     set_data(tempInitialData)
   }
 
-  const datatable = { columns: columns, rows: data }
+  const datatable = { columns, rows: data }
 
   useEffect(() => {
     initData(data)
@@ -393,7 +388,7 @@ const List = props => {
               <div className="d-flex justify-content-between">
                 <CardTitle>Жагсаалтууд</CardTitle>
                 <CardTitle className="text-right">
-                  <AddPodcast data={data} />
+                  <AddPodcast channelID={"id"} />
                 </CardTitle>
               </div>
               <MDBDataTable
