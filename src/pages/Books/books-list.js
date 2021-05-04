@@ -83,36 +83,11 @@ const Books = () => {
                   </div>
                 </form>
               </Col>
+              <Col lg={4} className="text-right">
+                <AddBook />
+              </Col>
             </Row>
             <Row>
-              <Col xl={3} lg={4} md={4} sm={4}>
-                <Card className="text-center" style={{ background: "#ccf0e3" }}>
-                  <CardBody
-                    style={{
-                      height: "24rem",
-                      marginLeft: "30px",
-                    }}
-                    className="d-flex align-items-center justify-content-center"
-                  >
-                    {/* <i
-                      className="bx bx-plus position-relative"
-                      style={{
-                        fontSize: "157px",
-                        color: "#34c38f",
-                        cursor: "pointer",
-                      }}
-                    /> */}
-                    <AddBook />
-                  </CardBody>
-                  <CardFooter className="bg-transparent border-top">
-                    <div className="contact-links d-flex font-size-20">
-                      <div className="flex-fill" style={{ color: "#34c38f" }}>
-                        Ном нэмэх
-                      </div>
-                    </div>
-                  </CardFooter>
-                </Card>
-              </Col>
               {booksList
                 .filter(val => {
                   if (searchItms === "") {
