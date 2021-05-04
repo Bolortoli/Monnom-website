@@ -3,9 +3,15 @@ import axios from "axios"
 import { Link } from "react-router-dom"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { Form, Card, CardBody, Col, Row, CardTitle, Button } from "reactstrap"
-import { Editor } from "react-draft-wysiwyg"
+import { ContentBlock, Editor } from "react-draft-wysiwyg"
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
-import { EditorState, convertToRaw, convertFromRaw } from "draft-js"
+import {
+  EditorState,
+  convertToRaw,
+  convertFromRaw,
+  convertFromHTML,
+  ContentState,
+} from "draft-js"
 import draftToHtml from "draftjs-to-html"
 import htmlToDraft from "html-to-draftjs"
 
@@ -201,6 +207,7 @@ const SettingsForm = () => {
     // EditorState.createWithContent(tempData)
     EditorState.createEmpty()
   )
+  const [res_d, set_res_d] = useState(false)
 
   // axios ruu ywuulah string
   const updateTerms = async () => {
@@ -208,7 +215,7 @@ const SettingsForm = () => {
     const formData = new FormData()
     formData.append(
       "terms",
-      JSON.stringify(convertToRaw(wysiwyg_content.getCurrentContent()))
+      draftToHtml(convertToRaw(wysiwyg_content.getCurrentContent()))
     )
     // draftToHtml(convertToRaw(wysiwyg_content.getCurrentContent()))
 
@@ -390,20 +397,22 @@ const SettingsForm = () => {
   }
 
   const fetchData = () => {
-    console.log("fetchData")
+    // console.log("fetchData")
     axios.get(`${process.env.REACT_APP_STRAPI_BASE_URL}/settings`).then(res => {
-      console.log(
-        convertFromRaw(
-          JSON.parse(JSON.parse(JSON.stringify(res.data.TermsAndConditions)))
-        )
+      // console.log(
+      //   convertFromRaw(
+      //     JSON.parse(JSON.parse(JSON.stringify(res.data.TermsAndConditions)))
+      //   )
+      // )
+      console.log(" hi data how r u ? ", res.data.TermsAndConditions)
+      const blocksFromHTML = convertFromHTML(res.data.TermsAndConditions)
+      const htmlData = ContentState.createFromBlockArray(
+        blocksFromHTML.contentBlocks,
+        blocksFromHTML.entityMap
       )
-      set_wysiwyg_content(
-        new EditorState(
-          convertFromRaw(
-            JSON.parse(JSON.parse(JSON.stringify(res.data.TermsAndConditions)))
-          )
-        )
-      )
+      set_wysiwyg_content(EditorState.createWithContent(htmlData))
+      set_res_d(true)
+      console.log("hehewwe => ", wysiwyg_content)
       // console.log(
       //   EditorState.create(
       //     JSON.parse(JSON.parse(JSON.stringify(res.data.TermsAndConditions)))
@@ -413,7 +422,7 @@ const SettingsForm = () => {
   }
 
   useEffect(() => {
-    // fetchData()
+    fetchData()
     initBook(book_data)
     initPodcast(podcast_data)
   }, [])
@@ -424,33 +433,46 @@ const SettingsForm = () => {
         <Card>
           <CardBody>
             <CardTitle>Үйлчилгээний нөхцөл</CardTitle>
-            <Editor
-              // initialContentState={wysiwyg_content}
-              onEditorStateChange={e => {
-                console.log(e)
-                set_wysiwyg_content(e)
-              }}
-              toolbarOnFocus
-              toolbar={{
-                options: [
-                  "inline",
-                  "blockType",
-                  "fontSize",
-                  "list",
-                  "textAlign",
-                  "colorPicker",
-                  "link",
-                  "embedded",
-                  "emoji",
-                  "image",
-                  "remove",
-                  "history",
-                ],
-              }}
-              toolbarClassName="toolbarClassName"
-              wrapperClassName="wrapperClassName"
-              editorClassName="editorClassName"
-            />
+            {res_d ? (
+              <Editor
+                // initialContentState={wysiwyg_content}
+
+                onEditorStateChange={e => {
+                  console.log(e)
+                  console.log("eeee => ", wysiwyg_content)
+                  set_wysiwyg_content(e)
+                }}
+                defaultEditorState={wysiwyg_content}
+                toolbarOnFocus
+                toolbar={{
+                  options: [
+                    // "inline",
+                    "blockType",
+                    "fontSize",
+                    "list",
+                    "textAlign",
+                    // "colorPicker",
+                    // "link",
+                    "embedded",
+                    "emoji",
+                    // "image",
+                    // "remove",
+                    "history",
+                  ],
+                }}
+                toolbarClassName="toolbarClassName"
+                wrapperClassName="wrapperClassName"
+                editorClassName="editorClassName"
+              />
+            ) : null}
+          </CardBody>
+          <CardBody>
+            {/* <textarea
+              disabled
+              value={draftToHtml(
+                convertToRaw(wysiwyg_content.getCurrentContent())
+              )}
+            /> */}
           </CardBody>
         </Card>
       </Col>

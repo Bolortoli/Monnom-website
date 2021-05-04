@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { Link } from "react-router-dom"
-import AddBook from "./AddBook"
 import { Alert } from "reactstrap"
 import {
   Container,
@@ -82,9 +81,6 @@ const Books = () => {
                     <span className="bx bx-search-alt" />
                   </div>
                 </form>
-              </Col>
-              <Col lg={4} className="text-right">
-                <AddBook />
               </Col>
             </Row>
             <Row>

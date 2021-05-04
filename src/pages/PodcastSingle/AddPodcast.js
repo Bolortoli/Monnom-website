@@ -48,9 +48,7 @@ const AddPodcast = () => {
     ""
   )
   const [checked, set_checked] = useState(false)
-  const [profileImage, set_profileImage] = useState(
-    "https://www.pngitem.com/pimgs/m/97-972731_podcast-podcasting-icon-hd-png-download.png"
-  )
+  const [profileImage, set_profileImage] = useState("")
   const [selectedFiles, set_selectedFiles] = useState([])
 
   // update and delete
@@ -170,7 +168,7 @@ const AddPodcast = () => {
           id="edittooltip"
         />
       </Button>
-      k
+
       <Col xs={1} class="position-relative">
         {success_dlg ? (
           <SweetAlert

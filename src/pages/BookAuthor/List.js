@@ -21,10 +21,11 @@ import { update } from "lodash"
 
 const List = props => {
   const [data, set_data] = useState(props.books.user_books)
-  console.log("props utga ", props.books.user_books)
+  // console.log("props utga ", props.books.user_books)
 
   const [edit_user_step, set_edit_user_step] = useState(false)
   const [book_author_info, set_book_author_info] = useState(false)
+  const [book_comments_section, set_book_comments_section] = useState(false)
   const [edit_has_sale, set_edit_has_sale] = useState(false)
   const [edit_has_mp3, set_edit_has_mp3] = useState(false)
   const [edit_has_pdf, set_edit_has_pdf] = useState(false)
@@ -45,6 +46,7 @@ const List = props => {
   const [edit_book_author_img, set_edit_book_author_img] = useState("")
   const [edit_book_desc, set_edit_book_desc] = useState("")
   const [edit_book_img, set_edit_book_img] = useState("")
+  const [edit_book_comments, set_edit_book_comments] = useState([])
 
   // axios oor huselt ywuulj update hiih
   const updateBook = async () => {
@@ -115,10 +117,16 @@ const List = props => {
       width: 100,
     },
     {
+      label: "Сэтгэгдэлүүд",
+      field: "book_comments",
+      sort: "disabled",
+      width: "100",
+    },
+    {
       label: "Нийтлэгдсэн огноо",
       field: "book_date",
       sort: "disabled",
-      width: 100,
+      width: 70,
     },
     {
       label: "Төрөл",
@@ -145,7 +153,7 @@ const List = props => {
       return {
         book_name: d.book_name,
         // book_author: d.book_author.name,
-        book_date: new Date(d.book_added_date).toLocaleString(),
+        book_date: new Date(d.book_added_date).toLocaleDateString(),
         // book_state: d.book_state,
         // type: d.type,
         // state: (
@@ -163,6 +171,16 @@ const List = props => {
         //     )}
         //   </>
         // ),
+        book_comments: (
+          <Link
+          // onClick={() => {
+          //   set_book_comments_section(true)
+          //   set_edit_book_comments(d.book_comments)
+          // }}
+          >
+            Харах
+          </Link>
+        ),
         book: (
           <Link
             onClick={() => {
@@ -265,6 +283,34 @@ const List = props => {
   return (
     <React.Fragment>
       <Row>
+        {book_comments_section ? (
+          <SweetAlert
+            confirmBtnBsStyle="primary"
+            confirmBtnText="Гарах"
+            style={{
+              padding: "3em",
+              borderRadius: "20px",
+            }}
+            onConfirm={() => {
+              set_book_comments_section(false)
+            }}
+          >
+            <CardTitle>Сэтгэгдэлүүд</CardTitle>
+            <Row>
+              {edit_book_comments.map((comment, key) => (
+                <Col lg={12} key={key}>
+                  <p>
+                    <strong>{comment.name}</strong>
+                  </p>
+                  <p>{comment.comment}</p>
+                  <p className="w-100 text-right">
+                    new Date(comment.date).toLocaleString()
+                  </p>
+                </Col>
+              ))}
+            </Row>
+          </SweetAlert>
+        ) : null}
         {book_author_info ? (
           <SweetAlert
             confirmBtnBsStyle="primary"

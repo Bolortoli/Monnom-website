@@ -19,6 +19,7 @@ import {
 } from "reactstrap"
 import axios from "axios"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
+import Dropzone from "react-dropzone"
 import Switch from "react-switch"
 import classnames from "classnames"
 import { Link } from "react-router-dom"
@@ -83,13 +84,20 @@ const AddBook = () => {
   const [profileImage, set_profileImage] = useState("")
   const [audio_book_label, set_audio_book_label] = useState("mp3 book")
   const [success_dlg, setsuccess_dlg] = useState(false)
-
-  // axios -oor damjuulah state set
-  const [book_name_value, set_book_name_value] = useState("")
-  const [book_author_value, set_book_author_value] = useState("")
-  const [podcast_description_value, set_podcast_description_value] = useState(
+  const [selectedFiles, set_selectedFiles] = useState([])
+  const [confirm_edit, set_confirm_edit] = useState(false)
+  const [file_upload_name_message, set_file_upload_name_message] = useState("")
+  const [youtube_url_name, set_youtube_url_name] = useState("")
+  const [book_introduction_message, set_book_introduction_message] = useState(
     ""
   )
+
+  // axios -oor damjuulah state set
+  const [youtube_url_value, set_youtube_url_value] = useState("")
+  const [book_introduction_value, set_book_introduction_value] = useState("")
+  const [book_name_value, set_book_name_value] = useState("")
+  const [book_author_value, set_book_author_value] = useState("")
+  const [book_description_value, set_book_description_value] = useState("")
   const [audio_book_files, set_audio_book_files] = useState([])
   const [book_files, set_book_files] = useState([])
 
@@ -145,6 +153,32 @@ const AddBook = () => {
       })
   }
 
+  // file upload hiih
+  const handleAcceptedFiles = files => {
+    files.map(file =>
+      Object.assign(file, {
+        preview: URL.createObjectURL(file),
+        formattedSize: formatBytes(file.size),
+      })
+    )
+    set_selectedFiles(files)
+    if (selectedFiles) {
+      set_file_upload_name_message("")
+    }
+  }
+
+  // file iin formatuud
+  const formatBytes = (bytes, decimals = 2) => {
+    if (bytes === 0) return "0 Bytes"
+    const k = 1024
+    const dm = decimals < 0 ? 0 : decimals
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
+  }
+
   // Nomiig hudaldah esehiig asuuj input nemne
   const handleChange = checked => {
     set_checked(checked)
@@ -162,11 +196,11 @@ const AddBook = () => {
         set_activeTab(tab)
 
         if (tab === 1) {
-          setprogressValue(33)
+          setprogressValue(33.3)
           set_next_button_label("Дараах")
         }
         if (tab === 2) {
-          setprogressValue(66)
+          setprogressValue(66.6)
           set_next_button_label("Алгасах")
         }
         if (tab === 3) {
@@ -189,13 +223,13 @@ const AddBook = () => {
   }
 
   // inputiin utga hooson esehiig shalgah
-  const handle = event => {
+  const handle1 = event => {
     if (book_name_value === "") {
       set_book_name_message("Хоосон утгатай байна !")
     } else {
       set_book_name_message("")
     }
-    if (podcast_description_value === "") {
+    if (book_description_value === "") {
       set_podcast_description_message("Хоосон утгатай байна !")
     } else {
       set_podcast_description_message("")
@@ -204,6 +238,23 @@ const AddBook = () => {
       set_book_author_message("Хоосон утгатай байна !")
     } else {
       set_book_author_message("")
+    }
+  }
+
+  const handle2 = event => {
+    if (youtube_url_value === "") {
+      set_youtube_url_name("Хоосон утгатай байна !")
+    } else {
+      set_youtube_url_name("")
+    }
+    if (book_introduction_value === "") {
+      set_book_introduction_message("Хоосон утгатай байна !")
+    } else {
+      set_book_introduction_message("")
+    }
+    if (selectedFiles != "") {
+    } else {
+      set_file_upload_name_message("Хоосон утгатай байна !")
     }
   }
 
@@ -282,6 +333,26 @@ const AddBook = () => {
         />
       </Button>
       <Col xs={1} class="position-relative">
+        {confirm_edit ? (
+          <SweetAlert
+            title="Та итгэлтэй байна уу ?"
+            warning
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Болих"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              set_confirm_edit(false)
+              setsuccess_dlg(true)
+              createBook()
+            }}
+            onCancel={() => {
+              set_confirm_edit(false)
+              togglemodal()
+            }}
+          ></SweetAlert>
+        ) : null}
         {success_dlg ? (
           <SweetAlert
             title={"Амжилттай"}
@@ -295,7 +366,6 @@ const AddBook = () => {
             showConfirm={false}
             success
             onConfirm={() => {
-              createBook()
               setsuccess_dlg(false)
             }}
           >
@@ -323,9 +393,14 @@ const AddBook = () => {
                         className={classnames({
                           active: activeTab === 1,
                         })}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          height: "100%",
+                        }}
                       >
                         <span className="step-number mr-2">01</span>
-                        Дэлгэрэнгүй мэдээлэл
+                        <p className="my-auto">Ерөнхий мэдээлэл</p>
                       </NavLink>
                     </NavItem>
                     <NavItem>
@@ -333,19 +408,29 @@ const AddBook = () => {
                         className={classnames({
                           active: activeTab === 2,
                         })}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          height: "100%",
+                        }}
                       >
                         <span className="step-number mr-2">02</span>
-                        Файл оруулах
+                        <p className="my-auto">Файл оруулах</p>
                       </NavLink>
                     </NavItem>
                     <NavItem>
                       <NavLink
-                        classNames={classnames({
+                        className={classnames({
                           active: activeTab === 3,
                         })}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          height: "100%",
+                        }}
                       >
                         <span className="step-number mr-2">03</span>
-                        Баталгаажуулах
+                        <p className="my-auto">Нэмэлт мэдээлэл</p>
                       </NavLink>
                     </NavItem>
                   </ul>
@@ -406,9 +491,9 @@ const AddBook = () => {
                                 className="form-control"
                                 id="productdesc"
                                 rows="5"
-                                value={podcast_description_value}
+                                value={book_description_value}
                                 onChange={e => {
-                                  set_podcast_description_value(e.target.value)
+                                  set_book_description_value(e.target.value)
                                 }}
                               />
                               <p class="text-danger">
@@ -471,6 +556,105 @@ const AddBook = () => {
                                 </Col>
                               </Row>
                             ) : null}
+                          </Col>
+                        </Row>
+                      </Form>
+                    </TabPane>
+                    <TabPane tabId={3} id="comments">
+                      <Form>
+                        <Row>
+                          <Col lg={6}>
+                            <FormGroup>
+                              <Label for="kycfirstname-input">
+                                Юү түүб хаяг
+                              </Label>
+                              <Input
+                                type="text"
+                                required
+                                value={youtube_url_value}
+                                onChange={e => {
+                                  set_youtube_url_value(e.target.value)
+                                }}
+                              />
+                              <p class="text-danger">{youtube_url_name}</p>
+                            </FormGroup>
+                          </Col>
+                          <Col lg={6}>
+                            <FormGroup>
+                              <Label htmlFor="productdesc">Танилцуулга</Label>
+                              <textarea
+                                className="form-control"
+                                id="productdesc"
+                                rows="5"
+                                value={book_introduction_value}
+                                onChange={e => {
+                                  set_book_introduction_value(e.target.value)
+                                }}
+                              />
+                              <p class="text-danger">
+                                {book_introduction_message}
+                              </p>
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col lg={12}>
+                            <h5 className="font-size-14 mb-3">Ишлэл</h5>
+                            <div className="kyc-doc-verification mb-3">
+                              <Dropzone
+                                onDrop={acceptedFiles => {
+                                  handleAcceptedFiles(acceptedFiles)
+                                }}
+                                accept="image/*"
+                              >
+                                {({ getRootProps, getInputProps }) => (
+                                  <div className="dropzone">
+                                    <div
+                                      className="dz-message needsclick"
+                                      {...getRootProps()}
+                                    >
+                                      <input {...getInputProps()} />
+                                      <div className="mb-3">
+                                        <i className="display-4 text-muted bx bxs-cloud-upload"></i>
+                                      </div>
+                                      <h3>Файлаа энд байршуулна уу ?</h3>
+                                    </div>
+                                  </div>
+                                )}
+                              </Dropzone>
+                              <p className="text-danger">
+                                {file_upload_name_message}
+                              </p>
+                              <div
+                                className="dropzone-previews mt-3"
+                                id="file-previews"
+                              >
+                                {selectedFiles.map((f, i) => {
+                                  return (
+                                    <Card
+                                      className="mt-1 mb-0 shadow-none border dz-processing dz-image-preview dz-success dz-complete "
+                                      key={i + "-file"}
+                                    >
+                                      <div className="p-2">
+                                        <Row className="align-items-center">
+                                          <Col>
+                                            <Link
+                                              to="#"
+                                              className="text-muted font-weight-bold"
+                                            >
+                                              {f.name}
+                                            </Link>
+                                            <p className="mb-0">
+                                              <strong>{f.formattedSize}</strong>
+                                            </p>
+                                          </Col>
+                                        </Row>
+                                      </div>
+                                    </Card>
+                                  )
+                                })}
+                              </div>
+                            </div>
                           </Col>
                         </Row>
                       </Form>
@@ -639,24 +823,6 @@ const AddBook = () => {
                         </Col>
                       </Row>
                     </TabPane>
-                    <TabPane tabId={3} id="personal-info">
-                      <div className="row justify-content-center">
-                        <Col lg="6">
-                          <div className="text-center">
-                            <div className="mb-4">
-                              <i className="mdi mdi-check-circle-outline text-success display-4" />
-                            </div>
-                            <div>
-                              <h5>Баталгаажуулах</h5>
-                              <p className="text-muted">
-                                Та баталгаажуулахын тулд "Дуусгах" товчийг дарна
-                                уу ?
-                              </p>
-                            </div>
-                          </div>
-                        </Col>
-                      </div>
-                    </TabPane>
                   </TabContent>
                   <ul className="pager wizard twitter-bs-wizard-pager-link">
                     <li
@@ -677,16 +843,33 @@ const AddBook = () => {
                       <Link
                         to="#"
                         onClick={e => {
-                          handle(e)
+                          handle1(e)
                           if (
+                            activeTab === 1 &&
                             book_name_value !== "" &&
-                            podcast_description_value !== ""
+                            book_author_value !== "" &&
+                            book_description_value !== ""
                           ) {
                             toggleTab(activeTab + 1)
                           }
-                          if (next_button_label == "Дуусгах") {
+                          if (
+                            activeTab == 2 &&
+                            (next_button_label == "Алгасах" ||
+                              next_button_label == "Дараах")
+                          ) {
+                            toggleTab(activeTab + 1)
+                          }
+                          if (activeTab === 3) {
+                            handle2(e)
+                          }
+                          if (
+                            next_button_label == "Дуусгах" &&
+                            youtube_url_value !== "" &&
+                            book_introduction_value !== "" &&
+                            selectedFiles != ""
+                          ) {
                             togglemodal()
-                            setsuccess_dlg(true)
+                            set_confirm_edit(true)
                           }
                         }}
                       >

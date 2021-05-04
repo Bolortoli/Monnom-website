@@ -12,7 +12,6 @@ import {
   Row,
   Alert,
 } from "reactstrap"
-import AddPodcast from "./AddPodcast"
 require("dotenv").config()
 const ContactsGrid = props => {
   const [data, set_data] = useState(props.podcast.podcastChannels)
@@ -47,9 +46,6 @@ const ContactsGrid = props => {
               <span className="bx bx-search-alt" />
             </div>
           </form>
-        </Col>
-        <Col lg={4} className="text-right">
-          <AddPodcast />
         </Col>
       </Row>
       {load ? (
