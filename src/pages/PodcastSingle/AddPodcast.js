@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Row,
   Col,
@@ -26,9 +26,11 @@ import SweetAlert from "react-bootstrap-sweetalert"
 //Dropzone
 import Dropzone from "react-dropzone"
 import { useParams } from "react-router-dom"
+// require('dotenv').config()
 
-const AddPodcast = () => {
+const AddPodcast = props => {
   const { id } = useParams()
+  var latestEpisodeNumber = props.latestEpisodeNumber
   const [modal, setModal] = useState(false)
   const [activeTab, set_activeTab] = useState(1)
   const [progressValue, setprogressValue] = useState(33)
@@ -48,6 +50,7 @@ const AddPodcast = () => {
     ""
   )
   const [checked, set_checked] = useState(false)
+  const [episode_picture, set_episode_picture] = useState(null)
   const [profileImage, set_profileImage] = useState(
     "https://www.pngitem.com/pimgs/m/97-972731_podcast-podcasting-icon-hd-png-download.png"
   )
@@ -55,12 +58,20 @@ const AddPodcast = () => {
 
   // update and delete
   const createPodcast = async () => {
-    const url = `http://127.0.0.1:3001/podcast`
-    console.log(url)
-    const formData = new FormData()
-    formData.append("podcast_name", podcast_name_value)
-    formData.append("podcast_desc", podcast_description_value)
-    formData.append("podcast_file_name", selectedFiles)
+    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-episodes`
+    const podcastDataToUpload = new FormData()
+    podcastDataToUpload.append("files.audio_file_path", selectedFiles)
+    podcastDataToUpload.append("files.picture", episode_picture)
+    console.log(selectedFiles)
+
+    const tempSendData = {
+      name: podcast_name_value,
+      description: podcast_description_value,
+      podcast_channel: id,
+      episode_number: latestEpisodeNumber + 1,
+    }
+    console.log(tempSendData)
+    podcastDataToUpload.append("data", JSON.stringify(tempSendData))
 
     const config = {
       headers: {
@@ -72,10 +83,8 @@ const AddPodcast = () => {
     }
 
     await axios
-      .post(url, formData, config)
-      .then(async res => {
-        console.log("res =>", res.data)
-      })
+      .post(url, podcastDataToUpload, config)
+      .then(async res => {})
       .catch(e => {
         alert(e)
       })
@@ -122,7 +131,7 @@ const AddPodcast = () => {
       })
     )
 
-    set_selectedFiles(files)
+    set_selectedFiles(files[0])
     set_file_upload_name_message("")
   }
 
@@ -143,9 +152,11 @@ const AddPodcast = () => {
     reader.onload = () => {
       if (reader.readyState === 2) {
         set_profileImage(reader.result)
+        console.log(e.target.files[0])
       }
     }
     reader.readAsDataURL(e.target.files[0])
+    set_episode_picture(e.target.files[0])
   }
 
   // input textuudiin hooson utgiig shalgana
@@ -161,6 +172,10 @@ const AddPodcast = () => {
       set_podcast_description_message("")
     }
   }
+
+  useEffect(() => {
+    latestEpisodeNumber = props.latestEpisodeNumber
+  }, [props.latestEpisodeNumber])
 
   return (
     <React.Fragment>
