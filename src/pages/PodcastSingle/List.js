@@ -60,7 +60,7 @@ const columns = [
 ]
 
 const List = props => {
-  console.log(props)
+  const [latestEpisodeNumber, setLatestEpisodeNumber] = useState(0)
   const [data, set_data] = useState(props.podcasts)
 
   const [editUserStep1, setEditUserStep1] = useState(false)
@@ -86,9 +86,7 @@ const List = props => {
 
     await axios
       .post(url, updateForm, config)
-      .then(async res => {
-        console.log(res.data)
-      })
+      .then(async res => {})
       .catch(e => {
         alert(e)
       })
@@ -105,9 +103,7 @@ const List = props => {
 
     await axios
       .post(url, formData, config)
-      .then(async res => {
-        console.log(res.data)
-      })
+      .then(async res => {})
       .catch(e => {
         alert(e)
       })
@@ -127,6 +123,9 @@ const List = props => {
   // table der nemj edit button, tolowiig haruulah
   const initData = data => {
     let tempInitialData = data.map(d => {
+      if (d.episode_number > latestEpisodeNumber) {
+        setLatestEpisodeNumber(d.episode_number)
+      }
       return {
         pod_name: d.podcast_name,
         podcast_state: d.podcast_state,
@@ -388,7 +387,7 @@ const List = props => {
               <div className="d-flex justify-content-between">
                 <CardTitle>Жагсаалтууд</CardTitle>
                 <CardTitle className="text-right">
-                  <AddPodcast channelID={"id"} />
+                  <AddPodcast latestEpisodeNumber={latestEpisodeNumber} />
                 </CardTitle>
               </div>
               <MDBDataTable
