@@ -91,11 +91,13 @@ const AddBook = () => {
   const [youtube_url_name, set_youtube_url_name] = useState("")
   const [category_of_book_message, set_category_of_book_message] = useState("")
   const [optionGroup, set_optionGroup] = useState([])
+  const [is_pdf_price, set_is_pdf_price] = useState(false)
   const [book_introduction_message, set_book_introduction_message] = useState(
     ""
   )
 
   // axios -oor damjuulah state set
+  const [pdf_price, set_pdf_price] = useState(0)
   const [youtube_url_value, set_youtube_url_value] = useState("")
   const [book_introduction_value, set_book_introduction_value] = useState("")
   const [selectedFiles, set_selectedFiles] = useState([])
@@ -351,6 +353,7 @@ const AddBook = () => {
     if (files.length > 0) {
       set_book_label("pdf book")
       set_next_button_label("Дараах")
+      set_is_pdf_price(true)
     } else {
       set_next_button_label("Алгасах")
     }
@@ -360,6 +363,7 @@ const AddBook = () => {
   const removeBookFiles = f => {
     set_progress_mp3(0)
     set_book_files(book_files.filter(x => x !== f))
+    set_is_pdf_price(false)
     if (book_files.length === 0) {
       set_book_label("mp3 book")
       set_next_button_label("Дараах")
@@ -701,6 +705,20 @@ const AddBook = () => {
                                 />
                                 <p class="text-danger">{youtube_url_name}</p>
                               </FormGroup>
+                              <Row>
+                                {is_pdf_price ? (
+                                  <Col lg={12}>
+                                    <Label>Pdf номын үнэ</Label>
+                                    <Input
+                                      type="number"
+                                      value={pdf_price}
+                                      onChange={e =>
+                                        set_pdf_price(e.target.value)
+                                      }
+                                    />
+                                  </Col>
+                                ) : null}
+                              </Row>
                             </Col>
                             <Col lg={6}>
                               <FormGroup>
