@@ -90,6 +90,7 @@ const List = props => {
     setselectedMulti(selectedMulti)
   }
 
+  // props oos irsen nomnii categoruudiig awah
   const getAuthorsInfo = authors => {
     const a = authors.map(author => {
       return {
