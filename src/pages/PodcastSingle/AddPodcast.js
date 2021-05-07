@@ -50,14 +50,10 @@ const AddPodcast = props => {
     ""
   )
   const [checked, set_checked] = useState(false)
-<<<<<<< HEAD
-  const [profileImage, set_profileImage] = useState("")
-=======
   const [episode_picture, set_episode_picture] = useState(null)
   const [profileImage, set_profileImage] = useState(
     "https://www.pngitem.com/pimgs/m/97-972731_podcast-podcasting-icon-hd-png-download.png"
   )
->>>>>>> 92308940b50604c1083ff2f3839c2b24e03dc67c
   const [selectedFiles, set_selectedFiles] = useState([])
 
   // update and delete
@@ -66,7 +62,6 @@ const AddPodcast = props => {
     const podcastDataToUpload = new FormData()
     podcastDataToUpload.append("files.audio_file_path", selectedFiles)
     podcastDataToUpload.append("files.picture", episode_picture)
-    console.log(selectedFiles)
 
     const tempSendData = {
       name: podcast_name_value,
@@ -156,7 +151,6 @@ const AddPodcast = props => {
     reader.onload = () => {
       if (reader.readyState === 2) {
         set_profileImage(reader.result)
-        console.log(e.target.files[0])
       }
     }
     reader.readAsDataURL(e.target.files[0])
@@ -387,30 +381,25 @@ const AddPodcast = props => {
                           className="dropzone-previews mt-3"
                           id="file-previews"
                         >
-                          {selectedFiles.map((f, i) => {
-                            return (
-                              <Card
-                                className="mt-1 mb-0 shadow-none border dz-processing dz-image-preview dz-success dz-complete "
-                                key={i + "-file"}
-                              >
-                                <div className="p-2">
-                                  <Row className="align-items-center">
-                                    <Col>
-                                      <Link
-                                        to="#"
-                                        className="text-muted font-weight-bold"
-                                      >
-                                        {f.name}
-                                      </Link>
-                                      <p className="mb-0">
-                                        <strong>{f.formattedSize}</strong>
-                                      </p>
-                                    </Col>
-                                  </Row>
-                                </div>
-                              </Card>
-                            )
-                          })}
+                          <Card className="mt-1 mb-0 shadow-none border dz-processing dz-image-preview dz-success dz-complete ">
+                            <div className="p-2">
+                              <Row className="align-items-center">
+                                <Col>
+                                  <Link
+                                    to="#"
+                                    className="text-muted font-weight-bold"
+                                  >
+                                    {selectedFiles.name}
+                                  </Link>
+                                  <p className="mb-0">
+                                    <strong>
+                                      {selectedFiles.formattedSize}
+                                    </strong>
+                                  </p>
+                                </Col>
+                              </Row>
+                            </div>
+                          </Card>
                         </div>
                       </div>
                     </TabPane>

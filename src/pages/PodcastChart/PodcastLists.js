@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { Link } from "react-router-dom"
 import {
@@ -8,13 +8,16 @@ import {
   CardTitle,
   CardImg,
   CardText,
-  CardFooter,
   Row,
   Alert,
 } from "reactstrap"
 require("dotenv").config()
 const ContactsGrid = props => {
-  const [data, set_data] = useState(props.podcast.podcastChannels)
+  const [data, set_data] = useState([])
+
+  useEffect(() => {
+    set_data(props.podcast.podcastChannels)
+  }, [props])
 
   const [searchItms, setSearchItms] = useState("")
   const [load, setLoad] = useState(false)
@@ -61,7 +64,7 @@ const ContactsGrid = props => {
         </Row>
       ) : (
         <Row>
-          {data.length != 0
+          {data
             ? data
                 .filter(val => {
                   if (searchItms === "") {
@@ -110,7 +113,7 @@ const ContactsGrid = props => {
                                   <b>
                                     {new Date(
                                       podcast.podcast_added_date
-                                    ).toLocaleString()}
+                                    ).toLocaleDateString()}
                                   </b>
                                 </Col>
                               </Row>

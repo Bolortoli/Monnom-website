@@ -24,6 +24,7 @@ import Switch from "react-switch"
 import classnames from "classnames"
 import { Link } from "react-router-dom"
 import SweetAlert from "react-bootstrap-sweetalert"
+import Select from "react-select"
 
 // file  generator
 const getItems = files => {
@@ -84,10 +85,10 @@ const AddBook = () => {
   const [profileImage, set_profileImage] = useState("")
   const [audio_book_label, set_audio_book_label] = useState("mp3 book")
   const [success_dlg, setsuccess_dlg] = useState(false)
-  const [selectedFiles, set_selectedFiles] = useState([])
   const [confirm_edit, set_confirm_edit] = useState(false)
   const [file_upload_name_message, set_file_upload_name_message] = useState("")
   const [youtube_url_name, set_youtube_url_name] = useState("")
+  const [category_of_book_message, set_category_of_book_message] = useState("")
   const [book_introduction_message, set_book_introduction_message] = useState(
     ""
   )
@@ -95,18 +96,40 @@ const AddBook = () => {
   // axios -oor damjuulah state set
   const [youtube_url_value, set_youtube_url_value] = useState("")
   const [book_introduction_value, set_book_introduction_value] = useState("")
+  const [selectedFiles, set_selectedFiles] = useState([])
   const [book_name_value, set_book_name_value] = useState("")
   const [book_author_value, set_book_author_value] = useState("")
   const [book_description_value, set_book_description_value] = useState("")
+  const [book_picture, set_book_picture] = useState(null)
   const [audio_book_files, set_audio_book_files] = useState([])
   const [book_files, set_book_files] = useState([])
+  const [selectedMulti, setselectedMulti] = useState([])
+  const [sale_count, set_sale_count] = useState(0)
 
   // create
   const createBook = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-upload`
+    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}/books`
     const formData = new FormData()
-    formData.append("book_name", book_name_value)
+
+    const sendBookInfo = {
+      name: book_name_value,
+      description: book_description_value,
+      picture: book_picture,
+
+      if(audio_book_files) {
+        has_pdf: true
+      },
+      if(book_files) {
+        has_mp3: true
+      },
+      if(sale_count) {
+        has_sale: true
+      },
+    }
+
     formData.append("book_author.name", book_author_value)
+    formData.append("book_author.description", book_description_value)
+
     // formData.append("has_sale", has_sale)
     // formData.append("has_mp3", has_mp3)
     // formData.append("has_pdf", has_pdf)
@@ -220,10 +243,11 @@ const AddBook = () => {
       }
     }
     reader.readAsDataURL(e.target.files[0])
+    set_book_picture(e.target.files[0])
   }
 
   // inputiin utga hooson esehiig shalgah
-  const handle1 = event => {
+  const handle1 = () => {
     if (book_name_value === "") {
       set_book_name_message("Хоосон утгатай байна !")
     } else {
@@ -239,9 +263,16 @@ const AddBook = () => {
     } else {
       set_book_author_message("")
     }
+    if (selectedMulti) {
+      set_category_of_book_message("")
+      console.log("not null")
+    } else {
+      set_category_of_book_message("Хоосон утгатай байна !")
+      console.log("null")
+    }
   }
 
-  const handle2 = event => {
+  const handle2 = () => {
     if (youtube_url_value === "") {
       set_youtube_url_name("Хоосон утгатай байна !")
     } else {
@@ -322,6 +353,44 @@ const AddBook = () => {
     )
 
     set_audio_book_files(items)
+  }
+
+  // multiple book categories
+  function handleMulti(selectedMulti) {
+    setselectedMulti(selectedMulti)
+    set_category_of_book_message("")
+  }
+
+  // book category
+  const optionGroup = [
+    {
+      label: "Сонголт 1",
+      options: [
+        { label: "Уран зохиол", value: "zohiol" },
+        { label: "Түүх", value: "history" },
+        { label: "Технологи", value: "technology" },
+      ],
+    },
+    {
+      label: "Сонголт 2",
+      options: [
+        { label: "Романтик", value: "romantic" },
+        { label: "Хувь хүний хөгжил", value: "self investment" },
+        { label: "Үлгэр домог   ", value: "Toilet Paper" },
+      ],
+    },
+  ]
+
+  const sdf = asd => {
+    const ddd = {
+      label: "   ",
+      options: asd.map(a => {
+        return {
+          label: "",
+          value: "",
+        }
+      }),
+    }
   }
 
   return (
@@ -451,6 +520,27 @@ const AddBook = () => {
                     <TabPane tabId={1} id="personal-info">
                       <Form>
                         <Row>
+                          <Col lg={8} className="w-100 mx-auto">
+                            <FormGroup className="select2-container">
+                              <label className="control-label">
+                                Номны төрөл
+                              </label>
+                              <Select
+                                value={selectedMulti}
+                                isMulti={true}
+                                defaultValue={optionGroup[0]}
+                                placeholder="Сонгох ... "
+                                onChange={() => {
+                                  handleMulti()
+                                }}
+                                options={optionGroup}
+                                classNamePrefix="select2-selection"
+                              />
+                              <p class="text-danger">
+                                {category_of_book_message}
+                              </p>
+                            </FormGroup>
+                          </Col>
                           <Col lg="6">
                             <FormGroup>
                               <Label for="kycfirstname-input">Номын нэр</Label>
@@ -543,20 +633,39 @@ const AddBook = () => {
                               />
                             </label>
                           </Col>
-                          <Col lg={6}>
-                            {checked ? (
-                              <Row>
-                                <Col lg={6}>
-                                  <Label for="exampleSelect1">
-                                    Зарагдах тоо оруулах
-                                  </Label>
-                                </Col>
-                                <Col lg={4}>
-                                  <Input type="number" value="0" />
-                                </Col>
-                              </Row>
-                            ) : null}
-                          </Col>
+                        </Row>
+                        <Row>
+                          {checked ? (
+                            <>
+                              <Col lg={3} className="my-auto">
+                                <Label for="exampleSelect1">
+                                  Зарагдах тоо оруулах
+                                </Label>
+                              </Col>
+                              <Col lg={3}>
+                                <Input
+                                  type="number"
+                                  // value="0"
+                                  onChange={e => set_sale_count(e.target.value)}
+                                />
+                              </Col>
+                              <Col lg={3} className="my-auto">
+                                <Label
+                                  for="exampleSelect1"
+                                  className="text-right w-100"
+                                >
+                                  Нэг бүрийн үнэ
+                                </Label>
+                              </Col>
+                              <Col lg={3}>
+                                <Input
+                                  type="number"
+                                  // value="0"
+                                  onChange={e => set_sale_count(e.target.value)}
+                                />
+                              </Col>
+                            </>
+                          ) : null}
                         </Row>
                       </Form>
                     </TabPane>
@@ -617,7 +726,7 @@ const AddBook = () => {
                                       <div className="mb-3">
                                         <i className="display-4 text-muted bx bxs-cloud-upload"></i>
                                       </div>
-                                      <h3>Файлаа энд байршуулна уу ?</h3>
+                                      <h3>Зурагаа энд байршуулна уу ?</h3>
                                     </div>
                                   </div>
                                 )}

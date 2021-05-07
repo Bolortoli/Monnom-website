@@ -13,15 +13,8 @@ import {
   FormGroup,
 } from "reactstrap"
 import SweetAlert from "react-bootstrap-sweetalert"
-
-const config = {
-  headers: {
-    "content-type": "multipart/form-data",
-    // Authorization: `Bearer ${
-    //   JSON.parse(localStorage.getItem("user_information")).jwt
-    // }`,
-  },
-}
+import axios from "axios"
+import { update } from "lodash"
 
 const columns = [
   {
@@ -70,19 +63,31 @@ const List = props => {
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
   const [coverImage, setCoverImage] = useState("")
+  const [delete_podcast_id, set_delete_podcast_id] = useState(null)
 
   // update, delete hiih state uud
+  const [podcast_pic, set_podcast_pic] = useState(null)
   const [edit_podcast_name, set_edit_podcast_name] = useState("")
   const [edit_podcast_desc, set_edit_podcast_desc] = useState("")
   const [edit_podcast_file, set_edit_podcast_file] = useState("")
 
   // axios oor huselt ywuulj update hiih
   const updatePodcast = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-upload`
+    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-upload`
     const updateForm = new FormData()
     updateForm.append("podcast_name", edit_podcast_name)
     updateForm.append("podcast_desc", edit_podcast_desc)
     updateForm.append("podcast_file_name", edit_podcast_file)
+    updateForm.append("podcast_profile_pic", podcast_pic)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
 
     await axios
       .post(url, updateForm, config)
@@ -93,19 +98,16 @@ const List = props => {
   }
 
   // axios oor huselt ywuulj delete hiih
-  const deletePodcast = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-upload`
-    const formData = new FormData()
-    formData.append("podcast_name", edit_podcast_name)
-    formData.append("podcast_name", edit_podcast_name)
-    formData.append("podcast_desc", edit_podcast_desc)
-    formData.append("podcast_file_name", edit_podcast_file)
-
+  const deletePodcast = async id => {
+    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast/${id}`
     await axios
-      .post(url, formData, config)
-      .then(async res => {})
+      .delete(url)
+      .then(async res => {
+        console.log("aldaagui")
+        setsuccess_dlg(true)
+      })
       .catch(e => {
-        alert(e)
+        console.log("sdasdasd", url)
       })
   }
 
@@ -118,6 +120,7 @@ const List = props => {
       }
     }
     reader.readAsDataURL(e.target.files[0])
+    set_podcast_pic(e.target.files[0])
   }
 
   // table der nemj edit button, tolowiig haruulah
@@ -147,10 +150,8 @@ const List = props => {
               />
               <i
                 onClick={() => {
+                  set_delete_podcast_id(d.id)
                   set_confirm_delete(true)
-                  set_edit_podcast_name(d.podcast_name)
-                  set_edit_podcast_desc(d.podcast_desc)
-                  set_edit_podcast_file(d.podcast_file_name)
                 }}
                 className="bx bxs-trash text-danger font-size-20"
               />
@@ -369,9 +370,8 @@ const List = props => {
             confirmBtnBsStyle="success"
             cancelBtnBsStyle="danger"
             onConfirm={() => {
-              deletePodcast()
+              deletePodcast(delete_podcast_id)
               set_confirm_delete(false)
-              setsuccess_dlg(true)
               setdynamic_title("Амжилттай")
               setdynamic_description("Энэ подкастыг амжилттай устгалаа.")
             }}

@@ -25,16 +25,16 @@ const LiveChannel = () => {
       },
     })
       .then(res => {
-        setIsNetworking(false)
         set_data(res.data)
+        setIsNetworking(false)
       })
       .catch(err => {
-        setIsNetworking(false)
+        setIsNetworking(true)
       })
   }
 
   useEffect(() => {
-    makeGetReq()
+    // makeGetReq()
   }, [])
 
   return (

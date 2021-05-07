@@ -8,7 +8,7 @@ const PodcastList = () => {
   const [data, set_data] = useState([])
 
   // Check network
-  const [isNetworking, setIsNetworking] = useState(false)
+  const [isNetworking, setIsNetworking] = useState(true)
 
   async function makeGetReq() {
     await axios({
@@ -22,6 +22,7 @@ const PodcastList = () => {
     })
       .then(res => {
         set_data(res.data)
+        setIsNetworking(false)
       })
       .catch(err => {
         setIsNetworking(true)
