@@ -103,6 +103,13 @@ const SidebarContent = props => {
           </li>
 
           <li>
+            <Link to="/delivery" className=" waves-effect">
+              <i className="bx bx-cart-alt"></i>
+              <span>{props.t("Хүргэлтийн мэдээлэл")}</span>
+            </Link>
+          </li>
+
+          <li>
             <Link to="/settings" className=" waves-effect">
               <i className="bx bx-wrench"></i>
               <span>{props.t("Тохиргоо")}</span>

@@ -248,8 +248,6 @@ const List = props => {
       }
     })
     set_data(tempInitialData)
-    console.log("console.log")
-    console.log(tempInitialData)
   }
 
   const book_datatable = {

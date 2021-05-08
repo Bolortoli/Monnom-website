@@ -12,22 +12,23 @@ import {
 } from "reactstrap"
 
 import Breadcrumbs from "../../components/Common/Breadcrumb"
+import GivePermission from "./givePermission"
 
 import axios from "axios"
 import { MDBDataTable } from "mdbreact"
+import { Link } from "react-router-dom"
+import Switch from "react-switch"
 import SweetAlert from "react-bootstrap-sweetalert"
 require("dotenv").config()
 
 const Customers = () => {
-  const [book_data, set_book_data] = useState([])
   const [tableRows, setTableRows] = useState([])
   const [isNetworking, setIsNetworking] = useState(false)
+
   const [is_gift_btn, set_is_gift_btn] = useState(false)
-  const [gift_count, set_gift_count] = useState(0)
   const [confirm_allow, set_confirm_allow] = useState(false)
   const [success_dlg, setsuccess_dlg] = useState(false)
   const [dynamic_title, setdynamic_title] = useState("")
-  const [confirm_gift, set_confirm_gift] = useState({ id: null, state: false })
 
   const data = {
     columns: [
@@ -99,6 +100,7 @@ const Customers = () => {
             gift: (
               <i
                 onClick={() => {
+                  // makeGetReq()
                   set_is_gift_btn(true)
                 }}
                 className="bx bx-gift text-success text-center d-block"
@@ -123,32 +125,9 @@ const Customers = () => {
       })
   }
 
-  async function makeGetReq() {
-    await axios({
-      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/books`,
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    })
-      .then(res => {
-        set_book_data(res.data)
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
-
   useEffect(() => {
     fetchData()
-    makeGetReq()
   }, [])
-
-  const toggleBtn = (id, checked) => {
-    set_confirm_gift({ id: id, state: !checked })
-  }
 
   return (
     <React.Fragment>
@@ -162,102 +141,10 @@ const Customers = () => {
           ) : (
             <Row>
               {is_gift_btn ? (
-                <SweetAlert
-                  showCancel
-                  cancelBtnBsStyle="primary"
-                  confirmBtnBsStyle="success"
-                  confirmBtnText="Бэлэглэх"
-                  cancelBtnText="Цуцлах"
-                  onConfirm={() => {
-                    set_confirm_allow(true)
-                    set_is_gift_btn(false)
-                  }}
-                  onCancel={() => {
-                    set_is_gift_btn(false)
-                  }}
-                >
-                  <Row>
-                    <CardTitle className="text-center w-100 font-size-20 border-bottom border-light pb-2">
-                      Бэлэглэх номоо сонгоно уу ?
-                    </CardTitle>
-                    <CardBody>
-                      {book_data.map(book => (
-                        <div
-                          className="d-flex mb-2"
-                          style={{
-                            maxHeight: "300px",
-                          }}
-                        >
-                          <img
-                            src={
-                              process.env.REACT_APP_STRAPI_BASE_URL +
-                              book.picture
-                            }
-                            style={{
-                              height: "120px",
-                              width: "27%",
-                              borderRadius: "10px",
-                              marginRight: "1rem",
-                            }}
-                          ></img>
-                          <div
-                            className="d-flex flex-column"
-                            style={{ width: "70%" }}
-                          >
-                            <strong className="font-size-18 d-block mb-3 text-left w-100">
-                              {book.name}
-                            </strong>
-                            <div className="d-flex mb-3 w-50 justify-content-around">
-                              <i
-                                style={{
-                                  color: book.has_sale ? "#24ea75" : "#767676",
-                                  fontSize: "25px",
-                                }}
-                                className="bx bxs-book-open font-size-30"
-                              />
-                              <i
-                                style={{
-                                  color: book.has_pdf ? "#fe2379" : "#767676",
-                                  fontSize: "25px",
-                                }}
-                                className="bx bxs-music"
-                              />
-                              <i
-                                style={{
-                                  color: book.has_audio ? "#ffd722" : "#767676",
-                                  fontSize: "25px",
-                                }}
-                                className="bx bxs-file-pdf"
-                              />
-                            </div>
-                            <div className="text-right">
-                              <div class="custom-control custom-checkbox">
-                                <input
-                                  type="checkbox"
-                                  class="custom-control-input"
-                                  id="customCheck1"
-                                  checked={confirm_gift.state}
-                                  onClick={() => {
-                                    toggleBtn(book.id, confirm_gift)
-                                  }}
-                                />
-                                <label
-                                  class="custom-control-label"
-                                  for="customCheck1"
-                                >
-                                  Сонгох
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </CardBody>
-                    <CardFooter className="w-100">
-                      Нийт сонгосон ном {gift_count}
-                    </CardFooter>
-                  </Row>
-                </SweetAlert>
+                <GivePermission
+                  confirm={set_confirm_allow}
+                  cancel={set_is_gift_btn}
+                />
               ) : null}
               {confirm_allow ? (
                 <SweetAlert
