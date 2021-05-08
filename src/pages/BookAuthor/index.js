@@ -10,10 +10,10 @@ require("dotenv").config()
 
 const BookAuthor = () => {
   const { id } = useParams()
-  const [data, set_data] = useState([])
+  const [data, set_data] = useState(null)
 
   // Check network
-  const [isNetworking, setIsNetworking] = useState(false)
+  const [isNetworking, setIsNetworking] = useState(true)
 
   async function makeGetReq() {
     await axios({
@@ -27,6 +27,8 @@ const BookAuthor = () => {
     })
       .then(res => {
         set_data(res.data)
+        console.log("res ->", res.data)
+        setIsNetworking(false)
       })
       .catch(err => {
         setIsNetworking(true)
@@ -47,7 +49,7 @@ const BookAuthor = () => {
         ) : (
           <React.Fragment>
             <Breadcrumb breadcrumbItem="Ном дэлгэрэнгүй" title="Ном" />
-            {data != 0 ? <BookDetail user={data} /> : null}
+            <BookDetail user={data} />
           </React.Fragment>
         )}
       </div>

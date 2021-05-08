@@ -186,11 +186,10 @@ const SalesList = props => {
   const pdfDatatable = { columns: bookColumns, rows: books }
 
   useEffect(() => {
-    initBookData(books)
-    initMp3kData(mp3_books)
-    initPdfData(pdf_books)
-    // fetchData();
-  }, [])
+    initBookData(props.books.books)
+    initMp3kData(props.books.book_mp3)
+    initPdfData(props.books.book_pdf)
+  }, [props])
 
   return (
     <React.Fragment>

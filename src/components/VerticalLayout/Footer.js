@@ -10,7 +10,7 @@ const Footer = () => {
             <Col md={6}>{new Date().getFullYear()} © MON | NOM</Col>
             <Col md={6}>
               <div className="text-sm-right d-none d-sm-block">
-                Design & Develop by Diverse Solutiona LLC
+                Design & Develop by Diverse Solutions LLC
               </div>
             </Col>
           </Row>

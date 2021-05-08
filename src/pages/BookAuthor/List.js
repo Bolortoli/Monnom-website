@@ -8,52 +8,52 @@ import {
   Card,
   CardBody,
   CardTitle,
-  CardSubtitle,
   Label,
   Input,
   FormGroup,
-  Button,
+  Form,
 } from "reactstrap"
 import Switch from "react-switch"
 import SweetAlert from "react-bootstrap-sweetalert"
 import axios from "axios"
 import { update } from "lodash"
+import Select from "react-select"
 
 const List = props => {
-  const [data, set_data] = useState(props.books.user_books)
-  console.log("props utga ", props.books.user_books)
+  const [data, set_data] = useState(null)
 
   const [edit_user_step, set_edit_user_step] = useState(false)
-  const [book_author_info, set_book_author_info] = useState(false)
+  const [book_comments_section, set_book_comments_section] = useState(false)
   const [edit_has_sale, set_edit_has_sale] = useState(false)
   const [edit_has_mp3, set_edit_has_mp3] = useState(false)
   const [edit_has_pdf, set_edit_has_pdf] = useState(false)
   const [edit_podcast_state, set_edit_podcast_state] = useState(false)
   const [checked, set_checked] = useState(false)
-  const [file_name, set_file_name] = useState("")
   const [coverImage, setCoverImage] = useState("")
   const [confirm_edit, set_confirm_edit] = useState(false)
   const [confirm_delete, set_confirm_delete] = useState(false)
   const [success_dlg, setsuccess_dlg] = useState(false)
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
+  const [author_image, set_author_image] = useState(null)
+  const [remove_comm, set_remove_comm] = useState("")
+  const [optionGroup, set_optionGroup] = useState([])
+  const [delete_book_id, set_delete_book_id] = useState(null)
 
   // update, delete hiih state uud
+  const [selectedMulti, setselectedMulti] = useState([])
   const [edit_book_name, set_edit_book_name] = useState("")
-  const [edit_book_author_name, set_edit_book_author_name] = useState("")
-  const [edit_book_author_desc, set_edit_book_author_desc] = useState("")
-  const [edit_book_author_img, set_edit_book_author_img] = useState("")
   const [edit_book_desc, set_edit_book_desc] = useState("")
   const [edit_book_img, set_edit_book_img] = useState("")
+  const [edit_book_comments, set_edit_book_comments] = useState([])
 
   // axios oor huselt ywuulj update hiih
   const updateBook = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-upload`
+    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}/book-upload`
     const formData = new FormData()
-    formData.set("book_name", edit_book_name)
-    formData.set("book_author.name", edit_book_author_name)
-    formData.set("book_author.description", edit_book_author_desc)
-    formData.set("book_author.profile_pic", edit_book_author_img)
+    formData.append("name", edit_book_name)
+    formData.append("book_desc", edit_book_desc)
+    formData.append("book_pic_url", author_image)
 
     const config = {
       headers: {
@@ -74,30 +74,30 @@ const List = props => {
   }
 
   // axios oor huselt ywuulj delete hiih
-  const deleteBook = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-upload`
-    const formData = new FormData()
-    formData.delete("book_name", edit_book_name)
-    formData.delete("book_author.name", edit_book_author_name)
-    formData.delete("book_author.description", edit_book_author_desc)
-    formData.delete("book_author.profile_pic", edit_book_author_img)
+  const deleteBook = async id => {
+    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}/book-upload/${id}`
 
-    const config = {
-      headers: {
-        "content-type": "multiplart/form-data",
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    }
     await axios
-      .post(url, formData, config)
+      .delete(url)
       .then(async res => {
-        console.log(res.data)
+        setsuccess_dlg(true)
       })
-      .catch(e => {
-        alert(e)
-      })
+      .catch(e => {})
+  }
+
+  // multiple book authors selected
+  function handleMulti(selectedMulti) {
+    setselectedMulti(selectedMulti)
+  }
+
+  const getAuthorsInfo = authors => {
+    const a = authors.map(author => {
+      return {
+        label: author.name,
+        value: author.id,
+      }
+    })
+    set_optionGroup(a)
   }
 
   // book section
@@ -115,10 +115,16 @@ const List = props => {
       width: 100,
     },
     {
+      label: "Сэтгэгдэлүүд",
+      field: "book_comments",
+      sort: "disabled",
+      width: "100",
+    },
+    {
       label: "Нийтлэгдсэн огноо",
       field: "book_date",
       sort: "disabled",
-      width: 100,
+      width: 70,
     },
     {
       label: "Төрөл",
@@ -142,51 +148,58 @@ const List = props => {
 
   const initData = booksData => {
     let tempInitialData = booksData.map(d => {
+      console.log(d.book_comments)
       return {
         book_name: d.book_name,
         // book_author: d.book_author.name,
-        book_date: new Date(d.book_added_date).toLocaleString(),
-        // book_state: d.book_state,
-        // type: d.type,
-        // state: (
-        //   <>
-        //     {d.book_state ? (
-        //       <p className="text-muted mb-0">
-        //         <i className="mdi mdi-circle text-success" />
-        //         Идэвхитэй
-        //       </p>
-        //     ) : (
-        //       <p className="text-muted mb-0">
-        //         <i className="mdi mdi-circle text-danger" />
-        //         Идэвхгүй
-        //       </p>
-        //     )}
-        //   </>
-        // ),
-        book: (
+        book_date: new Date(d.book_added_date).toLocaleDateString(),
+        book_state: d.book_state,
+        type: d.type,
+        state: (
+          <>
+            {d.book_state ? (
+              <p className="text-muted mb-0">
+                <i className="mdi mdi-circle text-success" />
+                Идэвхитэй
+              </p>
+            ) : (
+              <p className="text-muted mb-0">
+                <i className="mdi mdi-circle text-danger" />
+                Идэвхгүй
+              </p>
+            )}
+          </>
+        ),
+        book_comments: (
           <Link
             onClick={() => {
-              if (!d.book_author) {
-              } else {
-                set_book_author_info(true)
-                set_edit_book_author_name(d.book_author.name)
-                set_edit_book_author_desc(d.book_author.description)
-                set_edit_book_author_img(d.book_author.profile_pic)
-              }
+              set_book_comments_section(true)
+              set_edit_book_comments(d.book_comments)
             }}
           >
-            {d.book_author.name}
+            Харах
           </Link>
+        ),
+        book: (
+          <select
+            multiple
+            size="2"
+            className="bg-transparent m-0 p-0"
+            style={{ border: "none" }}
+          >
+            {d.book_author.map(author => (
+              <option className="p-0 m-0">{author.name}</option>
+            ))}
+          </select>
         ),
         book_edit: (
           <Link to="#" className="d-flex justify-content-around">
             <i
               onClick={() => {
+                getAuthorsInfo(d.book_author)
                 set_edit_user_step(true)
                 set_edit_book_name(d.book_name)
-                set_edit_book_author_name(d.book_author.name)
-                set_edit_book_desc(d.book_author.description)
-                set_edit_book_img(d.book_author.profile_pic)
+                set_edit_book_desc(d.book_desc)
                 set_edit_has_pdf(d.has_pdf)
                 set_edit_has_mp3(d.has_mp3)
                 set_edit_has_sale(d.has_sale)
@@ -200,17 +213,16 @@ const List = props => {
             />
             <i
               onClick={() => {
+                set_delete_book_id(d.id)
                 set_confirm_delete(true)
-                set_edit_book_name(d.book_name)
-                set_edit_book_author_name(d.book_author.name)
-                set_edit_book_desc(d.book_author.description)
-                set_edit_book_img(d.book_author.profile_pic)
-                set_edit_has_pdf(d.has_pdf)
-                set_edit_has_mp3(d.has_mp3)
-                set_edit_has_sale(d.has_sale)
-                setCoverImage(
-                  process.env.REACT_APP_STRAPI_BASE_URL + edit_book_img
-                )
+                // set_edit_book_name(d.book_name)
+                // set_edit_book_img(d.book_author.profile_pic)
+                // set_edit_has_pdf(d.has_pdf)
+                // set_edit_has_mp3(d.has_mp3)
+                // set_edit_has_sale(d.has_sale)
+                // setCoverImage(
+                //   process.env.REACT_APP_STRAPI_BASE_URL + edit_book_img
+                // )
               }}
               className="bx bxs-trash text-danger font-size-20"
             />
@@ -235,6 +247,8 @@ const List = props => {
       }
     })
     set_data(tempInitialData)
+    console.log("console.log")
+    console.log(tempInitialData)
   }
 
   const book_datatable = {
@@ -243,7 +257,7 @@ const List = props => {
   }
 
   useEffect(() => {
-    initData(data)
+    initData(props.books)
   }, [])
 
   // nomiin zurag solih
@@ -255,6 +269,12 @@ const List = props => {
       }
     }
     reader.readAsDataURL(e.target.files[0])
+    set_author_image(e.target.files[0])
+  }
+
+  // delete comment
+  const removeComment = comm => {
+    set_edit_book_comments(edit_book_comments.filter(x => x !== comm))
   }
 
   // nomiin tolowiig toggledoh
@@ -265,7 +285,7 @@ const List = props => {
   return (
     <React.Fragment>
       <Row>
-        {book_author_info ? (
+        {book_comments_section ? (
           <SweetAlert
             confirmBtnBsStyle="primary"
             confirmBtnText="Гарах"
@@ -274,30 +294,73 @@ const List = props => {
               borderRadius: "20px",
             }}
             onConfirm={() => {
-              set_book_author_info(false)
+              set_book_comments_section(false)
             }}
           >
-            <Row className="mt-1">
-              <Col lg={10} className="mx-auto">
-                <CardTitle className="d-flex justify-content-around">
-                  <h4>Зохиолч : </h4>
-                  <h4 className="text-dark">{edit_book_author_name}</h4>
-                </CardTitle>
-              </Col>
-              <Col lg={6} className="mx-auto">
-                <img
-                  className="img-fluid"
-                  src={
-                    process.env.REACT_APP_STRAPI_BASE_URL + edit_book_author_img
-                  }
-                />
-              </Col>
-              <Col lg={12} className="mt-4">
-                <Label className="text-dark font-size-18">Танилцуулга</Label>
-                <Label style={{ textAlign: "justify" }}>
-                  {edit_book_author_desc}
-                </Label>
-              </Col>
+            <CardTitle className="mb-4">Сэтгэгдэлүүд</CardTitle>
+            <Row>
+              {edit_book_comments.map((comment, key) => (
+                <Col
+                  lg={12}
+                  key={key}
+                  className="border pt-3 rounded mb-2"
+                  style={{
+                    maxHeight: "500px",
+                  }}
+                >
+                  <div className="d-flex">
+                    <p className="text-left">
+                      <strong className="text-primary">
+                        {comment.user_name}
+                      </strong>{" "}
+                      - {new Date(comment.created_at).toLocaleString()}
+                    </p>
+                    <i
+                      className="dripicons-cross font-size-20 my-auto text-dark"
+                      style={{
+                        cursor: "pointer",
+                        margin: "auto",
+                        marginRight: "0",
+                      }}
+                      onClick={() => {
+                        set_checked(true), set_remove_comm(comment)
+                      }}
+                    />
+                  </div>
+                  <p className="text-left">{comment.comment}</p>
+                </Col>
+              ))}
+              {edit_book_comments.map((comment, key) => (
+                <Col
+                  lg={12}
+                  key={key}
+                  className="border pt-3 rounded mb-2"
+                  style={{
+                    maxHeight: "500px",
+                  }}
+                >
+                  <div className="d-flex">
+                    <p className="text-left">
+                      <strong className="text-primary">
+                        {comment.user_name}
+                      </strong>{" "}
+                      - {new Date(comment.created_at).toLocaleString()}
+                    </p>
+                    <i
+                      className="dripicons-cross font-size-20 my-auto text-dark"
+                      style={{
+                        cursor: "pointer",
+                        margin: "auto",
+                        marginRight: "0",
+                      }}
+                      onClick={() => {
+                        set_checked(true), set_remove_comm(comment)
+                      }}
+                    />
+                  </div>
+                  <p className="text-left">{comment.comment}</p>
+                </Col>
+              ))}
             </Row>
           </SweetAlert>
         ) : null}
@@ -315,6 +378,7 @@ const List = props => {
             onConfirm={() => {
               set_edit_user_step(false)
               set_confirm_edit(true)
+              console.log("file = > ", selectedMulti)
             }}
             onCancel={() => {
               set_edit_user_step(false)
@@ -351,12 +415,15 @@ const List = props => {
                     </Label>
                   </Col>
                   <Col lg={9}>
-                    <Input
-                      type="text"
-                      value={edit_book_author_name}
-                      onChange={event => {
-                        set_edit_book_author_name(event.target.value)
+                    <Select
+                      value={selectedMulti}
+                      isMulti={true}
+                      placeholder="Сонгох ... "
+                      onChange={() => {
+                        handleMulti()
                       }}
+                      options={optionGroup}
+                      classNamePrefix="select2-selection"
                     />
                   </Col>
                 </Row>
@@ -387,7 +454,7 @@ const List = props => {
                   <Row>
                     <img
                       className="rounded"
-                      alt="Skote"
+                      alt=""
                       width="150"
                       src={coverImage}
                       //   onClick={() => {}}
@@ -479,7 +546,7 @@ const List = props => {
         ) : null}
         {confirm_delete ? (
           <SweetAlert
-            title="Та энэ подкастыг устгах гэж байна !"
+            title="Та энэ номыг устгах гэж байна !"
             warning
             showCancel
             confirmBtnText="Тийм"
@@ -488,13 +555,30 @@ const List = props => {
             cancelBtnBsStyle="danger"
             onConfirm={() => {
               set_confirm_delete(false)
-              setsuccess_dlg(true)
               setdynamic_title("Амжилттай")
               setdynamic_description("Энэ подкастыг амжилттай устгалаа.")
-              deleteBook()
+              deleteBook(delete_book_id)
             }}
             onCancel={() => {
               set_confirm_delete(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {checked ? (
+          <SweetAlert
+            title="Та энэ комментыг устгах гэж байна !"
+            warning
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Болих"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              set_checked(false)
+              removeComment(remove_comm)
+            }}
+            onCancel={() => {
+              set_checked(false)
             }}
           ></SweetAlert>
         ) : null}
@@ -504,7 +588,7 @@ const List = props => {
               <div className="d-flex justify-content-between m-0 p-0">
                 <CardTitle>Номны жагсаалт</CardTitle>
                 <CardTitle>
-                  <AddBook data={data} />
+                  <AddBook />
                 </CardTitle>
               </div>
               <MDBDataTable

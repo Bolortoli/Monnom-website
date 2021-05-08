@@ -6,7 +6,7 @@ import SettingsForm from "./SettingsForm"
 
 export default function Settings() {
   // Check network
-  const [isNetworking, setIsNetworking] = useState(false)
+  const [isNetworking, setIsNetworking] = useState(true)
 
   return (
     <React.Fragment>

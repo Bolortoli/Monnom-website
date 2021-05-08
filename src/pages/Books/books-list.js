@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { Link } from "react-router-dom"
-import AddBook from "./AddBook"
 import { Alert } from "reactstrap"
 import {
   Container,
@@ -12,7 +11,6 @@ import {
   CardTitle,
   CardImg,
   CardText,
-  CardFooter,
 } from "reactstrap"
 
 import Breadcrumbs from "../../components/Common/Breadcrumb"
@@ -23,15 +21,19 @@ require("dotenv").config()
 const Books = () => {
   const [booksList, setBooksList] = useState([])
   const [searchItms, setSearchItms] = useState("")
-  const [isNetworking, setIsNetworking] = useState(false)
-  const [allow, set_allow] = useState(false)
+  const [isNetworking, setIsNetworking] = useState(true)
+  const [allow, set_allow] = useState({
+    id: null,
+    state: false,
+  })
+  const [allow_id, set_allow_id] = useState(0)
   const [confirm_allow, set_confirm_allow] = useState(false)
   const [success_dlg, setsuccess_dlg] = useState(false)
   const [dynamic_title, setdynamic_title] = useState("")
   const [dynamic_description, setdynamic_description] = useState("")
 
   const toggleAllow = checked => {
-    set_allow(!checked)
+    set_allow({ id: allow_id, state: !checked })
   }
 
   const fetchData = async () => {
@@ -46,6 +48,7 @@ const Books = () => {
     })
       .then(res => {
         setBooksList(res.data)
+        setIsNetworking(false)
       })
       .catch(err => {
         setIsNetworking(true)
@@ -85,34 +88,6 @@ const Books = () => {
               </Col>
             </Row>
             <Row>
-              <Col xl={3} lg={4} md={4} sm={4}>
-                <Card className="text-center" style={{ background: "#ccf0e3" }}>
-                  <CardBody
-                    style={{
-                      height: "24rem",
-                      marginLeft: "30px",
-                    }}
-                    className="d-flex align-items-center justify-content-center"
-                  >
-                    {/* <i
-                      className="bx bx-plus position-relative"
-                      style={{
-                        fontSize: "157px",
-                        color: "#34c38f",
-                        cursor: "pointer",
-                      }}
-                    /> */}
-                    <AddBook />
-                  </CardBody>
-                  <CardFooter className="bg-transparent border-top">
-                    <div className="contact-links d-flex font-size-20">
-                      <div className="flex-fill" style={{ color: "#34c38f" }}>
-                        Ном нэмэх
-                      </div>
-                    </div>
-                  </CardFooter>
-                </Card>
-              </Col>
               {booksList
                 .filter(val => {
                   if (searchItms === "") {
@@ -152,12 +127,12 @@ const Books = () => {
                             <Col xl={6} className="text-left">
                               Нэмэгдсэн огноо:
                             </Col>
-                            <Col xl={6} className="text-right">
-                              <b className="d-block">
+                            <Col xl={6} className="text-right mb-2">
+                              <strong className="d-block">
                                 {new Date(
                                   book.book_added_date
-                                ).toLocaleString()}
-                              </b>
+                                ).toLocaleDateString()}
+                              </strong>
                             </Col>
                           </Row>
                           <Row>
@@ -165,9 +140,21 @@ const Books = () => {
                               Зохиогч:
                             </Col>
                             <Col xl={8} className="text-right">
-                              <b className="d-block">
+                              {/* <b className="d-block">
                                 {book.book_author_name.slice(0, 14)}
-                              </b>
+                              </b> */}
+                              <select
+                                multiple
+                                size="2"
+                                className="bg-transparent m-0 p-0"
+                                style={{ border: "none" }}
+                              >
+                                {book.book_author_name.map(author => (
+                                  <option className="p-0 m-0 font-weight-bolder">
+                                    {author.slice(0, 14)}
+                                  </option>
+                                ))}
+                              </select>
                             </Col>
                           </Row>
                           <Row>
@@ -196,9 +183,10 @@ const Books = () => {
                                   class="custom-control-input"
                                   id="customCheck1"
                                   onClick={() => {
+                                    set_allow_id(1)
                                     set_confirm_allow(true)
                                   }}
-                                  checked={allow}
+                                  checked={allow.state}
                                 />
                                 <label
                                   class="custom-control-label"

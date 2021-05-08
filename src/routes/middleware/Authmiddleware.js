@@ -11,8 +11,8 @@ const Authmiddleware = ({
   <Route
     {...rest}
     render={props => {
-      console.log('localStorage.getItem("authUser")')
-      console.log(localStorage.getItem("isAuthenticated"))
+      // console.log('localStorage.getItem("authUser")')
+      // console.log(localStorage.getItem("isAuthenticated"))
       if (
         isAuthProtected &&
         (!localStorage.getItem("isAuthenticated") ||

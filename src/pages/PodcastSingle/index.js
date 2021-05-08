@@ -11,6 +11,9 @@ const PodcastSinglePage = () => {
   const { id } = useParams()
   const [data, set_data] = useState(null)
 
+  // Check network
+  const [isNetworking, setIsNetworking] = useState(true)
+
   async function makeGetReq() {
     await axios({
       url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels/${id}`,
@@ -23,6 +26,7 @@ const PodcastSinglePage = () => {
     })
       .then(res => {
         set_data(res.data)
+        setIsNetworking(false)
       })
       .catch(err => {
         setIsNetworking(true)
@@ -32,9 +36,6 @@ const PodcastSinglePage = () => {
   useEffect(() => {
     makeGetReq()
   }, [])
-
-  // Check network
-  const [isNetworking, setIsNetworking] = useState(false)
 
   return (
     <React.Fragment>

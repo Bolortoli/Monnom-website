@@ -68,7 +68,7 @@ const Sales = () => {
   const [data, set_data] = useState(demoData)
 
   // Check network
-  const [isNetworking, setIsNetworking] = useState(false)
+  const [isNetworking, setIsNetworking] = useState(true)
 
   async function makeGetReq() {
     await axios({
@@ -90,7 +90,7 @@ const Sales = () => {
   }
 
   useEffect(() => {
-    makeGetReq()
+    // makeGetReq()
   }, [])
   return (
     <React.Fragment>
