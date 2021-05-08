@@ -120,7 +120,10 @@ const Navbar = props => {
                     <Link to="/app-users" className="dropdown-item">
                       {props.t("Хэрэглэгчид")}
                     </Link>
-                    <Link to="#" className="dropdown-item">
+                    <Link to="/delivery" className="dropdown-item">
+                      {props.t("Хүргэлтийн мэдээлэл")}
+                    </Link>
+                    <Link to="/settings" className="dropdown-item">
                       {props.t("Тохиргоо")}
                     </Link>
                   </div>

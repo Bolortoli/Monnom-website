@@ -7,18 +7,28 @@ import {
   CardBody,
   CardTitle,
   CardSubtitle,
+  CardFooter,
   Alert,
 } from "reactstrap"
 
 import Breadcrumbs from "../../components/Common/Breadcrumb"
+import GivePermission from "./givePermission"
 
 import axios from "axios"
 import { MDBDataTable } from "mdbreact"
+import { Link } from "react-router-dom"
+import Switch from "react-switch"
+import SweetAlert from "react-bootstrap-sweetalert"
 require("dotenv").config()
 
 const Customers = () => {
   const [tableRows, setTableRows] = useState([])
   const [isNetworking, setIsNetworking] = useState(false)
+
+  const [is_gift_btn, set_is_gift_btn] = useState(false)
+  const [confirm_allow, set_confirm_allow] = useState(false)
+  const [success_dlg, setsuccess_dlg] = useState(false)
+  const [dynamic_title, setdynamic_title] = useState("")
 
   const data = {
     columns: [
@@ -53,6 +63,12 @@ const Customers = () => {
         width: 150,
       },
       {
+        label: "Бэлэг",
+        field: "gift",
+        sort: "disabled",
+        width: 50,
+      },
+      {
         label: "Зураг",
         field: "pic",
         sort: "asc",
@@ -81,6 +97,17 @@ const Customers = () => {
             phone: data.phone,
             gender: data.gender === "Male" ? "Эр" : "Эм",
             date: new Date(data.created_at).toLocaleString(),
+            gift: (
+              <i
+                onClick={() => {
+                  // makeGetReq()
+                  set_is_gift_btn(true)
+                }}
+                className="bx bx-gift text-success text-center d-block"
+                style={{ cursor: "pointer", fontSize: "40px" }}
+                id="edittooltip"
+              />
+            ),
             pic: (
               <img
                 style={{ width: "50px", height: "50px", borderRadius: "50%" }}
@@ -113,6 +140,48 @@ const Customers = () => {
             </Alert>
           ) : (
             <Row>
+              {is_gift_btn ? (
+                <GivePermission
+                  confirm={set_confirm_allow}
+                  cancel={set_is_gift_btn}
+                />
+              ) : null}
+              {confirm_allow ? (
+                <SweetAlert
+                  title="Та итгэлтэй байна уу ?"
+                  warning
+                  showCancel
+                  confirmBtnText="Тийм"
+                  cancelBtnText="Болих"
+                  confirmBtnBsStyle="success"
+                  cancelBtnBsStyle="danger"
+                  onConfirm={() => {
+                    set_confirm_allow(false)
+                    setsuccess_dlg(true)
+                    setdynamic_title("Амжилттай")
+                  }}
+                  onCancel={() => {
+                    set_confirm_allow(false)
+                  }}
+                ></SweetAlert>
+              ) : null}
+              {success_dlg ? (
+                <SweetAlert
+                  success
+                  title={dynamic_title}
+                  timeout={1500}
+                  style={{
+                    position: "absolute",
+                    top: "center",
+                    right: "center",
+                  }}
+                  showCloseButton={false}
+                  showConfirm={false}
+                  onConfirm={() => {
+                    setsuccess_dlg(false)
+                  }}
+                ></SweetAlert>
+              ) : null}
               <Col className="col-12">
                 <Card>
                   <CardBody>

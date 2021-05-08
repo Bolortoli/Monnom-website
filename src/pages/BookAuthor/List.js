@@ -90,6 +90,7 @@ const List = props => {
     setselectedMulti(selectedMulti)
   }
 
+  // props oos irsen nomnii categoruudiig awah
   const getAuthorsInfo = authors => {
     const a = authors.map(author => {
       return {
@@ -247,8 +248,6 @@ const List = props => {
       }
     })
     set_data(tempInitialData)
-    console.log("console.log")
-    console.log(tempInitialData)
   }
 
   const book_datatable = {

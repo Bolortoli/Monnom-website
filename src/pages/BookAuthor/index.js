@@ -27,7 +27,6 @@ const BookAuthor = () => {
     })
       .then(res => {
         set_data(res.data)
-        console.log("res ->", res.data)
         setIsNetworking(false)
       })
       .catch(err => {

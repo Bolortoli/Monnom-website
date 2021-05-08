@@ -15,6 +15,7 @@ import BookSinglePage from "../pages/BookAuthor"
 import Sales from "../pages/Sales"
 import LiveChannel from "../pages/LiveChannel"
 import Settings from "../pages/Settings"
+import Delivery from "../pages/Delivery"
 
 import ManageAdmins from "../pages/ManageAdmins"
 // import Login from "../pages/Authentication/Login"
@@ -30,6 +31,7 @@ const userRoutes = [
     component: ManageAdmins,
   },
   { path: "/dashboard", component: Dashboard },
+  { path: "/delivery", component: Delivery },
   {
     path: "/sales",
     component: Sales,
