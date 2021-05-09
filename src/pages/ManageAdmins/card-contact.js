@@ -8,11 +8,12 @@ import {
   Col,
   UncontrolledTooltip,
   Modal,
+  Spinner,
   Row,
 } from "reactstrap"
 
 const CardContact = props => {
-  const { user } = props
+  const [user, set_user] = useState(props.user)
   // console.log(user);
   const [user_desc_modal_center, set_user_desc_modal_center] = useState(false)
   const [user_update_modal_center, set_user_update_modal_center] = useState(
@@ -22,6 +23,7 @@ const CardContact = props => {
   const [edit_password, set_edit_password] = useState("")
   const [edit_phone, set_edit_phone] = useState("")
   const [edit_email, set_edit_email] = useState("")
+  const [edit_form_loading, set_edit_form_loading] = useState(false)
 
   const edit_form_elements = [
     {
@@ -43,6 +45,7 @@ const CardContact = props => {
   ]
 
   const sendEditUserRequest = user_id => {
+    set_edit_form_loading(true)
     let tempData = { id: user_id }
     if (edit_username !== "")
       tempData = { ...tempData, username: edit_username }
@@ -50,10 +53,20 @@ const CardContact = props => {
       tempData = { ...tempData, password: edit_password }
     if (edit_phone !== "") tempData = { ...tempData, phone: edit_phone }
     if (edit_email !== "") tempData = { ...tempData, email: edit_email }
+    if (
+      edit_username == "" &&
+      edit_password == "" &&
+      edit_phone == "" &&
+      edit_email == ""
+    ) {
+      set_edit_form_loading(false)
+      set_user_update_modal_center(false)
+      return
+    }
     // console.log(tempData);
     axios({
-      method: "POST",
-      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/update-employee`,
+      method: "PUT",
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/users/${user.id}`,
       data: tempData,
       headers: {
         Authorization: `Bearer ${
@@ -62,9 +75,16 @@ const CardContact = props => {
       },
     })
       .then(res => {
-        console.log(res)
+        console.log(res.data)
+        console.log(props.initializeUsersList([res.data]))
+        props.success(true)
+        set_edit_form_loading(false)
+        set_user(props.initializeUsersList([res.data])[0])
+        set_user_update_modal_center(false)
       })
       .catch(err => {
+        props.error(true)
+        set_edit_form_loading(false)
         console.log(err)
       })
   }
@@ -199,6 +219,7 @@ const CardContact = props => {
         </Card>
       </Col>
       <Modal
+        size="lg"
         isOpen={user_desc_modal_center}
         toggle={() => {
           toggle_user_desc_modal()
@@ -226,7 +247,7 @@ const CardContact = props => {
                 <img
                   alt={user.name + " name"}
                   src={user.img}
-                  height="100%"
+                  height="200"
                   width="100%"
                 />
               ) : null}
@@ -257,6 +278,19 @@ const CardContact = props => {
                   </td>
                   <td>{user.allData.phone}</td>
                 </tr>
+                <tr>
+                  <td>
+                    <b>Хүйс:</b>
+                  </td>
+                  <td>{user.allData.gender}</td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <b>Бүртгүүлсэн огноо:</b>
+                  </td>
+                  <td>{new Date(user.allData.created_at).toLocaleString()}</td>
+                </tr>
               </table>
             </Col>
           </Row>
@@ -267,6 +301,7 @@ const CardContact = props => {
         toggle={() => {
           toggle_user_update_modal()
         }}
+        centered={true}
       >
         <div className="modal-header">
           <h5 className="modal-title mt-0">
@@ -285,45 +320,56 @@ const CardContact = props => {
           </button>
         </div>
         <div className="modal-body">
-          <form>
-            <Col xs={12}>
-              {edit_form_elements.map(element => (
-                <>
-                  <b>{element.verbose}</b>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name={element.name}
-                    onChange={e => {
-                      handleFormChange(e)
-                    }}
-                  />
-                </>
-              ))}
+          {!edit_form_loading ? (
+            <form>
+              <Col xs={12}>
+                {edit_form_elements.map(element => (
+                  <>
+                    <b>{element.verbose}</b>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name={element.name}
+                      onChange={e => {
+                        handleFormChange(e)
+                      }}
+                    />
+                  </>
+                ))}
 
-              <Row>
-                <Col
-                  className="text-center text-md-right"
-                  style={{ marginTop: "15px" }}
-                >
-                  <button
-                    type="reset"
-                    onClick={() => sendEditUserRequest(user.id)}
-                    className="btn btn-success waves-effect btn-label waves-light"
+                <Row>
+                  <Col
+                    className="text-center text-md-right"
+                    style={{ marginTop: "15px" }}
                   >
-                    <i className="bx bx-check-double label-icon"></i> Засах
-                  </button>
-                  <button
-                    onClick={() => set_user_update_modal_center(false)}
-                    style={{ marginLeft: "5px" }}
-                    className="btn btn-danger waves-effect btn-label waves-light"
-                  >
-                    <i className="bx bx-check-double label-icon"></i> Болих
-                  </button>
-                </Col>
-              </Row>
-            </Col>
-          </form>
+                    <button
+                      type="reset"
+                      onClick={() => sendEditUserRequest(user.id)}
+                      className="btn btn-success waves-effect btn-label waves-light"
+                    >
+                      <i className="bx bx-check-double label-icon"></i> Засах
+                    </button>
+                    <button
+                      onClick={e => {
+                        e.preventDefault()
+                        set_user_update_modal_center(false)
+                      }}
+                      style={{ marginLeft: "5px" }}
+                      className="btn btn-danger waves-effect btn-label waves-light"
+                    >
+                      <i className="bx bx-check-double label-icon"></i> Болих
+                    </button>
+                  </Col>
+                </Row>
+              </Col>
+            </form>
+          ) : (
+            <Row className="d-flex justify-content-center">
+              <Col xl="1">
+                <Spinner className="" color="primary" />
+              </Col>
+            </Row>
+          )}
         </div>
       </Modal>
     </React.Fragment>

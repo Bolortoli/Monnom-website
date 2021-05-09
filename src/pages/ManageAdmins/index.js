@@ -7,181 +7,45 @@ import {
   Row,
   CardBody,
   CardFooter,
-  Form,
   FormGroup,
-  Button,
   Label,
   Modal,
-  CustomInput,
   Input,
 } from "reactstrap"
 import { map } from "lodash"
 import { Alert } from "reactstrap"
-import Dropzone from "react-dropzone"
-import { AvForm, AvField, AvInput } from "availity-reactstrap-validation"
-
-//Import Breadcrumb
+import { AvForm, AvField } from "availity-reactstrap-validation"
 import Breadcrumbs from "../../components/Common/Breadcrumb"
-
-//Import Card
 import CardContact from "./card-contact"
 import axios from "axios"
-// import { response } from "express";
-
-// import { getUsers } from "../../store/contacts/actions";
+import SweetAlert from "react-bootstrap-sweetalert"
 
 const userTypes = {
   Админ: 1,
   Менежер: 2,
   "Хүргэлтийн ажилтан": 3,
-  "Ном нийлүүлэгч": 6,
-  "Подкаст нийлүүлэгч": 5,
+  "Ном нийлүүлэгч": 5,
+  "Подкаст нийлүүлэгч": 4,
 }
-
-const users = [
-  {
-    id: "1",
-    color: "red",
-    name: "Bolortoli Munkhsaikhan",
-    designation: "Manager",
-    roles: [{ name: "Manager" }],
-  },
-  {
-    id: "1",
-    color: "red",
-    name: "Bolortoli Munkhsaikhan",
-    designation: "Manager",
-    roles: [{ name: "Manager" }],
-  },
-  {
-    id: "1",
-    color: "red",
-    name: "Bolortoli Munkhsaikhan",
-    designation: "Manager",
-    roles: [{ name: "Manager" }],
-  },
-  {
-    id: "1",
-    color: "red",
-    name: "Bolortoli Munkhsaikhan",
-    designation: "Manager",
-    roles: [{ name: "Manager" }],
-  },
-  {
-    id: "1",
-    color: "red",
-    name: "Bolortoli Munkhsaikhan",
-    designation: "Delivery Man",
-    roles: [{ name: "Manager" }],
-  },
-  {
-    id: "1",
-    color: "red",
-    name: "Bolortoli Munkhsaikhan",
-    designation: "Delivery Man",
-    roles: [{ name: "Manager" }],
-  },
-  {
-    id: "1",
-    color: "red",
-    name: "Bolortoli Munkhsaikhan",
-    designation: "Delivery Man",
-    roles: [{ name: "Manager" }],
-  },
-]
-
-const add_admin_step1_forms = [
-  { verbose: "Нэвтрэх нэр", type: "text", name: "username" },
-  { verbose: "Э-Майл хаяг", type: "email", name: "email" },
-  { verbose: "Бүтэн нэр", type: "text", name: "fullname" },
-  { verbose: "Утасны дугаар", type: "text", name: "phone" },
-  // { verbose: "Нууц үг", name: "password" },
-  // { verbose: "Нууц үг давтах", name: "password again" },
-]
 
 const ManageAdmins = () => {
   const [isNetworkError, SetIsNetworkError] = useState(false)
-  const [selectedFiles, setSelectedFiles] = useState([])
   const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
   const [usersList, setUsersList] = useState([])
   const [addAdminStep1, setAddAdminStep1] = useState(false)
-  const [addAdminStep1_txt, setAddAdminStep1_txt] = useState("")
-  const [profile_picture_create, set_profile_picture_create] = useState({})
+  const [profile_picture_create, set_profile_picture_create] = useState(null)
 
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [fullname, setFullname] = useState("")
   const [phone, setPhone] = useState("")
-  const [gender, setGender] = useState("Эрэгтэй")
+  const [gender, setGender] = useState("")
   const [password, setPassword] = useState("")
   const [userType, setUserType] = useState(1)
   const [passwordAgain, setPasswordAgain] = useState("")
-  const [userRoleAddAdmin, setUserRoleAddAdmin] = useState(null)
-
-  //   function handleAddAdminCancel() {
-  //     setUsername("");
-  //     setEmail("");
-  //     setFullname("");
-  //     setPhone("");
-  //     setGender("");
-  //   }
-
-  function handleAcceptedFiles(files) {
-    files.map(file =>
-      Object.assign(file, {
-        preview: URL.createObjectURL(file),
-        formattedSize: formatBytes(file.size),
-      })
-    )
-
-    setSelectedFiles(files)
-  }
-
-  function formatBytes(bytes, decimals = 2) {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const dm = decimals < 0 ? 0 : decimals
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
-  }
-
-  function handleStepChange(e) {
-    switch (e.target.name) {
-      case "username":
-        // alert("username");
-        setUsername(e.target.value)
-        break
-      case "profile_picture":
-        set_profile_picture_create(e.target.files[0])
-        break
-      case "email":
-        setEmail(e.target.value)
-        break
-      case "userType":
-        console.log(e.target.value)
-        setUserType(userTypes[e.target.value])
-        break
-      case "fullname":
-        setFullname(e.target.value)
-        break
-      case "phone":
-        setPhone(e.target.value)
-        break
-      case "gender":
-        setGender(e.target.value)
-        break
-      case "password":
-        setPassword(e.target.value)
-        break
-      case "password again":
-        setPasswordAgain(e.target.value)
-        break
-    }
-    // console.log(e.target.name)
-    setAddAdminStep1_txt(e.target.value)
-  }
+  const [add_admin_error_msg, set_add_admin_error_msg] = useState("")
+  const [success_dialog, setsuccess_dialog] = useState(false)
+  const [error_dialog, seterror_dialog] = useState(false)
 
   const initializeUsersList = data => {
     let usersTempList = data.map(user => {
@@ -201,6 +65,10 @@ const ManageAdmins = () => {
                 ? "Менежер"
                 : user.user_role === 3
                 ? "Хүргэгч"
+                : user.user_role === 4
+                ? "Подкаст нийлүүлэгч"
+                : user.user_role === 5
+                ? "Ном нийлүүлэгч"
                 : "Бусад",
           },
         ],
@@ -217,23 +85,46 @@ const ManageAdmins = () => {
       tempReverseArray.unshift(user)
     })
     setUsersList([...tempReverseArray, ...usersList])
+    return tempReverseArray
     // console.log(usersList.length)
   }
 
   const createUser = async () => {
-    SetIsNetworkLoading(true)
-    const url = "http://127.0.0.1:3001/create-admin"
     const formData = new FormData()
-    console.log(typeof username)
+
+    // Validate empty fields
+    try {
+      handleAddAdminErrors()
+    } catch (error) {
+      switch (error) {
+        case "Null value":
+          set_add_admin_error_msg("Өгөгдөл дутуу")
+          break
+
+        case "Passwords not equal":
+          set_add_admin_error_msg("Нууц үг зөрүүтэй")
+          break
+
+        case "Password is weak":
+          set_add_admin_error_msg("Нууц үгийн урт 8-с бага")
+          break
+
+        default:
+          break
+      }
+      console.log(error)
+      return
+    }
+
+    set_add_admin_error_msg("")
+
     formData.append("username", username)
     formData.append("password", password)
-    formData.append("email", email)
+    formData.append("emailof", email)
     formData.append("phone", phone)
     formData.append("gender", gender)
     formData.append("fullname", fullname)
     formData.append("user_role", userType)
-
-    // console.log(profile_picture_create)
 
     const config = {
       headers: {
@@ -243,35 +134,48 @@ const ManageAdmins = () => {
         }`,
       },
     }
+
+    // TODO fix email.missing
     await axios
-      .post(url, formData, config)
+      .post(
+        `${process.env.REACT_APP_STRAPI_BASE_URL}/users`,
+        // `${process.env.REACT_APP_EXPRESS_BASE_URL}/create-admin`,
+        formData,
+        config
+      )
       .then(async res => {
-        console.log("res.data")
-        console.log(res.data)
         let tempResponse = res.data
         let imageData = new FormData()
 
         imageData.append(`files`, profile_picture_create)
-
         imageData.append("refId", res.data.id)
         imageData.append("ref", "user")
         imageData.append("field", "profile_picture")
         imageData.append("source", "users-permissions")
 
         await axios
-          .post("http://127.0.0.1:1337/upload", imageData, config)
+          .post(
+            `${process.env.REACT_APP_STRAPI_BASE_URL}/upload`,
+            imageData,
+            config
+          )
           .then(res => {
             tempResponse.profile_picture = res.data[0]
+            setsuccess_dialog(true)
             SetIsNetworkLoading(false)
           })
           .catch(err => {
-            SetIsNetworkError(true)
+            seterror_dialog(true)
+            setAddAdminStep1(false)
+            // SetIsNetworkError(true)
           })
-        console.log(tempResponse)
         initializeUsersList([tempResponse])
       })
       .catch(err => {
-        SetIsNetworkError(true)
+        seterror_dialog(true)
+        setAddAdminStep1(false)
+        console.log(err)
+        SetIsNetworkLoading(false)
       })
   }
 
@@ -297,10 +201,6 @@ const ManageAdmins = () => {
         SetIsNetworkLoading(false)
       })
   }
-  function tog_large() {
-    setAddAdminStep1(!addAdminStep1)
-    // removeBodyCss();
-  }
 
   useEffect(() => {
     fetchUsers()
@@ -315,7 +215,7 @@ const ManageAdmins = () => {
               size="lg"
               isOpen={addAdminStep1}
               toggle={() => {
-                tog_large()
+                setAddAdminStep1(!addAdminStep1)
               }}
               centered={true}
             >
@@ -429,10 +329,10 @@ const ManageAdmins = () => {
                         <Label className="d-block mb-3">Хүйс :</Label>
                         <div className="custom-control custom-radio custom-control-inline">
                           <Input
-                            checked
+                            value="Male"
                             type="radio"
                             id="customRadioInline1"
-                            name="customRadioInline1"
+                            name="gender"
                             className="custom-control-input"
                             onChange={e => handleStepChange(e)}
                           />
@@ -446,9 +346,10 @@ const ManageAdmins = () => {
                         &nbsp;
                         <div className="custom-control custom-radio custom-control-inline">
                           <Input
+                            value="Female"
                             type="radio"
                             id="customRadioInline2"
-                            name="customRadioInline1"
+                            name="gender"
                             className="custom-control-input"
                             onChange={e => handleStepChange(e)}
                           />
@@ -505,6 +406,7 @@ const ManageAdmins = () => {
                           Нүүр зураг
                         </Label>
                         <Input
+                          required
                           id="adminProfilePic"
                           // style={{ visibility: "hidden" }}
                           accept="image/*"
@@ -514,41 +416,13 @@ const ManageAdmins = () => {
                         />
                       </FormGroup>
                     </Col>
+                    <Col lg="12">
+                      <span style={{ color: "#f46a6a" }}>
+                        {add_admin_error_msg}
+                      </span>
+                    </Col>
                   </Row>
-                  {/* <hr /> */}
-                  {/* {username}
-									<hr />
-									{JSON.stringify(profile_picture_create)}
-									<hr />
-									{email}
-									<hr />
-									{userType}
-									<hr />
-									{fullname}
-									<hr />
-									{phone}
-									<hr />
-									{gender}
-									<hr />
-									{password}
-									<hr />
-									{passwordAgain}
-									<hr />
-									<Row>
-										<Col lg="12">
-											<FormGroup>
-												<AvInput
-													tag={CustomInput}
-													type="checkbox"
-													label="Agree to terms and conditions"
-													id="invalidCheck"
-													name="condition"
-													errorMessage="You must agree before submitting."
-													validate={{ required: { value: true } }}
-												/>
-											</FormGroup>
-										</Col>
-									</Row> */}
+
                   <div className="modal-footer">
                     <button type="submit" className="btn btn-primary">
                       Дуусгах
@@ -607,7 +481,13 @@ const ManageAdmins = () => {
                       </Card>
                     </Col>
                     {map(usersList, (user, key) => (
-                      <CardContact user={user} key={"_user_" + key} />
+                      <CardContact
+                        error={seterror_dialog}
+                        success={setsuccess_dialog}
+                        user={user}
+                        key={"_user_" + key}
+                        initializeUsersList={initializeUsersList}
+                      />
                     ))}
                   </Row>
                 </>
@@ -625,10 +505,97 @@ const ManageAdmins = () => {
               )}
             </>
           )}
+          {success_dialog ? (
+            <SweetAlert
+              title={"Амжилттай"}
+              timeout={2000}
+              style={{
+                position: "absolute",
+                top: "center",
+                right: "center",
+              }}
+              showCloseButton={false}
+              showConfirm={false}
+              success
+              onConfirm={() => {
+                // createPodcast()
+                setsuccess_dialog(false)
+              }}
+            >
+              {"Үйлдэл амжилттай боллоо"}
+            </SweetAlert>
+          ) : null}
+          {error_dialog ? (
+            <SweetAlert
+              title={"Амжилтгүй"}
+              timeout={2000}
+              style={{
+                position: "absolute",
+                top: "center",
+                right: "center",
+              }}
+              showCloseButton={false}
+              showConfirm={false}
+              error
+              onConfirm={() => {
+                // createPodcast()
+                seterror_dialog(false)
+              }}
+            >
+              {"Үйлдэл амжилтгүй боллоо"}
+            </SweetAlert>
+          ) : null}
         </Container>
       </div>
     </React.Fragment>
   )
+
+  function handleStepChange(e) {
+    switch (e.target.name) {
+      case "username":
+        // alert("username");
+        setUsername(e.target.value)
+        break
+      case "profile_picture":
+        set_profile_picture_create(e.target.files[0])
+        break
+      case "email":
+        setEmail(e.target.value)
+        break
+      case "userType":
+        setUserType(userTypes[e.target.value])
+        break
+      case "fullname":
+        setFullname(e.target.value)
+        break
+      case "phone":
+        setPhone(e.target.value)
+        break
+      case "gender":
+        setGender(e.target.value)
+        break
+      case "password":
+        setPassword(e.target.value)
+        break
+      case "password again":
+        setPasswordAgain(e.target.value)
+        break
+    }
+  }
+
+  function handleAddAdminErrors() {
+    if (username == "") throw "Null value"
+    if (email == "") throw "Null value"
+    if (phone == "") throw "Null value"
+    if (gender == "") throw "Null value"
+    if (fullname == "") throw "Null value"
+    if (userType == "") throw "Null value"
+    if (password == "") throw "Null value"
+    if (passwordAgain == "") throw "Null value"
+    if (profile_picture_create == null) throw "Null value"
+    if (password != passwordAgain) throw "Passwords not equal"
+    if (password.length < 9) throw "Password is weak"
+  }
 }
 
 export default ManageAdmins

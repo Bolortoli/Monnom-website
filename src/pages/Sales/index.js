@@ -68,7 +68,7 @@ const Sales = () => {
   const [data, set_data] = useState(demoData)
 
   // Check network
-  const [isNetworking, setIsNetworking] = useState(true)
+  const [isNetworking, setIsNetworking] = useState(false)
 
   async function makeGetReq() {
     await axios({
@@ -85,6 +85,7 @@ const Sales = () => {
         setIsNetworking(false)
       })
       .catch(err => {
+        console.log(err)
         setIsNetworking(true)
       })
   }
