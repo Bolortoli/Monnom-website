@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 
+import { Link } from "react-router-dom"
 import {
   Container,
   Row,
@@ -12,6 +13,8 @@ import {
 } from "reactstrap"
 import { MDBDataTable } from "mdbreact"
 import Breadcrumbs from "../../components/Common/Breadcrumb"
+import SweetAlert from "react-bootstrap-sweetalert"
+import { Alert } from "reactstrap"
 require("dotenv").config()
 
 const demoData = [
@@ -474,7 +477,7 @@ const delivered_columns = [
     width: 100,
   },
   {
-    label: "Хөлс",
+    label: "Цалин",
     field: "salary",
     sort: "asc",
     width: 100,
@@ -560,6 +563,26 @@ export default function Delivery() {
   const [delivered_data, set_delivered_data] = useState([])
   const [not_delivered_data, set_not_delivered_data] = useState([])
 
+  const [isNetworkError, SetIsNetworkError] = useState(false)
+  const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
+  const [order_id, set_order_id] = useState(null)
+  const [confirm_order, set_confirm_order] = useState(false)
+  const [success_dlg, set_success_dlg] = useState(false)
+
+  const removeFromNotDelivered = async id => {
+    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}//${id}`
+
+    await axios
+      .delete(url)
+      .then(async res => {
+        set_success_dlg(true)
+        SetIsNetworkLoading(false)
+      })
+      .catch(e => {
+        SetIsNetworkError(true)
+      })
+  }
+
   async function makeGetReq() {
     await axios({
       url: `${process.env.REACT_APP_STRAPI_BASE_URL}/delivery-registrations`,
@@ -571,10 +594,13 @@ export default function Delivery() {
       },
     })
       .then(res => {
+        SetIsNetworkLoading(false)
         console.log("res done", res.data)
       })
       .catch(err => {
         console.log("error")
+        SetIsNetworkError(false)
+        SetIsNetworkLoading(true)
       })
   }
 
@@ -599,14 +625,18 @@ export default function Delivery() {
       else
         set_not_delivered_data_temp.push({
           book_name: data.book_name,
-          salary: data.customer_paid_book.payment,
+          salary: data.id,
           customer_phone: data.customer.phone,
           customer_name: data.customer.username,
           supplier_phone: data.employee.username,
           supplier_name: data.employee.phone,
           has_deliver: (
-            <Button type="submit" className="btn btn-success">
-              Баталгаажсан
+            <Button
+              type="submit"
+              className="btn btn-success mx-auto d-block"
+              onClick={(() => set_confirm_order(true), set_order_id(data.id))}
+            >
+              Баталгаажуулах
             </Button>
           ),
         })
@@ -614,6 +644,7 @@ export default function Delivery() {
     set_delivered_data(set_delivered_data_temp)
     set_not_delivered_data(set_not_delivered_data_temp)
   }
+
   const delivered_datatable = {
     columns: delivered_columns,
     rows: delivered_data,
@@ -629,54 +660,114 @@ export default function Delivery() {
       <div className="page-content">
         <Container fluid>
           <Breadcrumbs title="Хүргэлт" breadcrumbItem="Хүргэлтийн мэдээлэл" />
-          <Row>
-            <Col lg={12}>
-              <Card>
-                <CardBody>
-                  <CardTitle className="font-size-20">Хүргэгдээгүй</CardTitle>
-                  <MDBDataTable
-                    proSelect
-                    responsive
-                    striped
-                    bordered
-                    data={not_delivered_datatable}
-                    proSelect
-                    noBottomColumns
-                    noRecordsFoundLabel={"Номын дугаар байхгүй"}
-                    infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
-                    entries={5}
-                    entriesOptions={[5, 10, 20]}
-                    paginationLabel={["Өмнөх", "Дараах"]}
-                    searchingLabel={"Хайх"}
-                    searching
-                  />
-                </CardBody>
-              </Card>
-            </Col>
-            <Col lg={12}>
-              <Card>
-                <CardBody>
-                  <CardTitle className="font-size-20">Хүргэгдсэн</CardTitle>
-                  <MDBDataTable
-                    proSelect
-                    responsive
-                    striped
-                    bordered
-                    data={delivered_datatable}
-                    proSelect
-                    noBottomColumns
-                    noRecordsFoundLabel={"Номын дугаар байхгүй"}
-                    infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
-                    entries={5}
-                    entriesOptions={[5, 10, 20]}
-                    paginationLabel={["Өмнөх", "Дараах"]}
-                    searchingLabel={"Хайх"}
-                    searching
-                  />
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
+          {isNetworkError ? (
+            <Alert color="danger" role="alert" className="w-100 text-center">
+              Сүлжээ уналаа ! Дахин ачааллна уу ?
+            </Alert>
+          ) : (
+            <>
+              {isNetworkLoading ? (
+                <Row>
+                  <Col lg={12}>
+                    <Card>
+                      <CardBody>
+                        <CardTitle className="font-size-20">
+                          Хүргэгдээгүй
+                        </CardTitle>
+                        <MDBDataTable
+                          proSelect
+                          responsive
+                          striped
+                          bordered
+                          data={not_delivered_datatable}
+                          proSelect
+                          noBottomColumns
+                          noRecordsFoundLabel={"Номын дугаар байхгүй"}
+                          infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
+                          entries={5}
+                          entriesOptions={[5, 10, 20]}
+                          paginationLabel={["Өмнөх", "Дараах"]}
+                          searchingLabel={"Хайх"}
+                          searching
+                        />
+                      </CardBody>
+                    </Card>
+                  </Col>
+                  <Col lg={12}>
+                    <Card>
+                      <CardBody>
+                        <CardTitle className="font-size-20">
+                          Хүргэгдсэн
+                        </CardTitle>
+                        <MDBDataTable
+                          proSelect
+                          responsive
+                          striped
+                          bordered
+                          data={delivered_datatable}
+                          proSelect
+                          noBottomColumns
+                          noRecordsFoundLabel={"Номын дугаар байхгүй"}
+                          infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
+                          entries={5}
+                          entriesOptions={[5, 10, 20]}
+                          paginationLabel={["Өмнөх", "Дараах"]}
+                          searchingLabel={"Хайх"}
+                          searching
+                        />
+                      </CardBody>
+                    </Card>
+                  </Col>
+                </Row>
+              ) : (
+                <Row>
+                  <Col xs="12">
+                    <div className="text-center my-3">
+                      <Link to="#" className="text-success">
+                        <i className="bx bx-hourglass bx-spin mr-2" />
+                        Ачааллаж байна
+                      </Link>
+                    </div>
+                  </Col>
+                </Row>
+              )}
+            </>
+          )}
+          {confirm_order ? (
+            <SweetAlert
+              title="Хүргэлт амжилттай болсон уу ?"
+              warning
+              showCancel
+              confirmBtnText="Тийм"
+              cancelBtnText="Болих"
+              confirmBtnBsStyle="success"
+              cancelBtnBsStyle="danger"
+              onConfirm={() => {
+                set_confirm_order(false)
+                removeFromNotDelivered()
+              }}
+              onCancel={() => {
+                set_confirm_order(false)
+              }}
+            ></SweetAlert>
+          ) : null}
+          {success_dlg ? (
+            <SweetAlert
+              title={"Амжилттай"}
+              timeout={1500}
+              style={{
+                position: "absolute",
+                top: "center",
+                right: "center",
+              }}
+              showCloseButton={false}
+              showConfirm={false}
+              success
+              onConfirm={() => {
+                set_success_dlg(false)
+              }}
+            ></SweetAlert>
+          ) : null}
         </Container>
       </div>
     </React.Fragment>

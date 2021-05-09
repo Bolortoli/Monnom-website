@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom"
 import axios from "axios"
 import PodcastDetail from "./PodcastDetail"
 import { Alert } from "reactstrap"
+import { Link } from "react-router-dom"
 import Breadcrumb from "../../components/Common/Breadcrumb"
 
 require("dotenv").config()
@@ -12,7 +13,8 @@ const PodcastSinglePage = () => {
   const [data, set_data] = useState(null)
 
   // Check network
-  const [isNetworking, setIsNetworking] = useState(true)
+  const [isNetworkingError, setIsNetworkingError] = useState(false)
+  const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
 
   async function makeGetReq() {
     await axios({
@@ -26,10 +28,11 @@ const PodcastSinglePage = () => {
     })
       .then(res => {
         set_data(res.data)
-        setIsNetworking(false)
+        setIsNetworkingError(false)
       })
       .catch(err => {
-        setIsNetworking(true)
+        setIsNetworkingError(false)
+        SetIsNetworkLoading(true)
       })
   }
 
@@ -40,11 +43,28 @@ const PodcastSinglePage = () => {
   return (
     <React.Fragment>
       <div className="page-content">
-        {isNetworking ? (
+        {isNetworkingError ? (
           <Alert color="danger" role="alert">
             Сүлжээ уналаа ! Дахин ачааллна уу ?
           </Alert>
-        ) : null}
+        ) : (
+          <>
+            {isNetworkLoading ? (
+              <PodcastDetail user={data} />
+            ) : (
+              <Row>
+                <Col xs="12">
+                  <div className="text-center my-3">
+                    <Link to="#" className="text-success">
+                      <i className="bx bx-hourglass bx-spin mr-2" />
+                      Ачааллаж байна
+                    </Link>
+                  </div>
+                </Col>
+              </Row>
+            )}
+          </>
+        )}
         <Breadcrumb breadcrumbItem="Подкаст дэлгэрэнгүй" title="Подкаст" />
         {data != null ? <PodcastDetail user={data} /> : null}
       </div>

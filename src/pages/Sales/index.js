@@ -81,12 +81,14 @@ const Sales = () => {
       },
     })
       .then(res => {
+        console.log("done")
         set_data(res.data)
         setIsNetworking(false)
       })
       .catch(err => {
         console.log(err)
         setIsNetworking(true)
+        console.log("err")
       })
   }
 
