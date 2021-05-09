@@ -100,7 +100,7 @@ const Customers = () => {
             gift: (
               <i
                 onClick={() => {
-                  // makeGetReq()
+                  makeGetReq()
                   set_is_gift_btn(true)
                 }}
                 className="bx bx-gift text-success text-center d-block"
@@ -120,7 +120,7 @@ const Customers = () => {
         setIsNetworking(false)
       })
       .catch(err => {
-        setIsNetworking(true)
+        setIsNetworking(false)
         // SetIsNetworkLoading(false);
       })
   }
@@ -133,7 +133,10 @@ const Customers = () => {
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
-          <Breadcrumbs title="" breadcrumbItem="Хэрэглэгчдийн жагсаалт" />
+          <Breadcrumbs
+            title="Хэрэглэгчид"
+            breadcrumbItem="Хэрэглэгчдийн жагсаалт"
+          />
           {isNetworking ? (
             <Alert color="danger" role="alert">
               Сүлжээ уналаа ! Дахин ачааллна уу ?
@@ -186,11 +189,21 @@ const Customers = () => {
                 <Card>
                   <CardBody>
                     <CardTitle>Хэрэглэгчдийн жагсаалт</CardTitle>
-                    <CardSubtitle className="mb-3">
-                      Хэрэглэгчдийн жагсаалт
-                    </CardSubtitle>
-
-                    <MDBDataTable responsive striped bordered data={data} />
+                    <MDBDataTable
+                      responsive
+                      striped
+                      bordered
+                      data={data}
+                      proSelect
+                      noBottomColumns
+                      noRecordsFoundLabel={"Хэрэглэгч байхгүй"}
+                      infoLabel={["", "-ээс", "дахь хэрэглэгч. Нийт", ""]}
+                      entries={5}
+                      entriesOptions={[5, 10, 20]}
+                      paginationLabel={["Өмнөх", "Дараах"]}
+                      searchingLabel={"Хайх"}
+                      searching
+                    />
                   </CardBody>
                 </Card>
               </Col>

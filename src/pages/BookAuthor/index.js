@@ -14,6 +14,7 @@ const BookAuthor = () => {
 
   // Check network
   const [isNetworking, setIsNetworking] = useState(true)
+  const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
 
   async function makeGetReq() {
     await axios({
@@ -31,6 +32,7 @@ const BookAuthor = () => {
       })
       .catch(err => {
         setIsNetworking(true)
+        SetIsNetworkLoading(true)
       })
   }
 
@@ -46,10 +48,25 @@ const BookAuthor = () => {
             Сүлжээ уналаа ! Дахин ачааллна уу ?
           </Alert>
         ) : (
-          <React.Fragment>
-            <Breadcrumb breadcrumbItem="Ном дэлгэрэнгүй" title="Ном" />
-            <BookDetail user={data} />
-          </React.Fragment>
+          <>
+            {isNetworkLoading ? (
+              <React.Fragment>
+                <Breadcrumb breadcrumbItem="Ном дэлгэрэнгүй" title="Ном" />
+                <BookDetail user={data} />
+              </React.Fragment>
+            ) : (
+              <Row>
+                <Col xs="12">
+                  <div className="text-center my-3">
+                    <Link to="#" className="text-success">
+                      <i className="bx bx-hourglass bx-spin mr-2" />
+                      Ачааллаж байна
+                    </Link>
+                  </div>
+                </Col>
+              </Row>
+            )}
+          </>
         )}
       </div>
     </React.Fragment>

@@ -216,14 +216,6 @@ const List = props => {
               onClick={() => {
                 set_delete_book_id(d.id)
                 set_confirm_delete(true)
-                // set_edit_book_name(d.book_name)
-                // set_edit_book_img(d.book_author.profile_pic)
-                // set_edit_has_pdf(d.has_pdf)
-                // set_edit_has_mp3(d.has_mp3)
-                // set_edit_has_sale(d.has_sale)
-                // setCoverImage(
-                //   process.env.REACT_APP_STRAPI_BASE_URL + edit_book_img
-                // )
               }}
               className="bx bxs-trash text-danger font-size-20"
             />
@@ -596,7 +588,6 @@ const List = props => {
                 striped
                 bordered
                 data={book_datatable}
-                proSelect
                 noBottomColumns
                 noRecordsFoundLabel={"Подкастын дугаар байхгүй"}
                 infoLabel={["", "-ээс", "дахь подкаст. Нийт", ""]}

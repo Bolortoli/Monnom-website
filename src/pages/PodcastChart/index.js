@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react"
 import axios from "axios"
+import { Link } from "react-router-dom"
 import ContactsGrid from "./PodcastLists"
-import { Container, Alert, Row, Col } from "reactstrap"
+import { Container, Alert } from "reactstrap"
 import Breadcrumbs from "../../components/Common/Breadcrumb"
 
 const PodcastList = () => {
   const [data, set_data] = useState([])
 
   // Check network
-  const [isNetworking, setIsNetworking] = useState(true)
+  const [isNetworking, setIsNetworking] = useState(false)
+  const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
 
   async function makeGetReq() {
     await axios({
@@ -23,6 +25,7 @@ const PodcastList = () => {
       .then(res => {
         set_data(res.data)
         setIsNetworking(false)
+        SetIsNetworkLoading(true)
       })
       .catch(err => {
         setIsNetworking(true)
@@ -42,9 +45,24 @@ const PodcastList = () => {
             Сүлжээ уналаа ! Дахин ачааллна уу ?
           </Alert>
         ) : (
-          <Container fluid>
-            {data.length != 0 ? <ContactsGrid podcast={data} /> : null}
-          </Container>
+          <>
+            {isNetworkLoading ? (
+              <Container fluid>
+                {data.length != 0 ? <ContactsGrid podcast={data} /> : null}
+              </Container>
+            ) : (
+              <Row>
+                <Col xs="12">
+                  <div className="text-center my-3">
+                    <Link to="#" className="text-success">
+                      <i className="bx bx-hourglass bx-spin mr-2" />
+                      Ачааллаж байна
+                    </Link>
+                  </div>
+                </Col>
+              </Row>
+            )}
+          </>
         )}
       </div>
     </React.Fragment>
