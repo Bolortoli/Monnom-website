@@ -122,11 +122,6 @@ const CardContact = props => {
 
   return (
     <React.Fragment>
-      {/* {console.log(user)}
-			{console.log(edit_username)}
-			{console.log(edit_password)}
-			{console.log(edit_phone)}
-			{console.log(edit_email)} */}
       <Col xl="3" sm="6">
         <Card className="text-center">
           <CardBody>

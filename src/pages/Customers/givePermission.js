@@ -1,21 +1,11 @@
-import React, { useEffect, useState, useRef } from "react"
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  CardBody,
-  CardTitle,
-  CardSubtitle,
-  CardFooter,
-  Alert,
-} from "reactstrap"
+import React, { useEffect, useState } from "react"
+import { Badge, Modal } from "reactstrap"
 
 import axios from "axios"
 import { MDBDataTable } from "mdbreact"
 import { Link } from "react-router-dom"
-import Switch from "react-switch"
 import SweetAlert from "react-bootstrap-sweetalert"
+
 require("dotenv").config()
 
 const columns = [
@@ -32,37 +22,37 @@ const columns = [
     width: 100,
   },
   {
-    label: "Сонгох",
-    field: "gift",
+    label: "Онлайн худалдан авалт",
+    field: "online_books_order",
+    sort: "disabled",
+    width: 60,
+  },
+  {
+    label: "Биет худалдан авалт",
+    field: "physical_books_order",
     sort: "disabled",
     width: 60,
   },
 ]
 
 const GivePermission = props => {
-  const [checked, set_checked] = useState([])
+  const [books, set_books] = useState([])
   const [book_data, set_book_data] = useState([])
-  const [gift_count, set_gift_count] = useState(0)
+  const [paid_online_books, set_paid_online_books] = useState([])
+  const [paid_books, set_paid_books] = useState([])
+  const [confirm_allow, set_confirm_allow] = useState(false)
+  const [success_dialog, setsuccess_dialog] = useState(false)
+  const [error_dialog, seterror_dialog] = useState(false)
+  const [selected_book_id, set_selected_book_id] = useState(null)
 
-  const checked_ref = useRef([])
-
-  const datatable = {
+  const table_data = {
     columns: columns,
     rows: book_data,
   }
 
-  const initialState = data => {
-    console.log(data)
-    const initial = data.map(book => {
-      return {
-        id: book.id,
-        state: true,
-      }
-    })
-    checked_ref.current = initial
-    // set_checked(initial)
-    console.log(checked_ref.current)
-    let tempCols = data.map(book => {
+  const initialState = () => {
+    let tempCols = books.map(book => {
+      console.log(book.id)
       return {
         name: book.name,
         type: (
@@ -81,21 +71,72 @@ const GivePermission = props => {
             />
           </Link>
         ),
-        gift: (
-          <Switch
-            onChange={c => handleSwitchChange(book, c)}
-            checked={
-              checked_ref.current.length != 0
-                ? checked_ref.current.find(el => book.id == el.id).state
-                : false
-            }
-            name={book.id}
-          />
+        physical_books_order: (
+          <Badge
+            color={noticeIsBought(book.id) ? "success" : "primary"}
+            className="mr-1 font-size-13"
+          >
+            <strong>
+              {noticeIsBought(book.id) ? "Худалдаж авсан" : "Худалдаж аваагүй"}
+            </strong>
+          </Badge>
+        ),
+        online_books_order: (
+          <Badge
+            color={noticeIsBoughtEbook(book.id) ? "success" : "primary"}
+            className="mr-1 font-size-13"
+          >
+            <strong
+              onClick={() => {
+                if (!noticeIsBoughtEbook(book.id)) {
+                  set_selected_book_id(book.id)
+                  set_confirm_allow(true)
+                }
+              }}
+              style={{
+                cursor: noticeIsBoughtEbook(book.id) ? "" : "pointer",
+              }}
+            >
+              {noticeIsBoughtEbook(book.id)
+                ? "Худалдаж авсан"
+                : "Худалдаж аваагүй"}
+            </strong>
+          </Badge>
         ),
       }
     })
     set_book_data(tempCols)
   }
+
+  async function givePermissionToCustomer() {
+    if (selected_book_id == null || props.selected_user_id == null) {
+      seterror_dialog(true)
+      return
+    }
+
+    await axios({
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-ebooks`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+      data: {
+        book: selected_book_id,
+        users_permissions_user: props.selected_user_id,
+      },
+    })
+      .then(res => {
+        console.log(res.data)
+        set_paid_online_books([...paid_online_books, res.data])
+        setsuccess_dialog(true)
+      })
+      .catch(err => {
+        seterror_dialog(true)
+      })
+  }
+
   async function makeGetReq() {
     await axios({
       url: `${process.env.REACT_APP_STRAPI_BASE_URL}/books`,
@@ -107,66 +148,142 @@ const GivePermission = props => {
       },
     })
       .then(res => {
-        initialState(res.data)
+        set_books(res.data)
       })
       .catch(err => {
-        console.log(err)
+        props.setIsNetworking(true)
+      })
+    await axios({
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-ebooks?users_permissions_user.id=${props.selected_user_id}`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
+      .then(res => {
+        set_paid_online_books(res.data)
+      })
+      .catch(err => {
+        props.setIsNetworking(true)
+      })
+
+    await axios({
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-books?users_permissions_user.id=${props.selected_user_id}`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
+      .then(res => {
+        set_paid_books(res.data)
+      })
+      .catch(err => {
+        props.setIsNetworking(true)
       })
   }
 
-  const handleSwitchChange = (e, c) => {
-    console.log("aasdasd")
-    console.log(checked_ref.current)
-    let tempCheckedColumns = checked_ref.current.map(column => {
-      console.log(column)
-      console.log("column")
-      console.log(e)
-      console.log("book")
-      if (column.id == e.id) {
-        column = {
-          id: column.id,
-          state: c,
-        }
-      }
-      return column
-    })
-    console.log("hehe ", tempCheckedColumns)
-    checked_ref.current = tempCheckedColumns
-  }
+  useEffect(() => {
+    initialState()
+  }, [books, paid_online_books, paid_books])
 
   useEffect(() => {
     makeGetReq()
   }, [])
 
   return (
-    <SweetAlert
-      showCancel
-      cancelBtnBsStyle="primary"
-      confirmBtnBsStyle="success"
-      confirmBtnText="Бэлэглэх"
-      cancelBtnText="Цуцлах"
-      onConfirm={() => {
-        props.cancel(false)
-        props.confirm(true)
-      }}
-      onCancel={() => {
-        props.cancel(false)
-      }}
-      style={{ width: "600px" }}
-    >
-      {JSON.stringify(checked_ref.current)}
-
-      <Row>
-        <CardTitle className="text-center w-100 font-size-20 border-bottom border-light pb-2">
-          Бэлэглэх номоо сонгоно уу ?
-        </CardTitle>
-        <CardBody>
+    <>
+      {confirm_allow ? (
+        <SweetAlert
+          title="Та хэрэглэгчид номын эрх нээх гэж байна. Итгэлтэй байна уу ?"
+          warning
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Болих"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            set_confirm_allow(false)
+            givePermissionToCustomer()
+          }}
+          onCancel={() => {
+            set_confirm_allow(false)
+          }}
+        ></SweetAlert>
+      ) : null}
+      {success_dialog ? (
+        <SweetAlert
+          title={"Амжилттай"}
+          timeout={2000}
+          style={{
+            position: "absolute",
+            top: "center",
+            right: "center",
+          }}
+          showCloseButton={false}
+          showConfirm={false}
+          success
+          onConfirm={() => {
+            setsuccess_dialog(false)
+          }}
+        >
+          {"Хэрэглэгчид эрх олгогдлоо"}
+        </SweetAlert>
+      ) : null}
+      {error_dialog ? (
+        <SweetAlert
+          title={"Амжилтгүй"}
+          timeout={2000}
+          style={{
+            position: "absolute",
+            top: "center",
+            right: "center",
+          }}
+          showCloseButton={false}
+          showConfirm={false}
+          error
+          onConfirm={() => {
+            // createPodcast()
+            seterror_dialog(false)
+          }}
+        >
+          {"Эрх олгох үйлдэл амжилтгүй боллоо"}
+        </SweetAlert>
+      ) : null}
+      <Modal
+        size="xl"
+        isOpen={props.modal_toggle}
+        toggle={() => {
+          props.set_modal_toggle(!props.modal_toggle)
+        }}
+        centered={true}
+      >
+        <div className="modal-header">
+          <h5 className="modal-title mt-0">
+            <strong>Худалдан авалтууд</strong>
+          </h5>
+          <button
+            onClick={() => {
+              props.set_modal_toggle(false)
+            }}
+            type="button"
+            className="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div className="modal-body">
           <MDBDataTable
             proSelect
             responsive
             striped
             bordered
-            data={datatable}
+            data={table_data}
             proSelect
             noBottomColumns
             noRecordsFoundLabel={"Номын дугаар байхгүй"}
@@ -177,13 +294,27 @@ const GivePermission = props => {
             searchingLabel={"Хайх"}
             searching
           />
-        </CardBody>
-        <CardFooter className="w-100">
-          Нийт бэлэглэх ном {gift_count}
-        </CardFooter>
-      </Row>
-    </SweetAlert>
+        </div>
+      </Modal>
+    </>
   )
+
+  function noticeIsBought(book_id) {
+    if (
+      paid_books.filter(paid_book => book_id == paid_book.book?.id).length != 0
+    )
+      return true
+    return false
+  }
+
+  function noticeIsBoughtEbook(book_id) {
+    if (
+      paid_online_books.filter(paid_book => book_id == paid_book.book?.id)
+        .length != 0
+    )
+      return true
+    return false
+  }
 }
 
 export default GivePermission

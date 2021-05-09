@@ -16,7 +16,6 @@ import {
 import Breadcrumbs from "../../components/Common/Breadcrumb"
 
 import axios from "axios"
-import { Suspense } from "react"
 require("dotenv").config()
 
 let BookCard = ({ book }) => {

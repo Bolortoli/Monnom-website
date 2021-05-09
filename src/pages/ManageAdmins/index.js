@@ -49,8 +49,6 @@ const ManageAdmins = () => {
 
   const initializeUsersList = data => {
     let usersTempList = data.map(user => {
-      // color: user.role.user_role == 1 ? "red" : user.role.user_role == 2 ? "green" : "yellow",
-      // skills:
       return {
         id: user.id,
         color: user.gender === "Male" ? "red" : "yellow",
@@ -78,15 +76,14 @@ const ManageAdmins = () => {
         allData: user,
       }
     })
-    // console.log("usersTempList")
-    // console.log(usersTempList)
+
     let tempReverseArray = []
+
     usersTempList.map(user => {
       tempReverseArray.unshift(user)
     })
     setUsersList([...tempReverseArray, ...usersList])
     return tempReverseArray
-    // console.log(usersList.length)
   }
 
   const createUser = async () => {
@@ -190,13 +187,10 @@ const ManageAdmins = () => {
       url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/all-admins-list`,
     })
       .then(res => {
-        // console.log("users");
-        // console.log(res.data);
         SetIsNetworkLoading(false)
         initializeUsersList(res.data)
       })
       .catch(err => {
-        console.log(err)
         SetIsNetworkError(true)
         SetIsNetworkLoading(false)
       })

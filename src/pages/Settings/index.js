@@ -6,7 +6,7 @@ import SettingsForm from "./SettingsForm"
 
 export default function Settings() {
   // Check network
-  const [isNetworking, setIsNetworking] = useState(true)
+  const [isNetworking, setIsNetworking] = useState(false)
 
   return (
     <React.Fragment>
@@ -18,7 +18,7 @@ export default function Settings() {
           </Alert>
         ) : (
           <Container fluid>
-            <SettingsForm />
+            <SettingsForm setIsNetworking={setIsNetworking} />
           </Container>
         )}
       </div>
