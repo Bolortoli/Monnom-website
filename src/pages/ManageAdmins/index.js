@@ -161,6 +161,9 @@ const ManageAdmins = () => {
             tempResponse.profile_picture = res.data[0]
             setsuccess_dialog(true)
             SetIsNetworkLoading(false)
+            setTimeout(() => {
+              window.location.reload()
+            }, 2000)
           })
           .catch(err => {
             seterror_dialog(true)
