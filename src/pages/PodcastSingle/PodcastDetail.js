@@ -33,7 +33,7 @@ const PodcastDetail = props => {
   // update using formdata
   const updatePodcastInfo = async () => {
     await axios({
-      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-episodes/${props.channel.id}`,
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-channels/${props.channel.id}`,
       method: "PUT",
       headers: {
         Authorization: `Bearer ${
@@ -41,13 +41,15 @@ const PodcastDetail = props => {
         }`,
       },
       data: {
-        episode_name: edit_podcast_channel,
-        episode_description: edit_podcast_desc,
+        name: edit_podcast_channel,
+        description: edit_podcast_desc,
       },
     })
       .then(async res => {
         setsuccess_dialog(true)
-        window.location.reload()
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
         console.log(res.data)
       })
       .catch(err => {

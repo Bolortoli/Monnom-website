@@ -91,8 +91,8 @@ const List = props => {
       method: "PUT",
       config,
       data: {
-        description: edit_podcast_desc,
-        name: edit_podcast_name,
+        episode_description: edit_podcast_desc,
+        episode_name: edit_podcast_name,
       },
     })
       .then(async res => {

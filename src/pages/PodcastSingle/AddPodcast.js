@@ -85,7 +85,9 @@ const AddPodcast = props => {
       .post(url, podcastDataToUpload, config)
       .then(async res => {
         setsuccess_dialog(true)
-        window.location.reload()
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
       })
       .catch(e => {
         // alert(e)
