@@ -26,63 +26,16 @@ import { Link } from "react-router-dom"
 import SweetAlert from "react-bootstrap-sweetalert"
 import Select from "react-select"
 
-// file  generator
-const getItems = files => {
-  let tempArray = []
-  Object.keys(files).map((key, index) => {
-    tempArray.push({
-      id: `item-${index}`,
-      content: files[key].name,
-    })
-  })
-  return tempArray
-}
-
-// a little function to help us with reordering the result
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list)
-  const [removed] = result.splice(startIndex, 1)
-  result.splice(endIndex, 0, removed)
-
-  return result
-}
-
-const grid = 8
-
-const getItemStyle = (isDragging, draggableStyle) => ({
-  // some basic styles to make the items look a bit nicer
-  userSelect: "none",
-  padding: grid * 2,
-  margin: `0 0 ${grid}px 0`,
-  width: 450,
-  // styles we need to apply on draggables
-  ...draggableStyle,
-})
-
-const getListStyle = isDraggingOver => ({
-  background: isDraggingOver ? "lightgreen" : "white",
-  padding: grid,
-  width: 460,
-})
-
-const AddBook = () => {
-  const [netWork, set_netWork] = useState(true)
+const AddBook = props => {
+  const [netWork, set_netWork] = useState(false)
   const [modal, setModal] = useState(false)
   const [activeTab, set_activeTab] = useState(1)
   const [progressValue, setprogressValue] = useState(33)
   const [book_name_message, set_book_name_message] = useState("")
-  const [book_author_message, set_book_author_message] = useState("")
   const [checked, set_checked] = useState(false)
   const [book_label, set_book_label] = useState("pdf book")
   const [progress_mp3, set_progress_mp3] = useState(0)
-  const [progress_pdf, set_progress_pdf] = useState(0)
-  const [page, setPage] = useState(1)
-  const [users, setUsers] = useState([])
   const [next_button_label, set_next_button_label] = useState("Дараах")
-  const [
-    podcast_description_message,
-    set_podcast_description_message,
-  ] = useState("")
   const [profileImage, set_profileImage] = useState("")
   const [audio_book_label, set_audio_book_label] = useState("mp3 book")
   const [success_dlg, setsuccess_dlg] = useState(false)
@@ -90,53 +43,71 @@ const AddBook = () => {
   const [file_upload_name_message, set_file_upload_name_message] = useState("")
   const [youtube_url_name, set_youtube_url_name] = useState("")
   const [category_of_book_message, set_category_of_book_message] = useState("")
-  const [optionGroup, set_optionGroup] = useState([])
+  const [author_of_book_message, set_author_of_book_message] = useState("")
+  const [optionGroup_authors, set_optionGroup_authors] = useState([])
+  const [optionGroup_categories, set_optionGroup_categories] = useState([])
   const [is_pdf_price, set_is_pdf_price] = useState(false)
   const [book_introduction_message, set_book_introduction_message] = useState(
     ""
   )
+  const [success_dialog, setsuccess_dialog] = useState(false)
+  const [error_dialog, seterror_dialog] = useState(false)
 
   // axios -oor damjuulah state set
   const [pdf_price, set_pdf_price] = useState(0)
   const [youtube_url_value, set_youtube_url_value] = useState("")
   const [book_introduction_value, set_book_introduction_value] = useState("")
+
   const [selectedFiles, set_selectedFiles] = useState([])
+
   const [book_name_value, set_book_name_value] = useState("")
-  const [book_author_value, set_book_author_value] = useState("")
-  const [book_description_value, set_book_description_value] = useState("")
   const [book_picture, set_book_picture] = useState(null)
   const [audio_book_files, set_audio_book_files] = useState([])
+  const [audio_book_files_for_save, set_audio_book_files_for_save] = useState(
+    []
+  )
   const [book_files, set_book_files] = useState([])
-  const [selectedMulti, setselectedMulti] = useState([])
+  const [selectedMulti_category, setselectedMulti_category] = useState([])
+  const [selectedMulti_author, setselectedMulti_author] = useState([])
   const [sale_count, set_sale_count] = useState(0)
+  const [sale_price, set_sale_price] = useState(0)
 
   // create
   const createBook = async () => {
-    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}/books`
     const formData = new FormData()
 
-    const sendBookInfo = {
-      name: book_name_value,
-      description: book_description_value,
-      picture: book_picture,
+    let categories = selectedMulti_category.map(cat => cat.value.toString())
+    let authors = selectedMulti_author.map(author => author.value.toString())
+    console.log(categories)
+    console.log(authors)
+    console.log(props.user_id)
 
-      if(audio_book_files) {
-        has_pdf: true
-      },
-      if(book_files) {
-        has_mp3: true
-      },
-      if(sale_count) {
-        has_sale: true
-      },
+    let data = {}
+
+    data["name"] = book_name_value
+    data["has_sale"] = sale_count != 0 ? true : false
+    data["sale_quantity"] = sale_count
+    data["has_audio"] = audio_book_files.length != 0 ? true : false
+    data["has_pdf"] = book_files.length != 0 ? true : false
+    data["book_categories"] = categories
+    data["users_permissions_user"] = props.user_id
+    data["youtube_intro"] = youtube_url_value
+    data["introduction"] = book_introduction_value
+    data["book_authors"] = authors
+    data["online_book_price"] = pdf_price
+    data["book_price"] = sale_price
+
+    formData.append("data", JSON.stringify(data))
+    formData.append("files.pdf_book_path", book_files[0])
+    formData.append("files.picture", book_picture)
+    for (let i = 0; i < selectedFiles.length; i++) {
+      console.log(selectedFiles[i].name.split(".").slice(0, -1).join("."))
+      formData.append(
+        "files.picture_comment",
+        selectedFiles[i],
+        selectedFiles[i].name
+      )
     }
-
-    formData.append("book_author.name", book_author_value)
-    formData.append("book_author.description", book_description_value)
-
-    // formData.append("has_sale", has_sale)
-    // formData.append("has_mp3", has_mp3)
-    // formData.append("has_pdf", has_pdf)
 
     const config = {
       headers: {
@@ -147,64 +118,72 @@ const AddBook = () => {
       },
     }
     await axios
-      .post(url, formData, config)
+      .post(`${process.env.REACT_APP_STRAPI_BASE_URL}/books`, formData, config)
       .then(async res => {
-        console.log("res =>", res.data)
-        let which_book = new FormData()
-        if (audio_book_files && !book_files) {
-          which_book.append("has_pdf", true)
-          which_book.append("has_mp3", false)
-        } else if (!audio_book_files && book_files) {
-          which_book.append("has_pdf", true)
-          which_book.append("has_mp3", false)
-        } else {
-          which_book.append("has_pdf", false)
-          which_book.append("has_mp3", false)
-        }
-
-        await axios
-          .post(
-            `${process.env.REACT_APP_EXPRESS_BASE_URL}/upload`,
-            which_book,
-            config
+        let tempAudioRequests = []
+        for (let i = 0; i < audio_book_files_for_save.length; i++) {
+          console.log(audio_book_files_for_save[i])
+          let tempFormData = new FormData()
+          let data = {
+            chapter_name: audio_book_files_for_save[i].name
+              .split(".")
+              .slice(0, -1)
+              .join("."),
+            book: res.data.id,
+            number: i,
+          }
+          tempFormData.append("data", JSON.stringify(data))
+          tempFormData.append("files.mp3_file", audio_book_files_for_save[i])
+          tempAudioRequests.push(
+            axios.post(
+              `${process.env.REACT_APP_STRAPI_BASE_URL}/book-audios`,
+              tempFormData,
+              config
+            )
           )
-          .then(res => {
-            console.log(res.data)
+        }
+        axios
+          .all(tempAudioRequests)
+          .then(() => {
+            setsuccess_dialog(true)
+            setTimeout(() => {
+              window.location.reload()
+            }, 2000)
           })
           .catch(err => {
-            alert(err)
+            seterror_dialog(true)
           })
       })
       .catch(e => {
-        alert(e)
+        seterror_dialog(true)
       })
   }
 
-  // axios get request
-  async function makeGetReq() {
-    await axios({
-      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/book-categories`,
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
+  // props oos irsen nomnii categoruudiig awah
+  const getAuthorsCategoriesInfo = (authors, categories) => {
+    const a = authors.map(author => {
+      return {
+        label: author.author_name,
+        value: author.id,
+      }
     })
-      .then(res => {
-        console.log(res.data)
-        getAuthorsInfo(res.data)
-        console.log("state => ", optionGroup)
-        set_netWork(false)
-      })
-      .catch(err => {
-        console.log(err)
-        set_netWork(true)
-      })
+    set_optionGroup_authors(a)
+
+    const c = categories.map(category => {
+      return {
+        label: category.name,
+        value: category.id,
+      }
+    })
+    set_optionGroup_categories(c)
   }
 
   useEffect(() => {
-    makeGetReq()
+    getAuthorsCategoriesInfo(
+      props.available_authors,
+      props.available_categories
+    )
+    // makeGetReq()
   }, [])
 
   // file upload hiih
@@ -279,28 +258,28 @@ const AddBook = () => {
 
   // inputiin utga hooson esehiig shalgah
   const handle1 = () => {
-    if (book_name_value === "") {
-      set_book_name_message("Хоосон утгатай байна !")
-    } else {
-      set_book_name_message("")
-    }
-    if (book_description_value === "") {
-      set_podcast_description_message("Хоосон утгатай байна !")
-    } else {
-      set_podcast_description_message("")
-    }
-    if (book_author_value === "") {
-      set_book_author_message("Хоосон утгатай байна !")
-    } else {
-      set_book_author_message("")
-    }
-    if (selectedMulti) {
-      set_category_of_book_message("")
-      console.log("not null")
-    } else {
-      set_category_of_book_message("Хоосон утгатай байна !")
-      console.log("null")
-    }
+    // if (book_name_value === "") {
+    //   set_book_name_message("Хоосон утгатай байна !")
+    // } else {
+    //   set_book_name_message("")
+    // }
+    // if (book_description_value === "") {
+    //   set_podcast_description_message("Хоосон утгатай байна !")
+    // } else {
+    //   set_podcast_description_message("")
+    // }
+    // if (book_author_value === "") {
+    //   set_book_author_message("Хоосон утгатай байна !")
+    // } else {
+    //   set_book_author_message("")
+    // }
+    // if (selectedMulti_category) {
+    //   set_category_of_book_message("")
+    //   console.log("not null")
+    // } else {
+    //   set_category_of_book_message("Хоосон утгатай байна !")
+    //   console.log("null")
+    // }
   }
 
   const handle2 = () => {
@@ -324,6 +303,7 @@ const AddBook = () => {
   const uploadAudioBook = e => {
     var files = e.target.files
 
+    set_audio_book_files_for_save(files)
     set_audio_book_files(getItems(files))
     if (files.length > 0) {
       set_audio_book_label("Цахим ном нэмэх")
@@ -335,7 +315,19 @@ const AddBook = () => {
 
   // upload hiij bga mp3 file aa ustgah
   const removeAudioBookFiles = f => {
+    console.log(f)
+    console.log(
+      Array.from(audio_book_files_for_save).filter(
+        file => file.name != f.content
+      )
+    )
+    // filter(book => book.name != f.content)
     set_audio_book_files(audio_book_files.filter(x => x !== f))
+    set_audio_book_files_for_save(
+      Array.from(audio_book_files_for_save).filter(
+        file => file.name != f.content
+      )
+    )
     if (audio_book_files.length === 0) {
       set_audio_book_label("pdf book")
       set_next_button_label("Дараах")
@@ -389,20 +381,15 @@ const AddBook = () => {
   }
 
   // multiple book categories
-  function handleMulti(selectedMulti) {
-    setselectedMulti(selectedMulti)
+  function handleMulti_category(selected_category) {
+    setselectedMulti_category(selected_category)
     set_category_of_book_message("")
   }
 
-  // props oos irsen nomnii categoruudiig awah
-  const getAuthorsInfo = authors => {
-    const a = authors.map(author => {
-      return {
-        label: author.name,
-        value: author.id,
-      }
-    })
-    set_optionGroup(a)
+  // multiple book categories
+  function handleMulti_author(selected_author) {
+    setselectedMulti_author(selected_author)
+    set_author_of_book_message("")
   }
 
   return (
@@ -426,7 +413,7 @@ const AddBook = () => {
               cancelBtnBsStyle="danger"
               onConfirm={() => {
                 set_confirm_edit(false)
-                setsuccess_dlg(true)
+                // setsuccess_dlg(true)
                 createBook()
               }}
               onCancel={() => {
@@ -530,6 +517,8 @@ const AddBook = () => {
                       activeTab={activeTab}
                       className="twitter-bs-wizard-tab-content"
                     >
+                      {JSON.stringify(selectedMulti_category)}
+                      {JSON.stringify(selectedMulti_author)}
                       <TabPane tabId={1} id="personal-info">
                         <Form>
                           <Row>
@@ -539,13 +528,13 @@ const AddBook = () => {
                                   Номны төрөл
                                 </label>
                                 <Select
-                                  value={selectedMulti}
+                                  value={selectedMulti_category}
                                   isMulti={true}
                                   placeholder="Сонгох ... "
-                                  onChange={() => {
-                                    handleMulti()
+                                  onChange={e => {
+                                    handleMulti_category(e)
                                   }}
-                                  options={optionGroup}
+                                  options={optionGroup_categories}
                                   classNamePrefix="select2-selection"
                                 />
                                 <p class="text-danger">
@@ -571,24 +560,29 @@ const AddBook = () => {
                               </FormGroup>
                             </Col>
                             <Col lg="6">
-                              <FormGroup>
-                                <Label for="kyclastname-input">Зохиолч</Label>
-                                <Input
-                                  type="text"
-                                  className="podcast_channel"
-                                  required
-                                  value={book_author_value}
+                              <FormGroup className="select2-container">
+                                <label className="control-label">
+                                  Номны зохиогч
+                                </label>
+                                <Select
+                                  value={selectedMulti_author}
+                                  isMulti={true}
+                                  placeholder="Сонгох ... "
                                   onChange={e => {
-                                    set_book_author_value(e.target.value)
+                                    handleMulti_author(e)
                                   }}
+                                  options={optionGroup_authors}
+                                  classNamePrefix="select2-selection"
                                 />
-                                <p class="text-danger">{book_author_message}</p>
+                                <p class="text-danger">
+                                  {author_of_book_message}
+                                </p>
                               </FormGroup>
                             </Col>
                           </Row>
 
                           <Row>
-                            <Col lg="7">
+                            {/* <Col lg="7">
                               <FormGroup>
                                 <Label htmlFor="productdesc">Тайлбар</Label>
                                 <textarea
@@ -604,7 +598,7 @@ const AddBook = () => {
                                   {podcast_description_message}
                                 </p>
                               </FormGroup>
-                            </Col>
+                            </Col> */}
                             <Col lg={4}>
                               <FormGroup>
                                 <Label htmlFor="productdesc">Зураг</Label>
@@ -678,7 +672,7 @@ const AddBook = () => {
                                     type="number"
                                     // value="0"
                                     onChange={e =>
-                                      set_sale_count(e.target.value)
+                                      set_sale_price(e.target.value)
                                     }
                                   />
                                 </Col>
@@ -706,18 +700,16 @@ const AddBook = () => {
                                 <p class="text-danger">{youtube_url_name}</p>
                               </FormGroup>
                               <Row>
-                                {is_pdf_price ? (
-                                  <Col lg={12}>
-                                    <Label>Pdf номын үнэ</Label>
-                                    <Input
-                                      type="number"
-                                      value={pdf_price}
-                                      onChange={e =>
-                                        set_pdf_price(e.target.value)
-                                      }
-                                    />
-                                  </Col>
-                                ) : null}
+                                <Col lg={12}>
+                                  <Label>Онлайн номын үнэ</Label>
+                                  <Input
+                                    type="number"
+                                    value={pdf_price}
+                                    onChange={e =>
+                                      set_pdf_price(e.target.value)
+                                    }
+                                  />
+                                </Col>
                               </Row>
                             </Col>
                             <Col lg={6}>
@@ -860,7 +852,7 @@ const AddBook = () => {
                             <label className="custom-file-upload d-flex">
                               <input
                                 type="file"
-                                accept=".pdf"
+                                accept=".pdf,.epub"
                                 style={{
                                   display: "none",
                                 }}
@@ -951,7 +943,7 @@ const AddBook = () => {
                             <label className="custom-file-upload">
                               <input
                                 type="file"
-                                accept="audio/*"
+                                accept=".mp3"
                                 multiple
                                 className="invisible"
                                 onChange={e => uploadAudioBook(e)}
@@ -990,15 +982,15 @@ const AddBook = () => {
                         <Link
                           to="#"
                           onClick={e => {
-                            handle1(e)
-                            if (
-                              activeTab === 1 &&
-                              book_name_value !== "" &&
-                              book_author_value !== "" &&
-                              book_description_value !== ""
-                            ) {
-                              toggleTab(activeTab + 1)
-                            }
+                            // handle1(e)
+                            // if (
+                            //   activeTab === 1 &&
+                            //   book_name_value !== "" &&
+                            //   book_author_value !== "" &&
+                            //   book_description_value !== ""
+                            // ) {
+                            toggleTab(activeTab + 1)
+                            // }
                             if (
                               activeTab == 2 &&
                               (next_button_label == "Алгасах" ||
@@ -1031,8 +1023,87 @@ const AddBook = () => {
           </Card>
         </Col>
       ) : null}
+      {success_dialog ? (
+        <SweetAlert
+          title={"Амжилттай"}
+          timeout={2000}
+          style={{
+            position: "absolute",
+            top: "center",
+            right: "center",
+          }}
+          showCloseButton={false}
+          showConfirm={false}
+          success
+          onConfirm={() => {
+            // createPodcast()
+            setsuccess_dialog(false)
+          }}
+        >
+          {"Үйлдэл амжилттай боллоо"}
+        </SweetAlert>
+      ) : null}
+      {error_dialog ? (
+        <SweetAlert
+          title={"Амжилтгүй"}
+          timeout={2000}
+          style={{
+            position: "absolute",
+            top: "center",
+            right: "center",
+          }}
+          showCloseButton={false}
+          showConfirm={false}
+          error
+          onConfirm={() => {
+            // createPodcast()
+            seterror_dialog(false)
+          }}
+        >
+          {"Үйлдэл амжилтгүй боллоо"}
+        </SweetAlert>
+      ) : null}
     </React.Fragment>
   )
 }
+
+// file  generator
+const getItems = files => {
+  let tempArray = []
+  Object.keys(files).map((key, index) => {
+    tempArray.push({
+      id: `item-${index}`,
+      content: files[key].name,
+    })
+  })
+  return tempArray
+}
+
+// a little function to help us with reordering the result
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list)
+  const [removed] = result.splice(startIndex, 1)
+  result.splice(endIndex, 0, removed)
+
+  return result
+}
+
+const grid = 8
+
+const getItemStyle = (isDragging, draggableStyle) => ({
+  // some basic styles to make the items look a bit nicer
+  userSelect: "none",
+  padding: grid * 2,
+  margin: `0 0 ${grid}px 0`,
+  width: 450,
+  // styles we need to apply on draggables
+  ...draggableStyle,
+})
+
+const getListStyle = isDraggingOver => ({
+  background: isDraggingOver ? "lightgreen" : "white",
+  padding: grid,
+  width: 460,
+})
 
 export default AddBook

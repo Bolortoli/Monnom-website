@@ -108,7 +108,9 @@ const BookDetail = props => {
                             <strong>
                               {new Date(
                                 data.user.user_joined_date
-                              ).toLocaleDateString()}
+                              ).toLocaleString("mn-MN", {
+                                timeZone: "Asia/Hovd",
+                              })}
                             </strong>
                           </th>
                         </tr>
@@ -119,17 +121,24 @@ const BookDetail = props => {
               </Card>
             </Col>
             <Col lg={8}>
-              {/* <Col xl={12}>
-       <Card>
-         <CardBody>
-           <BookAnalysis />
-         </CardBody>
-       </Card>
-     </Col> */}
               <Col xl={12}>
-                {" "}
-                <List books={data.user_books} />
+                <Card>
+                  <CardBody>
+                    <BookAnalysis />
+                  </CardBody>
+                </Card>
               </Col>
+            </Col>
+          </Row>
+          <Row>
+            <Col xl={12}>
+              {" "}
+              <List
+                user_id={data.user.id}
+                available_authors={data.available_authors}
+                available_categories={data.available_categories}
+                books={data.user_books}
+              />
             </Col>
           </Row>
         </Container>

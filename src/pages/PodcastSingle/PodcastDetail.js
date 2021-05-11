@@ -19,137 +19,49 @@ import List from "./List"
 import axios from "axios"
 
 const PodcastDetail = props => {
+  // console.log(props.user)
   const [data, set_data] = useState(null)
 
   const [edit_detail, set_edit_detail] = useState(false)
   const [confirm_edit, set_confirm_edit] = useState(false)
-  const [success_dlg, setsuccess_dlg] = useState(false)
-  const [dynamic_title, setdynamic_title] = useState("")
-  const [dynamic_description, setdynamic_description] = useState("")
-
+  const [success_dialog, setsuccess_dialog] = useState(false)
+  const [error_dialog, seterror_dialog] = useState(false)
   // update hiih state
-  const [edit_podcast_channel, set_edit_podcast_channel] = useState()
-  const [edit_podcast_desc, set_edit_podcast_desc] = useState()
+  const [edit_podcast_channel, set_edit_podcast_channel] = useState("")
+  const [edit_podcast_desc, set_edit_podcast_desc] = useState("")
 
   // update using formdata
   const updatePodcastInfo = async () => {
-    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}`
-    const formData = new FormData()
-    formData.append("channel_name", edit_podcast_channel)
-    formData.append("channel_description", edit_podcast_desc)
-
-    const config = {
+    await axios({
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-episodes/${props.channel.id}`,
+      method: "PUT",
       headers: {
-        "content-type": "multipart/form-data",
-        Authorization: `Bearer ${JSON.parse(localStorage.getItem("").jwt)}`,
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
       },
-    }
-    await axios.post(url, formData, config).then(async res => {
-      console.log(res.data)
+      data: {
+        episode_name: edit_podcast_channel,
+        episode_description: edit_podcast_desc,
+      },
     })
+      .then(async res => {
+        setsuccess_dialog(true)
+        window.location.reload()
+        console.log(res.data)
+      })
+      .catch(err => {
+        seterror_dialog(true)
+      })
   }
 
   useEffect(() => {
-    set_data(props.user)
+    set_data(props.channel)
   }, [props])
 
   return (
     <React.Fragment>
       <Container fluid>
-        {edit_detail ? (
-          <SweetAlert
-            showCancel
-            title="Ерөнхий мэдээлэл"
-            cancelBtnBsStyle="danger"
-            confirmBtnText="Хадгалах"
-            cancelBtnText="Болих"
-            style={{
-              padding: "2em",
-              borderRadius: "20px",
-            }}
-            onConfirm={() => {
-              set_edit_detail(false)
-              set_confirm_edit(true)
-            }}
-            onCancel={() => {
-              set_edit_detail(false)
-            }}
-          >
-            <Row>
-              <Card>
-                <CardTitle className="mt-3 pl-2 text-left font-size-18 border-bottom border-dark">
-                  Подкаст мэдээлэл
-                </CardTitle>
-                <Col xl={12}>
-                  <Row>
-                    <Col lg={6} className="py-3">
-                      <Label className="w-100 text-left">Подкаст суваг</Label>
-                      <Input
-                        type="text"
-                        value={edit_podcast_channel}
-                        onChange={e => {
-                          set_edit_podcast_channel(e.target.value)
-                        }}
-                      />
-                    </Col>
-                    <Col lg={6} className="py-3">
-                      <Label className="w-100 text-left">Тайлбар</Label>
-                      <textarea
-                        className="form-control"
-                        id="productdesc"
-                        rows="5"
-                        value={edit_podcast_desc}
-                        onChange={e => {
-                          set_edit_podcast_desc(e.target.value)
-                        }}
-                      />
-                    </Col>
-                  </Row>
-                </Col>
-              </Card>
-            </Row>
-          </SweetAlert>
-        ) : null}
-        {confirm_edit ? (
-          <SweetAlert
-            title="Та итгэлтэй байна уу ?"
-            warning
-            showCancel
-            confirmButtonText="Тийм!"
-            cancelBtnText="Болих"
-            confirmBtnBsStyle="success"
-            cancelBtnBsStyle="danger"
-            onConfirm={() => {
-              set_confirm_edit(false)
-              setsuccess_dlg(true)
-              setdynamic_title("Амжилттай")
-              setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
-              // updatePodcastInfo()
-            }}
-            onCancel={() => {
-              set_confirm_edit(false)
-            }}
-          ></SweetAlert>
-        ) : null}
-        {success_dlg ? (
-          <SweetAlert
-            title={dynamic_title}
-            timeout={1500}
-            style={{
-              position: "absolute",
-              top: "center",
-              right: "center",
-            }}
-            showCloseButton={false}
-            showConfirm={false}
-            success
-            onConfirm={() => {
-              setsuccess_dlg(false)
-            }}
-          >
-            {dynamic_description}
-          </SweetAlert>
-        ) : null}
         {data != null ? (
           <Row>
             <Col xl="4">
@@ -172,7 +84,7 @@ const PodcastDetail = props => {
                     <Col sm="4">
                       <div className="avatar-md profile-user-wid mb-4">
                         <img
-                          style={{ width: "100%", height: "9.5vh" }}
+                          style={{ width: "100%", height: "100%" }}
                           src={
                             process.env.REACT_APP_STRAPI_BASE_URL +
                             data.channel_cover_pic
@@ -182,7 +94,7 @@ const PodcastDetail = props => {
                         />
                       </div>
                       <p>
-                        <strong>{data.user_firstname}</strong>
+                        <strong>{data.channel_name}</strong>
                       </p>
                     </Col>
 
@@ -277,14 +189,133 @@ const PodcastDetail = props => {
               </Card>
             </Col>
             <Col xl={8}>
-              {/* <Col xl={12}>
-                <PodcastAnalysis data={data} />
-              </Col> */}
+              <Col xl={12}>
+                <PodcastAnalysis data={data.user_podcasts} />
+              </Col>
               <Col xl="12">
-                <List podcasts={props.user.user_podcasts} />
+                <List
+                  set_data={set_data}
+                  data={data}
+                  podcasts={props.channel.user_podcasts}
+                />
               </Col>
             </Col>
           </Row>
+        ) : null}
+        {edit_detail ? (
+          <SweetAlert
+            showCancel
+            title="Ерөнхий мэдээлэл"
+            cancelBtnBsStyle="danger"
+            confirmBtnText="Хадгалах"
+            cancelBtnText="Болих"
+            style={{
+              padding: "2em",
+              borderRadius: "20px",
+            }}
+            onConfirm={() => {
+              set_edit_detail(false)
+              set_confirm_edit(true)
+            }}
+            onCancel={() => {
+              set_edit_detail(false)
+            }}
+          >
+            <Row>
+              <Card>
+                <CardTitle className="mt-3 pl-2 text-left font-size-18 border-bottom border-dark">
+                  Подкаст мэдээлэл
+                </CardTitle>
+                <Col xl={12}>
+                  <Row>
+                    <Col lg={6} className="py-3">
+                      <Label className="w-100 text-left">Подкаст суваг</Label>
+                      <Input
+                        type="text"
+                        value={edit_podcast_channel}
+                        onChange={e => {
+                          set_edit_podcast_channel(e.target.value)
+                        }}
+                      />
+                    </Col>
+                    <Col lg={6} className="py-3">
+                      <Label className="w-100 text-left">Тайлбар</Label>
+                      <textarea
+                        className="form-control"
+                        id="productdesc"
+                        rows="5"
+                        value={edit_podcast_desc}
+                        onChange={e => {
+                          set_edit_podcast_desc(e.target.value)
+                        }}
+                      />
+                    </Col>
+                  </Row>
+                </Col>
+              </Card>
+            </Row>
+          </SweetAlert>
+        ) : null}
+        {confirm_edit ? (
+          <SweetAlert
+            title="Та итгэлтэй байна уу ?"
+            warning
+            showCancel
+            confirmButtonText="Тийм!"
+            cancelBtnText="Болих"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              set_confirm_edit(false)
+              // setsuccess_dlg(true)
+              // setdynamic_title("Амжилттай")
+              // setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
+              updatePodcastInfo()
+            }}
+            onCancel={() => {
+              set_confirm_edit(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {success_dialog ? (
+          <SweetAlert
+            title={"Амжилттай"}
+            timeout={2000}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
+            onConfirm={() => {
+              // createPodcast()
+              setsuccess_dialog(false)
+            }}
+          >
+            {"Үйлдэл амжилттай боллоо"}
+          </SweetAlert>
+        ) : null}
+        {error_dialog ? (
+          <SweetAlert
+            title={"Амжилтгүй"}
+            timeout={2000}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            error
+            onConfirm={() => {
+              // createPodcast()
+              seterror_dialog(false)
+            }}
+          >
+            {"Үйлдэл амжилтгүй боллоо"}
+          </SweetAlert>
         ) : null}
       </Container>
     </React.Fragment>

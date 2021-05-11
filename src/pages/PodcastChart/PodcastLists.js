@@ -53,7 +53,6 @@ const ContactsGrid = props => {
         let tempChannels = Object.assign(data)
         tempChannels.find(channel => channel.id === res.data.id).is_featured =
           res.data.is_featured
-        console.log(tempChannels)
         setsuccess_dialog(true)
       })
       .catch(err => {
@@ -78,7 +77,7 @@ const ContactsGrid = props => {
   return (
     <React.Fragment>
       <Row>
-        <Col lg={4}>{pagination_current}</Col>
+        <Col lg={4}></Col>
 
         <Col xl={4} lg={6} md={8} xs={8} sm={8}>
           <form className="app-search d-none d-lg-block">
@@ -249,12 +248,12 @@ const ContactsGrid = props => {
                                         if (podcast.is_featured) {
                                           console.log("podcast.podcast_name")
                                           set_are_you_sure_title(
-                                            `${podcast.podcast_name}-ыг онцлох сувгаас хасах гэж байна. Та итгэлтэй байна уу?`
+                                            `${podcast.podcast_name} сувгийг онцлох сувгаас хасах гэж байна. Та итгэлтэй байна уу?`
                                           )
                                         } else {
                                           console.log(podcast.podcast_name)
                                           set_are_you_sure_title(
-                                            `${podcast.podcast_name}-ыг онцлох суваг болгох гэж байна. Та итгэлтэй байна уу?`
+                                            `${podcast.podcast_name} сувгийг онцлох суваг болгох гэж байна. Та итгэлтэй байна уу?`
                                           )
                                         }
                                         set_channel_info_to_update({
@@ -273,25 +272,6 @@ const ContactsGrid = props => {
                                     </label>
                                   </div>
                                 </Col>
-                                {confirm_allow ? (
-                                  <SweetAlert
-                                    title={are_you_sure_title}
-                                    info
-                                    showCancel
-                                    confirmBtnText="Тийм"
-                                    cancelBtnText="Болих"
-                                    confirmBtnBsStyle="success"
-                                    cancelBtnBsStyle="danger"
-                                    onConfirm={() => {
-                                      set_confirm_allow(false)
-                                      featurePodcastChannel()
-                                    }}
-                                    onCancel={() => {
-                                      set_are_you_sure_title("")
-                                      set_confirm_allow(false)
-                                    }}
-                                  ></SweetAlert>
-                                ) : null}
                               </Row>
                             </CardBody>
                           </Card>
@@ -304,6 +284,25 @@ const ContactsGrid = props => {
             : null}
         </Row>
       )}
+      {confirm_allow ? (
+        <SweetAlert
+          title={are_you_sure_title}
+          info
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Болих"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            set_confirm_allow(false)
+            featurePodcastChannel()
+          }}
+          onCancel={() => {
+            set_are_you_sure_title("")
+            set_confirm_allow(false)
+          }}
+        ></SweetAlert>
+      ) : null}
       {success_dialog ? (
         <SweetAlert
           title={"Амжилттай"}

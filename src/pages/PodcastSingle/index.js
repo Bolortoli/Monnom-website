@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
 import PodcastDetail from "./PodcastDetail"
-import { Alert } from "reactstrap"
+import { Alert, Row, Col } from "reactstrap"
 import { Link } from "react-router-dom"
 import Breadcrumb from "../../components/Common/Breadcrumb"
 
@@ -16,7 +16,7 @@ const PodcastSinglePage = () => {
   const [isNetworkingError, setIsNetworkingError] = useState(false)
   const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
 
-  async function makeGetReq() {
+  async function fetchData() {
     await axios({
       url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels/${id}`,
       method: "GET",
@@ -37,20 +37,21 @@ const PodcastSinglePage = () => {
   }
 
   useEffect(() => {
-    makeGetReq()
+    fetchData()
   }, [])
 
   return (
     <React.Fragment>
       <div className="page-content">
+        <Breadcrumb breadcrumbItem="Подкаст дэлгэрэнгүй" title="Подкаст" />
         {isNetworkingError ? (
           <Alert color="danger" role="alert">
             Сүлжээ уналаа ! Дахин ачааллна уу ?
           </Alert>
         ) : (
           <>
-            {isNetworkLoading ? (
-              <PodcastDetail user={data} />
+            {isNetworkLoading && data != null ? (
+              <PodcastDetail channel={data} set_data={set_data} />
             ) : (
               <Row>
                 <Col xs="12">
@@ -65,8 +66,6 @@ const PodcastSinglePage = () => {
             )}
           </>
         )}
-        <Breadcrumb breadcrumbItem="Подкаст дэлгэрэнгүй" title="Подкаст" />
-        {data != null ? <PodcastDetail user={data} /> : null}
       </div>
     </React.Fragment>
   )

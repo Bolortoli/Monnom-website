@@ -14,7 +14,7 @@ import {
 } from "reactstrap"
 import SweetAlert from "react-bootstrap-sweetalert"
 import axios from "axios"
-import { update } from "lodash"
+import { conformsTo, update } from "lodash"
 
 const columns = [
   {
@@ -56,14 +56,13 @@ const List = props => {
   const [latestEpisodeNumber, setLatestEpisodeNumber] = useState(0)
   const [data, set_data] = useState(props.podcasts)
 
-  const [editUserStep1, setEditUserStep1] = useState(false)
+  const [editEpisodeModal, setEditPodcastModal] = useState(false)
   const [confirm_edit, set_confirm_edit] = useState(false)
   const [confirm_delete, set_confirm_delete] = useState(false)
-  const [success_dlg, setsuccess_dlg] = useState(false)
-  const [dynamic_title, setdynamic_title] = useState("")
-  const [dynamic_description, setdynamic_description] = useState("")
   const [coverImage, setCoverImage] = useState("")
   const [delete_podcast_id, set_delete_podcast_id] = useState(null)
+  const [success_dialog, setsuccess_dialog] = useState(false)
+  const [error_dialog, seterror_dialog] = useState(false)
 
   // update, delete hiih state uud
   const [podcast_pic, set_podcast_pic] = useState(null)
@@ -72,28 +71,37 @@ const List = props => {
   const [edit_podcast_file, set_edit_podcast_file] = useState("")
 
   // axios oor huselt ywuulj update hiih
-  const updatePodcast = async () => {
-    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-upload`
+  const updatePodcast = async podcast_id => {
     const updateForm = new FormData()
     updateForm.append("podcast_name", edit_podcast_name)
     updateForm.append("podcast_desc", edit_podcast_desc)
-    updateForm.append("podcast_file_name", edit_podcast_file)
-    updateForm.append("podcast_profile_pic", podcast_pic)
+    // updateForm.append("podcast_file_name", edit_podcast_file)
+    // updateForm.append("podcast_profile_pic", podcast_pic)
 
     const config = {
       headers: {
-        "content-type": "multipart/form-data",
         Authorization: `Bearer ${
           JSON.parse(localStorage.getItem("user_information")).jwt
         }`,
       },
     }
 
-    await axios
-      .post(url, updateForm, config)
-      .then(async res => {})
+    await axios({
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-episodes/${podcast_id}`,
+      method: "PUT",
+      config,
+      data: {
+        description: edit_podcast_desc,
+        name: edit_podcast_name,
+      },
+    })
+      .then(async res => {
+        setsuccess_dialog(true)
+        window.location.reload()
+      })
       .catch(e => {
-        alert(e)
+        console.log(e)
+        seterror_dialog(true)
       })
   }
 
@@ -103,11 +111,13 @@ const List = props => {
     await axios
       .delete(url)
       .then(async res => {
-        console.log("aldaagui")
-        setsuccess_dlg(true)
+        setsuccess_dialog(true)
+        window.location.reload()
+        set_confirm_delete(false)
       })
       .catch(e => {
-        console.log("sdasdasd", url)
+        seterror_dialog(true)
+        set_confirm_delete(false)
       })
   }
 
@@ -139,11 +149,10 @@ const List = props => {
             <Link to="#" className="d-flex justify-content-around">
               <i
                 onClick={() => {
-                  setEditUserStep1(true)
+                  setEditPodcastModal(true)
                   set_edit_podcast_name(d.podcast_name)
                   set_edit_podcast_desc(d.podcast_desc)
-                  set_edit_podcast_file(d.podcast_file_name)
-                  setCoverImage()
+                  set_delete_podcast_id(d.id)
                 }}
                 className="bx bxs-edit text-primary font-size-20"
                 id="edittooltip"
@@ -187,7 +196,7 @@ const List = props => {
   return (
     <React.Fragment>
       <Row>
-        {editUserStep1 ? (
+        {editEpisodeModal ? (
           <SweetAlert
             showCancel
             title="Ерөнхий мэдээлэл"
@@ -199,11 +208,11 @@ const List = props => {
               borderRadius: "20px",
             }}
             onConfirm={() => {
-              setEditUserStep1(false)
+              setEditPodcastModal(false)
               set_confirm_edit(true)
             }}
             onCancel={() => {
-              setEditUserStep1(false)
+              setEditPodcastModal(false)
             }}
           >
             <Row>
@@ -225,7 +234,7 @@ const List = props => {
                   </Col>
                 </Row>
               </Col>
-              <Col lg="7">
+              <Col lg="12">
                 <FormGroup>
                   <Label className="text-left w-100" htmlFor="productdesc">
                     Тайлбар
@@ -233,12 +242,15 @@ const List = props => {
                   <textarea
                     className="form-control"
                     id="productdesc"
-                    rows="5"
+                    rows="4"
                     value={edit_podcast_desc}
+                    onChange={event => {
+                      set_edit_podcast_desc(event.target.value)
+                    }}
                   />
                 </FormGroup>
               </Col>
-              <Col lg={5}>
+              {/* <Col lg={5}>
                 <Label
                   htmlFor="input"
                   className="image-upload d-flex justify-content-center"
@@ -295,7 +307,7 @@ const List = props => {
                     id="customFile"
                   />
                 </div>
-              </Col>
+              </Col> */}
             </Row>
           </SweetAlert>
         ) : null}
@@ -310,22 +322,19 @@ const List = props => {
             cancelBtnBsStyle="danger"
             onConfirm={() => {
               set_confirm_edit(false)
-              setEditUserStep1(false)
-              setsuccess_dlg(true)
-              setdynamic_title("Амжилттай")
-              setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
-              updatePodcast()
+              setEditPodcastModal(false)
+              updatePodcast(delete_podcast_id)
             }}
             onCancel={() => {
               set_confirm_edit(false)
-              setEditUserStep1(true)
+              setEditPodcastModal(true)
             }}
           ></SweetAlert>
         ) : null}
-        {success_dlg ? (
+        {success_dialog ? (
           <SweetAlert
-            title={dynamic_title}
-            timeout={1500}
+            title={"Амжилттай"}
+            timeout={2000}
             style={{
               position: "absolute",
               top: "center",
@@ -335,16 +344,17 @@ const List = props => {
             showConfirm={false}
             success
             onConfirm={() => {
-              setsuccess_dlg(false)
+              // createPodcast()
+              setsuccess_dialog(false)
             }}
           >
-            {dynamic_description}
+            {"Үйлдэл амжилттай боллоо"}
           </SweetAlert>
         ) : null}
-        {success_dlg ? (
+        {error_dialog ? (
           <SweetAlert
-            title={dynamic_title}
-            timeout={1500}
+            title={"Амжилтгүй"}
+            timeout={2000}
             style={{
               position: "absolute",
               top: "center",
@@ -352,17 +362,18 @@ const List = props => {
             }}
             showCloseButton={false}
             showConfirm={false}
-            success
+            error
             onConfirm={() => {
-              setsuccess_dlg(false)
+              // createPodcast()
+              seterror_dialog(false)
             }}
           >
-            {dynamic_description}
+            {"Үйлдэл амжилтгүй боллоо"}
           </SweetAlert>
         ) : null}
         {confirm_delete ? (
           <SweetAlert
-            title="Та энэ номыг устгах гэж байна !"
+            title="Подкастын дугаарыг устгах гэж байна !"
             warning
             showCancel
             confirmBtnText="Тийм"
@@ -371,9 +382,6 @@ const List = props => {
             cancelBtnBsStyle="danger"
             onConfirm={() => {
               deletePodcast(delete_podcast_id)
-              set_confirm_delete(false)
-              setdynamic_title("Амжилттай")
-              setdynamic_description("Энэ подкастыг амжилттай устгалаа.")
             }}
             onCancel={() => {
               set_confirm_delete(false)
@@ -385,7 +393,7 @@ const List = props => {
           <Card>
             <CardBody>
               <div className="d-flex justify-content-between">
-                <CardTitle>Жагсаалтууд</CardTitle>
+                <CardTitle>Жагсаал</CardTitle>
                 <CardTitle className="text-right">
                   <AddPodcast latestEpisodeNumber={latestEpisodeNumber} />
                 </CardTitle>

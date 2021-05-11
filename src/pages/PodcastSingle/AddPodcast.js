@@ -33,8 +33,10 @@ const AddPodcast = props => {
   var latestEpisodeNumber = props.latestEpisodeNumber
   const [modal, setModal] = useState(false)
   const [activeTab, set_activeTab] = useState(1)
+  const [success_dialog, setsuccess_dialog] = useState(false)
+  const [error_dialog, seterror_dialog] = useState(false)
+
   const [progressValue, setprogressValue] = useState(33)
-  const [count, setCount] = useState(0)
   const [podcast_name_message, set_podcast_name_message] = useState("")
   const [
     podcast_description_message,
@@ -51,9 +53,7 @@ const AddPodcast = props => {
   )
   const [checked, set_checked] = useState(false)
   const [episode_picture, set_episode_picture] = useState(null)
-  const [profileImage, set_profileImage] = useState(
-    "https://www.pngitem.com/pimgs/m/97-972731_podcast-podcasting-icon-hd-png-download.png"
-  )
+  const [profileImage, set_profileImage] = useState()
   const [selectedFiles, set_selectedFiles] = useState([])
 
   // update and delete
@@ -64,8 +64,8 @@ const AddPodcast = props => {
     podcastDataToUpload.append("files.picture", episode_picture)
 
     const tempSendData = {
-      name: podcast_name_value,
-      description: podcast_description_value,
+      episode_name: podcast_name_value,
+      episode_description: podcast_description_value,
       podcast_channel: id,
       episode_number: latestEpisodeNumber + 1,
     }
@@ -83,9 +83,13 @@ const AddPodcast = props => {
 
     await axios
       .post(url, podcastDataToUpload, config)
-      .then(async res => {})
+      .then(async res => {
+        setsuccess_dialog(true)
+        window.location.reload()
+      })
       .catch(e => {
-        alert(e)
+        // alert(e)
+        seterror_dialog(true)
       })
   }
 
@@ -177,7 +181,13 @@ const AddPodcast = props => {
 
   return (
     <React.Fragment>
-      <Button type="button" color="success" onClick={togglemodal}>
+      <Button
+        type="button"
+        color="success"
+        onClick={() => {
+          togglemodal()
+        }}
+      >
         <i
           className="bx bx-plus-medical font-size-18 d-block text-center"
           id="edittooltip"
@@ -185,26 +195,6 @@ const AddPodcast = props => {
       </Button>
 
       <Col xs={1} class="position-relative">
-        {success_dlg ? (
-          <SweetAlert
-            title={"Амжилттай"}
-            timeout={1500}
-            style={{
-              position: "absolute",
-              top: "center",
-              right: "center",
-            }}
-            showCloseButton={false}
-            showConfirm={false}
-            success
-            onConfirm={() => {
-              createPodcast()
-              setsuccess_dlg(false)
-            }}
-          >
-            {"Та шинэ ном амжилттай нэмлээ."}
-          </SweetAlert>
-        ) : null}
         <Card>
           <Modal
             isOpen={modal}
@@ -459,7 +449,9 @@ const AddPodcast = props => {
                           }
                           if (next_button_label == "Дуусгах") {
                             togglemodal()
-                            setsuccess_dlg(true)
+                            createPodcast()
+
+                            // setsuccess_dlg(true)
                           }
                         }}
                       >
@@ -473,6 +465,46 @@ const AddPodcast = props => {
           </Modal>
         </Card>
       </Col>
+      {success_dialog ? (
+        <SweetAlert
+          title={"Амжилттай"}
+          timeout={2000}
+          style={{
+            position: "absolute",
+            top: "center",
+            right: "center",
+          }}
+          showCloseButton={false}
+          showConfirm={false}
+          success
+          onConfirm={() => {
+            // createPodcast()
+            setsuccess_dialog(false)
+          }}
+        >
+          {"Үйлдэл амжилттай боллоо"}
+        </SweetAlert>
+      ) : null}
+      {error_dialog ? (
+        <SweetAlert
+          title={"Амжилтгүй"}
+          timeout={2000}
+          style={{
+            position: "absolute",
+            top: "center",
+            right: "center",
+          }}
+          showCloseButton={false}
+          showConfirm={false}
+          error
+          onConfirm={() => {
+            // createPodcast()
+            seterror_dialog(false)
+          }}
+        >
+          {"Үйлдэл амжилтгүй боллоо"}
+        </SweetAlert>
+      ) : null}
     </React.Fragment>
   )
 }

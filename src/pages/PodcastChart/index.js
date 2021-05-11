@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import axios from "axios"
 import { Link } from "react-router-dom"
 import ContactsGrid from "./PodcastLists"
-import { Container, Alert } from "reactstrap"
+import { Container, Alert, Row, Col } from "reactstrap"
 import Breadcrumbs from "../../components/Common/Breadcrumb"
 
 const PodcastList = () => {
@@ -10,7 +10,7 @@ const PodcastList = () => {
 
   // Check network
   const [isNetworking, setIsNetworking] = useState(false)
-  const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
+  const [isNetworkLoading, SetIsNetworkLoading] = useState(false)
 
   async function makeGetReq() {
     await axios({

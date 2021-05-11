@@ -1,9 +1,16 @@
-import React from "react";
+import React from "react"
 
-import ReactApexChart from "react-apexcharts";
+import ReactApexChart from "react-apexcharts"
 
-const PodcastAnalysisSkeleton = () => {
-  const series = [{ name: "High - 2018", data: [26, 24, 32, 36, 33, 31, 33] }];
+const PodcastAnalysisSkeleton = props => {
+  console.log(props.data)
+
+  const series = [
+    {
+      name: "Хандалт",
+      data: props.data.map(podcast => podcast.listen_count),
+    },
+  ]
   const options = {
     chart: { zoom: { enabled: !1 }, toolbar: { show: !1 } },
     colors: ["#556ee6", "#34c38f"],
@@ -16,10 +23,10 @@ const PodcastAnalysisSkeleton = () => {
     },
     markers: { style: "inverted", size: 6 },
     xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
-      title: { text: "Сар" },
+      categories: props.data.map(podcast => podcast.id),
+      title: { text: "Подкастын дугаар" },
     },
-    yaxis: { title: { text: "Хандалтууд" }, min: 5, max: 40 },
+    yaxis: { title: { text: "Хандалт" } },
     legend: {
       position: "top",
       horizontalAlign: "right",
@@ -33,7 +40,7 @@ const PodcastAnalysisSkeleton = () => {
         options: { chart: { toolbar: { show: !1 } }, legend: { show: !1 } },
       },
     ],
-  };
+  }
 
   return (
     <ReactApexChart
@@ -42,7 +49,7 @@ const PodcastAnalysisSkeleton = () => {
       type="line"
       height="380"
     />
-  );
-};
+  )
+}
 
-export default PodcastAnalysisSkeleton;
+export default PodcastAnalysisSkeleton

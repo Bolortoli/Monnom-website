@@ -11,6 +11,9 @@ import {
   CardImg,
   CardText,
   Alert,
+  Pagination,
+  PaginationLink,
+  PaginationItem,
 } from "reactstrap"
 
 import Breadcrumbs from "../../components/Common/Breadcrumb"
@@ -18,7 +21,7 @@ import Breadcrumbs from "../../components/Common/Breadcrumb"
 import axios from "axios"
 require("dotenv").config()
 
-let BookCard = ({ book }) => {
+let BookCard = props => {
   let handleAddToSpecial = e => {
     if (e.target.checked) {
       // ontslohoos hasna
@@ -33,17 +36,19 @@ let BookCard = ({ book }) => {
         <CardImg
           top
           className="img-fluid mx-auto"
-          src={process.env.REACT_APP_STRAPI_BASE_URL + book.book_pic_url}
+          src={process.env.REACT_APP_STRAPI_BASE_URL + props.book.book_pic_url}
           style={{
             height: "30vh",
             resize: "both",
             overflow: "visible",
             width: "98%",
           }}
-          alt={book.book_name}
+          alt={props.book.book_name}
         />
         <CardBody>
-          <CardTitle className="mt-0">{book.book_name.slice(0, 30)}</CardTitle>
+          <CardTitle className="mt-0">
+            {props.book.book_name.slice(0, 30)}
+          </CardTitle>
           <CardText>
             <Row>
               <Col xl={6} className="text-left">
@@ -51,7 +56,7 @@ let BookCard = ({ book }) => {
               </Col>
               <Col xl={6} className="text-right mb-2">
                 <strong className="d-block">
-                  {new Date(book.book_added_date).toLocaleDateString()}
+                  {new Date(props.book.book_added_date).toLocaleDateString()}
                 </strong>
               </Col>
             </Row>
@@ -61,7 +66,7 @@ let BookCard = ({ book }) => {
               </Col>
               <Col xl={8} className="text-right">
                 {/* <b className="d-block">
-            {book.book_author_name.slice(0, 14)}
+            {props.book.book_author_name.slice(0, 14)}
           </b> */}
                 <select
                   multiple
@@ -69,7 +74,7 @@ let BookCard = ({ book }) => {
                   className="bg-transparent m-0 p-0"
                   style={{ border: "none" }}
                 >
-                  {book.book_author_name.map(author => (
+                  {props.book.book_author_name.map(author => (
                     <option className="p-0 m-0">{author.slice(0, 14)}</option>
                   ))}
                 </select>
@@ -81,10 +86,28 @@ let BookCard = ({ book }) => {
                   <input
                     type="checkbox"
                     class="custom-control-input"
-                    id={book.id}
-                    onChange={handleAddToSpecial}
+                    id={props.book.id}
+                    onClick={() => {
+                      if (props.book.is_featured) {
+                        console.log("props.book.podcast_name")
+                        props.set_are_you_sure_title(
+                          `"${props.book.book_name}" номыг онцлох номноос хасах гэж байна. Та итгэлтэй байна уу?`
+                        )
+                      } else {
+                        console.log(props.book.book_name)
+                        props.set_are_you_sure_title(
+                          `"${props.book.book_name}" номыг онцлох ном болгох гэж байна. Та итгэлтэй байна уу?`
+                        )
+                      }
+                      props.set_book_info_to_update({
+                        id: props.book.id,
+                        state: props.book.is_featured,
+                      })
+                      props.set_confirm_allow(true)
+                    }}
+                    checked={props.book.is_featured}
                   />
-                  <label class="custom-control-label" for={book.id}>
+                  <label class="custom-control-label" for={props.book.id}>
                     Онцлох
                   </label>
                 </div>
@@ -94,7 +117,7 @@ let BookCard = ({ book }) => {
           <Row>
             <Col xl={6} className="text-left">
               <Link
-                to={"/bookSingle/" + book.user_id}
+                to={"/bookSingle/" + props.book.user_id}
                 className="btn btn-primary waves-effect waves-light"
               >
                 Дэлгэрэнгүй
@@ -106,21 +129,21 @@ let BookCard = ({ book }) => {
             >
               <i
                 style={{
-                  color: book.has_sale ? "#24ea75" : "#767676",
+                  color: props.book.has_sale ? "#24ea75" : "#767676",
                   fontSize: "28px",
                 }}
                 className="bx bxs-book-open font-size-30"
               />
               <i
                 style={{
-                  color: book.has_pdf ? "#fe2379" : "#767676",
+                  color: props.book.has_pdf ? "#fe2379" : "#767676",
                   fontSize: "28px",
                 }}
                 className="bx bxs-music"
               />
               <i
                 style={{
-                  color: book.has_audio ? "#ffd722" : "#767676",
+                  color: props.book.has_audio ? "#ffd722" : "#767676",
                   fontSize: "28px",
                 }}
                 className="bx bxs-file-pdf"
@@ -134,23 +157,50 @@ let BookCard = ({ book }) => {
 }
 
 const Books = () => {
-  const [toggled, setToggled] = useState(false)
+  var ITEMS_PER_PAGE = 12
+
   const [booksList, setBooksList] = useState([])
   const [searchItms, setSearchItms] = useState("")
   const [isNetworkingError, setIsNetworkingError] = useState(false)
   const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
-  const [allow, set_allow] = useState({
-    id: null,
-    state: false,
-  })
-  const [allow_id, set_allow_id] = useState(0)
   const [confirm_allow, set_confirm_allow] = useState(false)
-  const [success_dlg, setsuccess_dlg] = useState(false)
-  const [dynamic_title, setdynamic_title] = useState("")
-  const [dynamic_description, setdynamic_description] = useState("")
+  const [pagination_current, set_pagination_current] = useState(1)
+  const [pagination_pages, set_pagination_pages] = useState([])
+  const [are_you_sure_title, set_are_you_sure_title] = useState("")
+  const [book_info_to_update, set_book_info_to_update] = useState({
+    id: null,
+    state: null,
+  })
+  const [success_dialog, setsuccess_dialog] = useState(false)
+  const [error_dialog, seterror_dialog] = useState(false)
 
-  const toggleAllow = checked => {
-    set_allow({ id: allow_id, state: !checked })
+  async function featureBook() {
+    // setLoad(true)
+    await axios({
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/books/${book_info_to_update.id}`,
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+      data: {
+        is_featured: !book_info_to_update.state,
+      },
+    })
+      .then(res => {
+        // setLoad(false)
+        set_confirm_allow(false)
+        let tempBook = Object.assign(booksList)
+        tempBook.find(book => book.id === res.data.id).is_featured =
+          res.data.is_featured
+        setsuccess_dialog(true)
+      })
+      .catch(err => {
+        set_confirm_allow(false)
+        // setLoad(false)
+        seterror_dialog(true)
+      })
   }
 
   const fetchData = async () => {
@@ -172,6 +222,15 @@ const Books = () => {
         SetIsNetworkLoading(true)
       })
   }
+
+  useEffect(() => {
+    let tempPaginations = []
+    for (let i = 1; i <= Math.ceil(booksList.length / ITEMS_PER_PAGE); i++) {
+      tempPaginations.push(i)
+    }
+    console.log(tempPaginations)
+    set_pagination_pages(tempPaginations)
+  }, [booksList])
 
   useEffect(() => {
     fetchData()
@@ -206,6 +265,51 @@ const Books = () => {
                       </div>
                     </form>
                   </Col>
+                  <Col lg={4}>
+                    <Pagination
+                      style={{ backgroundColor: "red" }}
+                      aria-label="Page navigation example"
+                      className="d-flex justify-content-end mt-3"
+                    >
+                      <PaginationItem
+                        disabled={pagination_current == 1}
+                        onClick={() => {
+                          if (pagination_current != 1)
+                            set_pagination_current(pagination_current - 1)
+                        }}
+                      >
+                        <PaginationLink>
+                          <i className="mdi mdi-chevron-left" />
+                        </PaginationLink>
+                      </PaginationItem>
+
+                      {pagination_pages.map(page => (
+                        <PaginationItem
+                          onClick={() => {
+                            set_pagination_current(page)
+                          }}
+                          active={page == pagination_current}
+                        >
+                          <PaginationLink href="#">{page}</PaginationLink>
+                        </PaginationItem>
+                      ))}
+                      <PaginationItem
+                        disabled={
+                          pagination_current ==
+                          pagination_pages[pagination_pages.length - 1]
+                        }
+                      >
+                        <PaginationLink
+                          href="#"
+                          onClick={() =>
+                            set_pagination_current(pagination_current + 1)
+                          }
+                        >
+                          <i className="mdi mdi-chevron-right" />
+                        </PaginationLink>
+                      </PaginationItem>
+                    </Pagination>
+                  </Col>
                 </Row>
                 <Row>
                   {booksList
@@ -220,9 +324,23 @@ const Books = () => {
                         return val
                       }
                     })
-                    .map(book => (
-                      <BookCard book={book} key={book.id} />
-                    ))}
+                    .map(book => {
+                      if (
+                        book.pagination_number <=
+                          pagination_current * ITEMS_PER_PAGE &&
+                        book.pagination_number >
+                          pagination_current * ITEMS_PER_PAGE - ITEMS_PER_PAGE
+                      )
+                        return (
+                          <BookCard
+                            book={book}
+                            key={book.id}
+                            set_are_you_sure_title={set_are_you_sure_title}
+                            set_book_info_to_update={set_book_info_to_update}
+                            set_confirm_allow={set_confirm_allow}
+                          />
+                        )
+                    })}
                 </Row>
               </Container>
             ) : (
@@ -241,7 +359,7 @@ const Books = () => {
         )}
         {confirm_allow ? (
           <SweetAlert
-            title="Та итгэлтэй байна уу ?"
+            title={are_you_sure_title}
             warning
             showCancel
             confirmBtnText="Тийм"
@@ -249,22 +367,17 @@ const Books = () => {
             confirmBtnBsStyle="success"
             cancelBtnBsStyle="danger"
             onConfirm={() => {
-              toggleAllow(allow)
-              set_confirm_allow(false)
-              setsuccess_dlg(true)
-              setdynamic_title("Амжилттай")
-              setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
+              featureBook()
             }}
             onCancel={() => {
               set_confirm_allow(false)
             }}
           ></SweetAlert>
         ) : null}
-        {success_dlg ? (
+        {success_dialog ? (
           <SweetAlert
-            success
-            title={dynamic_title}
-            timeout={1500}
+            title={"Амжилттай"}
+            timeout={2000}
             style={{
               position: "absolute",
               top: "center",
@@ -272,11 +385,33 @@ const Books = () => {
             }}
             showCloseButton={false}
             showConfirm={false}
+            success
             onConfirm={() => {
-              setsuccess_dlg(false)
+              // createPodcast()
+              setsuccess_dialog(false)
             }}
           >
-            {dynamic_description}
+            {"Үйлдэл амжилттай боллоо"}
+          </SweetAlert>
+        ) : null}
+        {error_dialog ? (
+          <SweetAlert
+            title={"Амжилтгүй"}
+            timeout={2000}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            error
+            onConfirm={() => {
+              // createPodcast()
+              seterror_dialog(false)
+            }}
+          >
+            {"Үйлдэл амжилтгүй боллоо"}
           </SweetAlert>
         ) : null}
       </div>

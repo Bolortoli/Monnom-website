@@ -117,6 +117,7 @@ const ManageAdmins = () => {
 
     formData.append("username", username)
     formData.append("password", password)
+    formData.append("email", email)
     formData.append("emailof", email)
     formData.append("phone", phone)
     formData.append("gender", gender)
