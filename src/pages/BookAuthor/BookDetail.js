@@ -124,7 +124,7 @@ const BookDetail = props => {
               <Col xl={12}>
                 <Card>
                   <CardBody>
-                    <BookAnalysis />
+                    <BookAnalysis books={data.user_books} />
                   </CardBody>
                 </Card>
               </Col>

@@ -10,7 +10,7 @@ const PodcastAnalysis = props => {
           <Col>
             <Card>
               <CardBody>
-                <CardTitle className="mb-4">Подкаст орлогын график</CardTitle>
+                <CardTitle className="mb-4">Подкаст хандалтын график</CardTitle>
                 <PodcastAnalysisSkeleton data={props.data} />
               </CardBody>
             </Card>
