@@ -81,6 +81,9 @@ const CardContact = props => {
         set_edit_form_loading(false)
         set_user(props.initializeUsersList([res.data])[0])
         set_user_update_modal_center(false)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
       })
       .catch(err => {
         props.error(true)

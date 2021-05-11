@@ -699,8 +699,8 @@ const List = props => {
                 bordered
                 data={book_datatable}
                 noBottomColumns
-                noRecordsFoundLabel={"Подкастын дугаар байхгүй"}
-                infoLabel={["", "-ээс", "дахь подкаст. Нийт", ""]}
+                noRecordsFoundLabel={"Ном байхгүй"}
+                infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
                 entries={5}
                 entriesOptions={[5, 10, 20]}
                 paginationLabel={["Өмнөх", "Дараах"]}

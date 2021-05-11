@@ -393,7 +393,7 @@ const List = props => {
           <Card>
             <CardBody>
               <div className="d-flex justify-content-between">
-                <CardTitle>Жагсаал</CardTitle>
+                <CardTitle>Жагсаалт</CardTitle>
                 <CardTitle className="text-right">
                   <AddPodcast latestEpisodeNumber={latestEpisodeNumber} />
                 </CardTitle>
