@@ -182,7 +182,7 @@ const GivePermission = props => {
         set_paid_books(res.data)
       })
       .catch(err => {
-        // props.setIsNetworking(true)
+        // props.setIsNetworking(true)Zzz
       })
   }
 

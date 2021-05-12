@@ -77,8 +77,6 @@ const Customers = () => {
       url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/all-app-users`,
     })
       .then(res => {
-        // console.log("res data")
-        // console.log(res.data)
         let tempRows = res.data.map(data => {
           return {
             id: data.id,
@@ -108,13 +106,11 @@ const Customers = () => {
           }
         })
         setTableRows(tempRows)
-        console.log("dst")
-        console.log(tableRows)
         setIsNetworkError(false)
         SetIsNetworkLoading(false)
       })
       .catch(err => {
-        // setIsNetworkError(true)
+        setIsNetworkError(true)
         SetIsNetworkLoading(false)
       })
   }

@@ -16,7 +16,11 @@ const SettingsForm = props => {
   const [loading_dialog, setloading_dialog] = useState(false)
   const [r_u_sure_title, set_r_u_sure_title] = useState("")
 
-  const [old_author_category, set_old_author_category] = useState([])
+  const [old_author_category, set_old_author_category] = useState([
+    "Renchin",
+    "Choinom",
+    "He",
+  ])
   const [new_author_category, set_new_author_category] = useState([])
   const [old_book_category, set_old_book_category] = useState([])
   const [new_book_category, set_new_book_category] = useState([])
@@ -63,7 +67,7 @@ const SettingsForm = props => {
     axios
       .get(`${process.env.REACT_APP_STRAPI_BASE_URL}/settings`)
       .then(res => {
-        props.setIsNetworkingError(false)
+        // props.setIsNetworkingError(false)
         const blocksFromHTML = convertFromHTML(res.data.TermsAndConditions)
         const htmlData = ContentState.createFromBlockArray(
           blocksFromHTML.contentBlocks,
@@ -73,14 +77,14 @@ const SettingsForm = props => {
         set_res_d(true)
       })
       .catch(err => {
-        props.SetIsNetworkingError(true)
+        // props.SetIsNetworkingError(true)
       })
   }
 
   useEffect(() => {
     console.log("props.author_categories")
     console.log(props.book_categories)
-    set_old_author_category(props.author_categories)
+    // set_old_author_category(props.author_categories)
     set_old_book_category(props.book_categories)
     set_old_podcast_category(props.podcast_categories)
     fetchData()

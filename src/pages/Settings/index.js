@@ -13,7 +13,7 @@ export default function Settings() {
 
   // Check network
   const [isNetworkingError, setIsNetworkingError] = useState(false)
-  const [isNetworkLoading, setIsNetworkLoading] = useState(true)
+  const [isNetworkLoading, setIsNetworkLoading] = useState(false)
 
   function fetchBookCategories() {
     axios({
