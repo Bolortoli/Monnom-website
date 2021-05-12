@@ -53,7 +53,7 @@ const GivePermission = props => {
 
   const initialState = () => {
     let tempCols = books.map(book => {
-      console.log(book.id)
+      // console.log(book.id)
       return {
         name: book.name,
         type: (
@@ -152,7 +152,9 @@ const GivePermission = props => {
       .then(res => {
         set_books(res.data)
       })
-      .catch(err => {})
+      .catch(err => {
+        props.setIsNetworking(true)
+      })
     await axios({
       url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-ebooks?users_permissions_user.id=${props.selected_user_id}`,
       method: "GET",
@@ -162,11 +164,11 @@ const GivePermission = props => {
         }`,
       },
     })
-      .then(res => {
-        set_paid_online_books(res.data)
+      .then(book => {
+        set_paid_online_books(book.data)
       })
       .catch(err => {
-        // props.setIsNetworking(true)
+        props.setIsNetworking(true)
       })
 
     await axios({
@@ -178,11 +180,11 @@ const GivePermission = props => {
         }`,
       },
     })
-      .then(res => {
-        set_paid_books(res.data)
+      .then(paidBook => {
+        set_paid_books(paidBook.data)
       })
       .catch(err => {
-        // props.setIsNetworking(true)Zzz
+        props.setIsNetworking(true)
       })
   }
 

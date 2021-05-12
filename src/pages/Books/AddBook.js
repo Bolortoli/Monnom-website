@@ -27,6 +27,8 @@ import SweetAlert from "react-bootstrap-sweetalert"
 import Select from "react-select"
 
 const AddBook = props => {
+  const [admin_id, set_admin_id] = useState(1)
+
   const [netWork, set_netWork] = useState(false)
   const [modal, setModal] = useState(false)
   const [activeTab, set_activeTab] = useState(1)
@@ -86,7 +88,7 @@ const AddBook = props => {
     data["has_audio"] = audio_book_files.length != 0 ? true : false
     data["has_pdf"] = book_files.length != 0 ? true : false
     data["book_categories"] = categories
-    data["users_permissions_user"] = props.admin_id
+    data["users_permissions_user"] = admin_id
     data["youtube_intro"] = youtube_url_value
     data["introduction"] = book_introduction_value
     data["book_authors"] = authors
@@ -157,8 +159,33 @@ const AddBook = props => {
       })
   }
 
+  async function getBookInfo() {
+    console.log(admin_id)
+    await axios({
+      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-single-by-author/${admin_id}`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
+      .then(res => {
+        props.setIsNetworkingError(false)
+        getAuthorsCategoriesInfo(
+          res.data.available_authors,
+          res.data.available_categories
+        )
+      })
+      .catch(err => {
+        props.setIsNetworkingError(true)
+      })
+  }
+
   // props oos irsen nomnii categoruudiig awah
   const getAuthorsCategoriesInfo = (authors, categories) => {
+    console.log("author")
+    console.log(authors)
     const a = authors.map(author => {
       return {
         label: author.author_name,
@@ -178,13 +205,13 @@ const AddBook = props => {
 
   useEffect(() => {
     console.log("book id")
-    console.log(props.admin_id)
-    if (props.available_authors != null) {
-      getAuthorsCategoriesInfo(
-        props.available_authors,
-        props.available_categories
-      )
-    }
+    console.log(props.admins_info)
+    // if (props.available_authors != null) {
+    //   getAuthorsCategoriesInfo(
+    //     props.available_authors,
+    //     props.available_categories
+    //   )
+    // }
 
     // makeGetReq()
   }, [props])
@@ -380,14 +407,14 @@ const AddBook = props => {
   return (
     <React.Fragment>
       <Button
-        className="btn btn-success ml-1"
-        type="button"
-        color="success"
+        className="btn btn-info ml-1 mt-3"
+        type="info"
+        color="primary"
         onClick={() => {
           togglemodal()
         }}
       >
-        Үргэлжлүүлэх 
+        Ном нэмэх
       </Button>
       {/* {props.shiftBookform ? togglemodal() : null} */}
       {netWork === false ? (
@@ -472,7 +499,30 @@ const AddBook = props => {
                       <TabPane tabId={1} id="personal-info">
                         <Form>
                           <Row>
-                            <Col lg="7">
+                            <Col lg={7}>
+                              <FormGroup className="select2-container mx-auto">
+                                <label className="control-label">
+                                  Админ сонгох
+                                </label>
+                                <select
+                                  className="form-control"
+                                  id="admins"
+                                  onChange={e => {
+                                    set_admin_id(e.target.value)
+                                    getBookInfo()
+                                  }}
+                                >
+                                  {props.admins_info.length != 0
+                                    ? props.admins_info.map(admin => (
+                                        <option value={admin.id}>
+                                          {admin.username}
+                                        </option>
+                                      ))
+                                    : null}
+                                </select>
+                              </FormGroup>
+                            </Col>
+                            <Col lg="5">
                               <FormGroup>
                                 <Label for="kycfirstname-input">
                                   Номын нэр
@@ -488,27 +538,27 @@ const AddBook = props => {
                                 />
                                 <p class="text-danger">{book_name_message}</p>
                               </FormGroup>
+                            </Col>
+                            <Col lg={7}>
+                              <FormGroup className="select2-container">
+                                <label className="control-label">
+                                  Номны төрөл
+                                </label>
+                                <Select
+                                  value={selectedMulti_category}
+                                  isMulti={true}
+                                  placeholder="Сонгох ... "
+                                  onChange={e => {
+                                    handleMulti_category(e)
+                                  }}
+                                  options={optionGroup_categories}
+                                  classNamePrefix="select2-selection"
+                                />
+                                <p class="text-danger">
+                                  {category_of_book_message}
+                                </p>
+                              </FormGroup>
                               <Row>
-                                <Col lg={12}>
-                                  <FormGroup className="select2-container">
-                                    <label className="control-label">
-                                      Номны төрөл
-                                    </label>
-                                    <Select
-                                      value={selectedMulti_category}
-                                      isMulti={true}
-                                      placeholder="Сонгох ... "
-                                      onChange={e => {
-                                        handleMulti_category(e)
-                                      }}
-                                      options={optionGroup_categories}
-                                      classNamePrefix="select2-selection"
-                                    />
-                                    <p class="text-danger">
-                                      {category_of_book_message}
-                                    </p>
-                                  </FormGroup>
-                                </Col>
                                 <Col lg="12">
                                   <FormGroup className="select2-container">
                                     <label className="control-label">
@@ -531,7 +581,7 @@ const AddBook = props => {
                                 </Col>
                               </Row>
                             </Col>
-                            <Col lg={4}>
+                            <Col lg={5}>
                               <FormGroup>
                                 <Label htmlFor="productdesc">Зураг</Label>
                                 <img
@@ -563,26 +613,7 @@ const AddBook = props => {
                           </Row>
 
                           <Row>
-                            {/* <Col lg="7">
-                              <FormGroup>
-                                <Label htmlFor="productdesc">Тайлбар</Label>
-                                <textarea
-                                  className="form-control"
-                                  id="productdesc"
-                                  rows="5"
-                                  value={book_description_value}
-                                  onChange={e => {
-                                    set_book_description_value(e.target.value)
-                                  }}
-                                />
-                                <p class="text-danger">
-                                  {podcast_description_message}
-                                </p>
-                              </FormGroup>
-                            </Col> */}
-                          </Row>
-                          <Row>
-                            <Col lg={4} className="d-flex mt-3">
+                            <Col lg={4} className="d-flex">
                               <label className="d-flex">
                                 <span className="d-block my-auto mr-3">
                                   Зарж байгаа юу ?

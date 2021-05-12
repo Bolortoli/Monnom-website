@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import axios from "axios"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { Card, CardBody, Col, Row, CardTitle, Button, Label } from "reactstrap"
+import Select from "react-select"
 import { Editor } from "react-draft-wysiwyg"
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
 import {
@@ -13,27 +14,253 @@ import {
 import draftToHtml from "draftjs-to-html"
 
 const SettingsForm = props => {
-  const [loading_dialog, setloading_dialog] = useState(false)
-  const [r_u_sure_title, set_r_u_sure_title] = useState("")
-
-  const [old_author_category, set_old_author_category] = useState([
-    "Renchin",
-    "Choinom",
-    "He",
-  ])
-  const [new_author_category, set_new_author_category] = useState([])
+  const [old_author_category, set_old_author_category] = useState([])
+  const [new_author_category, set_new_author_category] = useState("")
   const [old_book_category, set_old_book_category] = useState([])
-  const [new_book_category, set_new_book_category] = useState([])
+  const [new_book_category, set_new_book_category] = useState("")
   const [old_podcast_category, set_old_podcast_category] = useState([])
-  const [new_podcast_category, set_new_podcast_category] = useState([])
+  const [new_podcast_category, set_new_podcast_category] = useState("")
+  const [all_admins, set_all_admins] = useState([])
+  const [all_books, set_all_books] = useState([])
+
+  const [channel_name, set_channel_name] = useState("")
+  const [podcast_category, set_podcast_category] = useState([])
+  const [selectedMulti_category, setSelectedMulti_category] = useState(null)
+  const [admin_selected, set_admin_selected] = useState("")
+  const [podcast_pic, set_podcast_pic] = useState("")
+  const [channel_desc, set_channel_desc] = useState("")
 
   const [confirm_terms, set_confirm_terms] = useState(false)
+  const [confirm_save_book, set_confirm_save_book] = useState(false)
+  const [confirm_add_author, set_confirm_add_author] = useState(false)
+  const [confirm_remove_author, set_confirm_remove_author] = useState(false)
+  const [confirm_add_book_category, set_confirm_add_book_category] = useState(
+    false
+  )
+  const [
+    confirm_remove_book_category,
+    set_confirm_remove_book_category,
+  ] = useState(false)
+  const [
+    confirm_add_podcast_category,
+    set_confirm_add_podcast_category,
+  ] = useState(false)
+  const [
+    confirm_remove_podcast_category,
+    set_confirm_remove_podcast_category,
+  ] = useState(false)
+  const [
+    confirm_add_podcast_channel,
+    set_confirm_add_podcast_channel,
+  ] = useState(false)
+
   const [success_dialog, setsuccess_dialog] = useState(false)
   const [error_dialog, seterror_dialog] = useState(false)
+  const [loading_dialog, setloading_dialog] = useState(false)
+
   const [wysiwyg_content, set_wysiwyg_content] = useState(
     EditorState.createEmpty()
   )
-  const [res_d, set_res_d] = useState(false)
+  const [termsData, setTermsData] = useState(false)
+
+  const addAuthorCategory = async () => {
+    const formData = new FormData()
+    console.log("author")
+    console.log(new_author_category)
+
+    formData.append("book_authors.label", JSON.stringify(new_author_category))
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+    await axios
+      .post(
+        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`,
+        formData,
+        config
+      )
+      .then(res => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+      })
+      .catch(err => {
+        setloading_dialog(false)
+        seterror_dialog(true)
+      })
+  }
+
+  const addBookCategory = async () => {
+    const formData = new FormData()
+
+    formData.append("book_authors.label", new_book_category)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+    await axios
+      .post(
+        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`,
+        formData,
+        config
+      )
+      .then(res => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+      })
+      .catch(err => {
+        setloading_dialog(false)
+        seterror_dialog(true)
+      })
+  }
+
+  const addPodcastCategory = async () => {
+    const formData = new FormData()
+
+    formData.append("book_authors.label", new_podcast_category)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+    await axios
+      .post(
+        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`,
+        formData,
+        config
+      )
+      .then(res => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+      })
+      .catch(err => {
+        setloading_dialog(false)
+        seterror_dialog(true)
+      })
+  }
+
+  const deleteAuthorCategory = async id => {
+    await axios
+      .delete(
+        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page/${new_author_category}`
+      )
+      .then(async res => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+      })
+      .catch(res => {
+        setloading_dialog(false)
+        seterror_dialog(true)
+      })
+  }
+
+  const deleteBookCategory = async id => {
+    await axios
+      .delete(
+        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page/${new_book_category}`
+      )
+      .then(async res => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+      })
+      .catch(res => {
+        setloading_dialog(false)
+        seterror_dialog(true)
+      })
+  }
+
+  const deletePodcastCategory = async id => {
+    await axios
+      .delete(
+        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page/${new_podcast_category}`
+      )
+      .then(async res => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+      })
+      .catch(res => {
+        setloading_dialog(false)
+        seterror_dialog(true)
+      })
+  }
+
+  const createPodcastChannel = async () => {
+    const formData = new FormData()
+
+    let categories = selectedMulti_category.map(cat => cat.value.toString())
+
+    let data = {}
+    data["name"] = channel_name
+    data["description"] = channel_desc
+    data["cover_pic"] = podcast_pic
+    data["podcast_categories"] = categories
+
+    formData.append(
+      `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-channels`,
+      "data",
+      JSON.stringify(data)
+    )
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+
+    await axios
+      .post(formData, config)
+      .then(async res => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+      })
+      .catch(err => {
+        setloading_dialog(false)
+        seterror_dialog(true)
+      })
+  }
+
+  const saveBook = async () => {
+    const formData = new FormData()
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+
+    await axios
+      .put(
+        `${process.env.REACT_APP_STRAPI_BASE_URL}/books/${delete_book_id}`,
+        {},
+        config
+      )
+      .then(async => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+      })
+      .catch(err => {
+        setloading_dialog(false)
+        seterror_dialog(true)
+      })
+  }
 
   const updateTerms = async () => {
     const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/terms-and-conditions`
@@ -63,37 +290,106 @@ const SettingsForm = props => {
       })
   }
 
-  const fetchData = () => {
-    axios
-      .get(`${process.env.REACT_APP_STRAPI_BASE_URL}/settings`)
+  function getAllDatas(data) {
+    set_old_author_category(data.book_authors)
+    set_old_book_category(data.book_categories)
+    set_old_podcast_category(data.podcast_categories)
+
+    let blocksFromHTML = convertFromHTML(data.termsAndConditions)
+    let htmlData = ContentState.createFromBlockArray(
+      blocksFromHTML.contentBlocks,
+      blocksFromHTML.entityMap
+    )
+    set_wysiwyg_content(EditorState.createWithContent(htmlData))
+    setTermsData(true)
+
+    getCategoriesInfo(data.podcast_categories)
+  }
+
+  async function fetchData() {
+    await axios({
+      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
       .then(res => {
-        // props.setIsNetworkingError(false)
-        const blocksFromHTML = convertFromHTML(res.data.TermsAndConditions)
-        const htmlData = ContentState.createFromBlockArray(
-          blocksFromHTML.contentBlocks,
-          blocksFromHTML.entityMap
-        )
-        set_wysiwyg_content(EditorState.createWithContent(htmlData))
-        set_res_d(true)
+        // props.SetIsNetworkingError(false)
+        getAllDatas(res.data)
       })
       .catch(err => {
+        console.log("error")
         // props.SetIsNetworkingError(true)
       })
   }
 
+  async function fetchAdmins() {
+    await axios({
+      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/all-admins-list`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
+      .then(res => {
+        set_all_admins(res.data)
+      })
+      .catch(err => {})
+  }
+
+  async function fetchAllBooks() {
+    await axios({
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/books`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
+      .then(res => {
+        set_all_books(res.data)
+        console.log(res.data)
+        console.log(all_books)
+      })
+      .catch(err => {})
+  }
+
+  const getCategoriesInfo = categories => {
+    const a = categories.map(category => {
+      return {
+        label: category.label,
+        value: category.id,
+      }
+    })
+    set_podcast_category(a)
+  }
+
+  function handleMulti_author(selected_categories) {
+    setSelectedMulti_category(selected_categories)
+  }
+
   useEffect(() => {
-    console.log("props.author_categories")
-    console.log(props.book_categories)
-    // set_old_author_category(props.author_categories)
-    set_old_book_category(props.book_categories)
-    set_old_podcast_category(props.podcast_categories)
     fetchData()
+    fetchAdmins()
+    fetchAllBooks()
   }, [])
 
-  // useEffect(() => {
-  // console.log("props.author_categories")
-  // console.log(props.book_categories)
-  // }, [props])
+  // zurag solih
+  const imageHandler = e => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        set_podcast_pic(reader.result)
+      }
+    }
+    reader.readAsDataURL(e.target.files[0])
+  }
 
   return (
     <Row>
@@ -101,7 +397,7 @@ const SettingsForm = props => {
         <Card>
           <CardBody>
             <CardTitle>Үйлчилгээний нөхцөл</CardTitle>
-            {res_d ? (
+            {termsData ? (
               <Editor
                 onEditorStateChange={e => {
                   console.log(e)
@@ -136,18 +432,17 @@ const SettingsForm = props => {
           className="btn btn-success text-dark"
           style={{ height: "40px" }}
           color="success"
-          // onClick={() => {
-          //   set_r_u_sure_title("Үйлчилгээний нөхцөлөө өөрчлөх гэж байна")
-          //   set_confirm_terms(true)
-          // }}
+          onClick={() => {
+            set_confirm_terms(true)
+          }}
         >
           Хадгалах
         </Button>
       </Col>
 
-      <Col lg={4}>
+      <Col lg={6}>
         <Card>
-          <CardTitle className="p-3">Номын зохиолч</CardTitle>
+          <CardTitle className="p-3">Номын зохиолчид</CardTitle>
           <CardBody>
             <Row>
               <Col lg={12} className="w-100 mx-auto mb-3">
@@ -155,17 +450,19 @@ const SettingsForm = props => {
                 <select
                   className="form-control"
                   id="bookAuthorsCategory"
-                  onChange={e => set_old_author_category(e.target.value)}
+                  onChange={e => set_new_author_category(e.target.value)}
                 >
-                  {old_author_category.map(author => (
-                    <option>{author.author_name}</option>
-                  ))}
+                  {old_author_category.length != 0
+                    ? old_author_category.map(author => (
+                        <option>{author.label}</option>
+                      ))
+                    : null}
                 </select>
               </Col>
               <Col lg={12} className="mb-2">
                 <Label>Зохиолч нэмэх</Label>
                 <Row>
-                  <Col lg={9}>
+                  <Col lg={10}>
                     <input
                       className="form-control mt-1"
                       type="text"
@@ -173,19 +470,14 @@ const SettingsForm = props => {
                       onChange={e => set_new_author_category(e.target.value)}
                     />
                   </Col>
-                  <Col lg={3}>
+                  <Col lg={2}>
                     <Button
                       to="#"
                       color="light"
                       className="mt-1 py-2 px-3 border border-light"
-                      // onClick={() => {
-                      //   if (new_author_category.length != 0) {
-                      //     set_r_u_sure_title(
-                      //       `${new_author_category[0]} категорыг нэмэх гэж байна`
-                      //     )
-                      //     set_confirm_terms(true)
-                      //   }
-                      // }}
+                      onClick={() => {
+                        set_confirm_add_author(true)
+                      }}
                     >
                       Нэмэх
                     </Button>
@@ -195,31 +487,22 @@ const SettingsForm = props => {
               <Col lg={12}>
                 <Label>Сонгосон категори</Label>
                 <Row>
-                  <Col lg={9}>
-                    {old_author_category.length != 0 ? (
-                      <Label className="form-control mt-1">
-                        {old_author_category[0]}
-                      </Label>
-                    ) : null}
+                  <Col lg={10}>
+                    <Label className="form-control mt-1">
+                      {new_author_category}
+                    </Label>
                   </Col>
-                  <Col lg={3}>
-                    {old_author_category.length != 0 ? (
-                      <Button
-                        to="#"
-                        color="light"
-                        className="mt-1 py-2 px-3 border border-light"
-                        // onClick={() => {
-                        //   if (old_author_category != "") {
-                        //     set_r_u_sure_title(
-                        //       `${old_author_category[0]} категорыг устгах гэж байна`
-                        //     )
-                        //     set_confirm_terms(true)
-                        //   }
-                        // }}
-                      >
-                        Хасах
-                      </Button>
-                    ) : null}
+                  <Col lg={2}>
+                    <Button
+                      to="#"
+                      color="light"
+                      className="mt-1 py-2 px-3 border border-light"
+                      onClick={() => {
+                        set_confirm_remove_author(true)
+                      }}
+                    >
+                      Хасах
+                    </Button>
                   </Col>
                 </Row>
               </Col>
@@ -228,9 +511,9 @@ const SettingsForm = props => {
         </Card>
       </Col>
 
-      <Col lg={4}>
+      <Col lg={6}>
         <Card>
-          <CardTitle className="p-3">Номын категори</CardTitle>
+          <CardTitle className="p-3">Номын категориуд</CardTitle>
           <CardBody>
             <Row>
               <Col lg={12} className="w-100 mx-auto mb-3">
@@ -238,19 +521,20 @@ const SettingsForm = props => {
                 <select
                   className="form-control"
                   id="bookCategory"
-                  onChange={e => set_old_book_category(e.target.value)}
+                  onChange={e => set_new_book_category(e.target.value)}
                 >
-                  <option>ds</option>
-                  <option>dsgdsf</option>
-                  <option>sdgdsf</option>
+                  {old_book_category.length != 0
+                    ? old_book_category.map(book => {
+                        return <option value={book.id}>{book.label}</option>
+                      })
+                    : null}
                 </select>
               </Col>
 
               <Col className="mb-2" lg={12}>
                 <Label>Төрөл нэмэх</Label>
                 <Row>
-                  <Col lg={9}>
-                    {" "}
+                  <Col lg={10}>
                     <input
                       className="form-control mt-1"
                       type="text"
@@ -258,19 +542,14 @@ const SettingsForm = props => {
                       onChange={e => set_new_book_category(e.target.value)}
                     />
                   </Col>
-                  <Col lg={3}>
+                  <Col lg={2}>
                     <Button
                       to="#"
                       color="light"
                       className="mt-1 py-2 px-3 border border-light"
-                      // onClick={() => {
-                      //   if (new_book_category.length != 0) {
-                      //     set_r_u_sure_title(
-                      //       `${new_book_category[0]} категорыг устгах гэж байна`
-                      //     )
-                      //     set_confirm_terms(true)
-                      //   }
-                      // }}
+                      onClick={() => {
+                        set_confirm_add_book_category(true)
+                      }}
                     >
                       Нэмэх
                     </Button>
@@ -280,31 +559,22 @@ const SettingsForm = props => {
               <Col lg={12}>
                 <Label>Сонгосон категори</Label>
                 <Row>
-                  <Col lg={9}>
-                    {old_book_category.length != 0 ? (
-                      <Label className="form-control mt-1">
-                        {old_book_category[0]}
-                      </Label>
-                    ) : null}
+                  <Col lg={10}>
+                    <Label className="form-control mt-1">
+                      {new_book_category}
+                    </Label>
                   </Col>
-                  <Col lg={3}>
-                    {old_book_category.length != 0 ? (
-                      <Button
-                        to="#"
-                        color="light"
-                        className="mt-1 py-2 px-3 border border-light"
-                        // onClick={() => {
-                        //   if (old_book_category != "") {
-                        //     set_r_u_sure_title(
-                        //       `${old_book_category[0]} категорыг устгах гэж байна`
-                        //     )
-                        //     set_confirm_terms(true)
-                        //   }
-                        // }}
-                      >
-                        Хасах
-                      </Button>
-                    ) : null}
+                  <Col lg={2}>
+                    <Button
+                      to="#"
+                      color="light"
+                      className="mt-1 py-2 px-3 border border-light"
+                      onClick={() => {
+                        set_confirm_remove_book_category(true)
+                      }}
+                    >
+                      Хасах
+                    </Button>
                   </Col>
                 </Row>
               </Col>
@@ -313,9 +583,9 @@ const SettingsForm = props => {
         </Card>
       </Col>
 
-      <Col lg={4}>
+      <Col lg={6}>
         <Card>
-          <CardTitle className="p-3">Подкастын категори</CardTitle>
+          <CardTitle className="p-3">Подкастын категориуд</CardTitle>
           <CardBody>
             <Row>
               <Col lg={12} className="w-100 mx-auto mb-3">
@@ -323,19 +593,20 @@ const SettingsForm = props => {
                 <select
                   className="form-control"
                   id="podcastCategory"
-                  onChange={e => set_old_podcast_category(e.target.value)}
+                  onChange={e => set_new_podcast_category(e.target.value)}
                 >
-                  <option>ds</option>
-                  <option>dsgdsf</option>
-                  <option>sdgdsf</option>
+                  {old_podcast_category.length != 0
+                    ? old_podcast_category.map(podcast => (
+                        <option>{podcast.label}</option>
+                      ))
+                    : null}
                 </select>
               </Col>
 
               <Col className="mb-2" lg={12}>
                 <Label>Төрөл нэмэх</Label>
                 <Row>
-                  <Col lg={9}>
-                    {" "}
+                  <Col lg={10}>
                     <input
                       className="form-control mt-1"
                       type="text"
@@ -343,19 +614,14 @@ const SettingsForm = props => {
                       onChange={e => set_new_podcast_category(e.target.value)}
                     />
                   </Col>
-                  <Col lg={3}>
+                  <Col lg={2}>
                     <Button
                       to="#"
                       color="light"
                       className="mt-1 py-2 px-3 border border-light"
-                      // onClick={() => {
-                      //   if (new_podcast_category.length != 0) {
-                      //     set_r_u_sure_title(
-                      //       `${new_podcast_category[0]} категорыг устгах гэж байна`
-                      //     )
-                      //     set_confirm_terms(true)
-                      //   }
-                      // }}
+                      onClick={() => {
+                        set_confirm_add_podcast_category(true)
+                      }}
                     >
                       Нэмэх
                     </Button>
@@ -365,33 +631,156 @@ const SettingsForm = props => {
               <Col lg={12}>
                 <Label>Сонгосон категори</Label>
                 <Row>
-                  <Col lg={9}>
-                    {old_podcast_category.length != 0 ? (
-                      <Label className="form-control mt-1">
-                        {old_podcast_category[0]}
-                      </Label>
-                    ) : null}
+                  <Col lg={10}>
+                    <Label className="form-control mt-1">
+                      {new_podcast_category}
+                    </Label>
                   </Col>
-                  <Col lg={3}>
-                    {old_podcast_category.length != 0 ? (
-                      <Button
-                        to="#"
-                        color="light"
-                        className="mt-1 py-2 px-3 border border-light"
-                        // onClick={() => {
-                        //   if (old_podcast_category != "") {
-                        //     set_r_u_sure_title(
-                        //       `${old_podcast_category[0]} категорыг устгах гэж байна`
-                        //     )
-                        //     set_confirm_terms(true)
-                        //   }
-                        // }}
-                      >
-                        Хасах
-                      </Button>
-                    ) : null}
+                  <Col lg={2}>
+                    <Button
+                      to="#"
+                      color="light"
+                      className="mt-1 py-2 px-3 border border-light"
+                      onClick={() => {
+                        set_confirm_remove_podcast_category(true)
+                      }}
+                    >
+                      Хасах
+                    </Button>
                   </Col>
                 </Row>
+              </Col>
+            </Row>
+          </CardBody>
+        </Card>
+        <Row>
+          <Col lg={12}>
+            <Card>
+              <CardTitle className="p-3">Ном хадгалах</CardTitle>
+              <CardBody>
+                <Row>
+                  {/* <Col lg={3}>
+                <Label>Ном</Label>
+              </Col> */}
+                  <Col lg={9} className="">
+                    <select
+                      className="form-control"
+                      id="allBooks"
+                      onChange={e => set_all_books(e.target.value)}
+                    >
+                      {all_books.length != 0
+                        ? all_books.map(book => <option>{book.name}</option>)
+                        : null}
+                    </select>
+                  </Col>
+                  <Col lg={2}>
+                    <Button
+                      className="btn btn-info text-dark"
+                      onClick={() => {
+                        set_confirm_save_book(true)
+                      }}
+                    >
+                      Хадгалах
+                    </Button>
+                  </Col>
+                </Row>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+      </Col>
+
+      <Col lg={6}>
+        <Card>
+          <CardTitle className="p-3">Подкаст суваг нэмэх</CardTitle>
+          <CardBody>
+            <Row className="mb-3">
+              <Col lg={6}>
+                <p>Сувгийн нэр</p>
+                <input
+                  className="form-control"
+                  type="text"
+                  placeholder="Нэр оруулах"
+                  onChange={e => {
+                    set_channel_name(e.target.value)
+                  }}
+                />
+              </Col>
+              <Col lg={6}>
+                <p>Нийтлэгч</p>
+                <select
+                  className="form-control"
+                  id="allAdmins"
+                  onChange={e => set_admin_selected(e.target.value)}
+                >
+                  {all_admins.length != 0
+                    ? all_admins.map(admin => <option>{admin.username}</option>)
+                    : null}
+                </select>
+              </Col>
+              <Col lg={12} className="mt-3">
+                <p>Категори сонгох</p>
+                <Select
+                  value={selectedMulti_category}
+                  isMulti={true}
+                  placeholder="Сонгох ... "
+                  onChange={e => {
+                    handleMulti_author(e)
+                  }}
+                  options={podcast_category}
+                  classNamePrefix="select2-selection"
+                />
+              </Col>
+            </Row>
+            <Row className="mb-3">
+              <Col lg={7} className="mt-2">
+                <p>Тайлбар</p>
+                <textarea
+                  rows="3"
+                  className="form-control"
+                  onChange={e => set_channel_desc(e.target.value)}
+                ></textarea>
+              </Col>
+
+              <Col lg={5}>
+                <p className="m-0 p-0">Зураг</p>
+                <img
+                  className="rounded"
+                  alt=""
+                  id="img"
+                  className="img-fluid"
+                  src={podcast_pic}
+                />
+                <input
+                  type="file"
+                  id="input"
+                  accept="image/*"
+                  className="invisible"
+                  onChange={imageHandler}
+                />
+                <div className="label">
+                  <label
+                    htmlFor="input"
+                    className="image-upload d-flex justify-content-center"
+                    style={{ cursor: "pointer" }}
+                  >
+                    <i className="bx bx-image-add font-size-20 mr-2"></i>
+                    <p>Зураг оруулах</p>
+                  </label>
+                </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col lg={10}></Col>
+              <Col lg={2}>
+                <Button
+                  onClick={() => {
+                    set_confirm_add_podcast_channel(true)
+                  }}
+                  className="btn btn-success text-dark"
+                >
+                  Нэмэх
+                </Button>
               </Col>
             </Row>
           </CardBody>
@@ -409,16 +798,16 @@ const SettingsForm = props => {
       ) : null}
       {confirm_terms ? (
         <SweetAlert
-          title={r_u_sure_title}
+          title="Үйлчилгээний нөхцөлөө өөрчлөх гэж байна"
           info
           showCancel
-          confirmBtnText="Тийм!"
-          cancelBtnText="Болих"
+          confirmBtnText="Тийм"
+          cancelBtnText="Буцах"
           confirmBtnBsStyle="success"
           cancelBtnBsStyle="danger"
           onConfirm={() => {
-            updateTerms()
             setloading_dialog(true)
+            updateTerms()
             set_confirm_terms(false)
           }}
           onCancel={() => {
@@ -426,9 +815,160 @@ const SettingsForm = props => {
           }}
         ></SweetAlert>
       ) : null}
+      {confirm_add_author ? (
+        <SweetAlert
+          title="Зохиолч нэмэх"
+          info
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Буцах"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            setloading_dialog(true)
+            set_confirm_add_author(false)
+            addAuthorCategory()
+          }}
+          onCancel={() => {
+            set_confirm_add_author(false)
+          }}
+        ></SweetAlert>
+      ) : null}
+      {confirm_remove_author ? (
+        <SweetAlert
+          title="Зохиолч хасах"
+          info
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Буцах"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            setloading_dialog(true)
+            set_confirm_remove_author(false)
+            deleteAuthorCategory()
+          }}
+          onCancel={() => {
+            set_confirm_terms(false)
+          }}
+        ></SweetAlert>
+      ) : null}
+      {confirm_add_book_category ? (
+        <SweetAlert
+          title="Категори нэмэх"
+          info
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Буцах"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            setloading_dialog(true)
+            set_confirm_add_book_category(false)
+            addBookCategory()
+          }}
+          onCancel={() => {
+            set_confirm_add_book_category(false)
+          }}
+        ></SweetAlert>
+      ) : null}
+      {confirm_remove_book_category ? (
+        <SweetAlert
+          title="Категори хасах "
+          info
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Буцах"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            setloading_dialog(true)
+            set_confirm_remove_book_category(false)
+            deleteAuthorCategory()
+          }}
+          onCancel={() => {
+            set_confirm_remove_book_category(false)
+          }}
+        ></SweetAlert>
+      ) : null}
+      {confirm_add_podcast_category ? (
+        <SweetAlert
+          title="Категори нэмэх"
+          info
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Буцах"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            setloading_dialog(true)
+            set_confirm_add_podcast_category(false)
+            addPodcastCategory()
+          }}
+          onCancel={() => {
+            set_confirm_add_podcast_category(false)
+          }}
+        ></SweetAlert>
+      ) : null}
+      {confirm_remove_podcast_category ? (
+        <SweetAlert
+          title="Категори хасах"
+          info
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Буцах"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            setloading_dialog(true)
+            set_confirm_remove_podcast_category(false)
+            deletePodcastCategory()
+          }}
+          onCancel={() => {
+            set_confirm_remove_podcast_category(false)
+          }}
+        ></SweetAlert>
+      ) : null}
+      {confirm_add_podcast_channel ? (
+        <SweetAlert
+          title="Подкаст суваг нэмэх"
+          info
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Буцах"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            setloading_dialog(true)
+            set_confirm_add_podcast_channel(false)
+            createPodcastChannel()
+          }}
+          onCancel={() => {
+            set_confirm_add_podcast_channel(false)
+          }}
+        ></SweetAlert>
+      ) : null}
+      {confirm_save_book ? (
+        <SweetAlert
+          title="Подкаст суваг нэмэх"
+          info
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Буцах"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            setloading_dialog(true)
+            set_confirm_save_book(false)
+          }}
+          onCancel={() => {
+            set_confirm_save_book(false)
+          }}
+        ></SweetAlert>
+      ) : null}
       {success_dialog ? (
         <SweetAlert
-          title={"Амжилттай"}
+          title="Амжилттай"
           timeout={2000}
           style={{
             position: "absolute",

@@ -15,7 +15,6 @@ import {
   PaginationLink,
 } from "reactstrap"
 import axios from "axios"
-import AddPodcast from "./AddPodcast"
 
 const ContactsGrid = props => {
   const [data, set_data] = useState([])
@@ -76,9 +75,7 @@ const ContactsGrid = props => {
   return (
     <React.Fragment>
       <Row>
-        <Col lg={4}>
-          <AddPodcast latestEpisodeNumber={props.user_podcasts} />
-        </Col>
+        <Col lg={4}></Col>
 
         <Col xl={4} lg={6} md={8} xs={8} sm={8}>
           <form className="app-search d-none d-lg-block">
