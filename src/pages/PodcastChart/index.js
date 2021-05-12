@@ -3,16 +3,22 @@ import axios from "axios"
 import { Link } from "react-router-dom"
 import ContactsGrid from "./PodcastLists"
 import { Container, Alert, Row, Col } from "reactstrap"
+import { useParams } from "react-router-dom"
 import Breadcrumbs from "../../components/Common/Breadcrumb"
+require("dotenv").config()
 
 const PodcastList = () => {
+  const { id } = useParams()
+
   const [data, set_data] = useState([])
+  const [user_podcasts, set_user_podcasts] = useState([])
 
   // Check network
   const [isNetworking, setIsNetworking] = useState(false)
   const [isNetworkLoading, SetIsNetworkLoading] = useState(false)
 
-  async function makeGetReq() {
+  async function fetchData() {
+    console.log("id -> ", id)
     await axios({
       url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels`,
       method: "GET",
@@ -23,17 +29,37 @@ const PodcastList = () => {
       },
     })
       .then(res => {
-        set_data(res.data)
-        setIsNetworking(false)
+        console.log("hehe")
+        console.log(res.data)
         SetIsNetworkLoading(true)
+        set_data(res.data)
+        axios({
+          url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels/${id}`,
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${
+              JSON.parse(localStorage.getItem("user_information")).jwt
+            }`,
+          },
+        })
+          .then(podcasts => {
+            // set_user_podcasts(podcasts.data)
+            // setIsNetworking(false)
+            // SetIsNetworkLoading(true)
+          })
+          .catch(err => {
+            // console.log("err1")
+            // setIsNetworking(true)
+          })
       })
       .catch(err => {
+        console.log("err2")
         setIsNetworking(true)
       })
   }
 
   useEffect(() => {
-    makeGetReq()
+    fetchData()
   }, [])
 
   return (
@@ -48,7 +74,12 @@ const PodcastList = () => {
           <>
             {isNetworkLoading ? (
               <Container fluid>
-                {data.length != 0 ? <ContactsGrid podcast={data} /> : null}
+                {data.length != 0 ? (
+                  <ContactsGrid
+                    podcast={data}
+                    user_podcasts={user_podcasts.user_podcasts}
+                  />
+                ) : null}
               </Container>
             ) : (
               <Row>

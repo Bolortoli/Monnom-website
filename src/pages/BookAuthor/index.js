@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import axios from "axios"
 import Breadcrumb from "../../components/Common/Breadcrumb"
-import { Alert } from "reactstrap"
+import { Link } from "react-router-dom"
+import { Alert, Row, Col } from "reactstrap"
 
 import BookDetail from "./BookDetail"
 
@@ -13,10 +14,10 @@ const BookAuthor = () => {
   const [data, set_data] = useState(null)
 
   // Check network
-  const [isNetworking, setIsNetworking] = useState(true)
-  const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
+  const [isNetworkError, setIsNetworkError] = useState(false)
+  const [isNetworkLoading, SetIsNetworkLoading] = useState(false)
 
-  async function makeGetReq() {
+  async function fetchData() {
     await axios({
       url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-single-by-author/${id}`,
       method: "GET",
@@ -27,24 +28,24 @@ const BookAuthor = () => {
       },
     })
       .then(res => {
-        console.log(res.data)
         set_data(res.data)
-        setIsNetworking(false)
+        SetIsNetworkLoading(true)
+        setIsNetworkError(false)
       })
       .catch(err => {
-        setIsNetworking(true)
+        setIsNetworkError(true)
         SetIsNetworkLoading(true)
       })
   }
 
   useEffect(() => {
-    makeGetReq()
+    fetchData()
   }, [])
 
   return (
     <React.Fragment>
       <div className="page-content">
-        {isNetworking ? (
+        {isNetworkError ? (
           <Alert color="danger" role="alert">
             Сүлжээ уналаа ! Дахин ачааллна уу ?
           </Alert>

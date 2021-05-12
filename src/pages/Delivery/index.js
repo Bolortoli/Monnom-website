@@ -565,6 +565,7 @@ export default function Delivery() {
 
   const [isNetworkError, SetIsNetworkError] = useState(false)
   const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
+  const [loading_dialog, set_loading_dialog] = useState(false)
   const [order_id, set_order_id] = useState(null)
   const [confirm_order, set_confirm_order] = useState(false)
   const [success_dlg, set_success_dlg] = useState(false)
@@ -575,15 +576,18 @@ export default function Delivery() {
     await axios
       .delete(url)
       .then(async res => {
+        set_loading_dialog(false)
         set_success_dlg(true)
         SetIsNetworkLoading(false)
       })
       .catch(e => {
+        set_loading_dialog(false)
+        SetIsNetworkLoading(false)
         SetIsNetworkError(true)
       })
   }
 
-  async function makeGetReq() {
+  async function fetchData() {
     await axios({
       url: `${process.env.REACT_APP_STRAPI_BASE_URL}/delivery-registrations`,
       method: "GET",
@@ -595,17 +599,18 @@ export default function Delivery() {
     })
       .then(res => {
         SetIsNetworkLoading(false)
+        SetIsNetworkError(false)
         console.log("res done", res.data)
       })
       .catch(err => {
-        console.log("error")
+        console.log("error deliver")
         SetIsNetworkError(false)
-        SetIsNetworkLoading(true)
+        SetIsNetworkError(true)
       })
   }
 
   useEffect(() => {
-    makeGetReq()
+    fetchData()
     mapping()
   }, [])
 
@@ -668,6 +673,17 @@ export default function Delivery() {
             <>
               {isNetworkLoading ? (
                 <Row>
+                  <Col xs="12">
+                    <div className="text-center my-3">
+                      <Link to="#" className="text-success">
+                        <i className="bx bx-hourglass bx-spin mr-2" />
+                        Ачааллаж байна
+                      </Link>
+                    </div>
+                  </Col>
+                </Row>
+              ) : (
+                <Row>
                   <Col lg={12}>
                     <Card>
                       <CardBody>
@@ -719,20 +735,18 @@ export default function Delivery() {
                     </Card>
                   </Col>
                 </Row>
-              ) : (
-                <Row>
-                  <Col xs="12">
-                    <div className="text-center my-3">
-                      <Link to="#" className="text-success">
-                        <i className="bx bx-hourglass bx-spin mr-2" />
-                        Ачааллаж байна
-                      </Link>
-                    </div>
-                  </Col>
-                </Row>
               )}
             </>
           )}
+          {loading_dialog ? (
+            <SweetAlert
+              title="Түр хүлээнэ үү"
+              info
+              showCloseButton={false}
+              showConfirm={false}
+              success
+            ></SweetAlert>
+          ) : null}
           {confirm_order ? (
             <SweetAlert
               title="Хүргэлт амжилттай болсон уу ?"

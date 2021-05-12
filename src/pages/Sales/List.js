@@ -21,118 +21,84 @@ import "./datatables.scss"
 const bookColumns = [
   {
     label: "№",
-    field: "id",
-    sort: "disabled",
+    field: "book_id",
+    sort: "desc",
+    width: 10,
+  },
+  {
+    label: "Хэрэглэгчийн нэр",
+    field: "user_name",
+    sort: "desc",
     width: 10,
   },
   {
     label: "Нэр",
     field: "book_name",
     width: 150,
-    sort: "asc",
-    attributes: {
-      "aria-controls": "DataTable",
-      "aria-label": "Name",
-    },
+    sort: "desc",
   },
   {
-    label: "Зохиолч",
-    field: "author",
-    sort: "asc",
-    width: 100,
+    label: "Борлогдсон тоо",
+    field: "book_buy_count",
+    sort: "desc",
+    width: 70,
   },
   {
-    label: "Борлуулалт",
-    field: "buy_count",
-    sort: "asc",
+    label: "Үнэ",
+    field: "book_buy_price",
+    sort: "desc",
     width: 70,
   },
   {
     label: "Хүсэлтийн огноо",
-    field: "date",
-    sort: "disabled",
+    field: "book_date",
+    sort: "desc",
     width: 100,
   },
 ]
 
-const mp3Columns = [
+const ebookColumns = [
   {
     label: "№",
-    field: "id",
-    sort: "disabled",
+    field: "ebook_id",
+    sort: "desc",
+    width: 10,
+  },
+  {
+    label: "Хэрэглэгчийн нэр",
+    field: "e_user_name",
+    sort: "desc",
     width: 10,
   },
   {
     label: "Нэр",
-    field: "book_name",
+    field: "ebook_name",
     width: 150,
-    sort: "asc",
-    attributes: {
-      "aria-controls": "DataTable",
-      "aria-label": "Name",
-    },
+    sort: "desc",
   },
   {
-    label: "Зохиолч",
-    field: "author",
-    sort: "asc",
-    width: 100,
+    label: "Борлогдсон тоо",
+    field: "ebook_buy_count",
+    sort: "desc",
+    width: 70,
   },
   {
-    label: "Борлуулалт",
-    field: "buy_count",
-    sort: "asc",
+    label: "Үнэ",
+    field: "ebook_buy_price",
+    sort: "desc",
     width: 70,
   },
   {
     label: "Хүсэлтийн огноо",
-    field: "date",
-    sort: "disabled",
-    width: 100,
-  },
-]
-
-const pdfColumns = [
-  {
-    label: "№",
-    field: "id",
-    sort: "disabled",
-    width: 10,
-  },
-  {
-    label: "Нэр",
-    field: "book_name",
-    width: 150,
-    sort: "asc",
-    attributes: {
-      "aria-controls": "DataTable",
-      "aria-label": "Name",
-    },
-  },
-  {
-    label: "Зохиолч",
-    field: "author",
-    sort: "asc",
-    width: 100,
-  },
-  {
-    label: "Борлуулалт",
-    field: "buy_count",
-    sort: "asc",
-    width: 70,
-  },
-  {
-    label: "Хүсэлтийн огноо",
-    field: "date",
-    sort: "disabled",
+    field: "ebook_date",
+    sort: "desc",
     width: 100,
   },
 ]
 
 const SalesList = props => {
-  const [books, set_books] = useState(props.books.books)
-  const [mp3_books, set_mp3_books] = useState(props.books.book_mp3)
-  const [pdf_books, set_pdf_books] = useState(props.books.book_pdf)
+  const [books, set_books] = useState([])
+  const [ebooks, set_ebooks] = useState([])
 
   const [activeTab, setactiveTab] = useState("1")
 
@@ -143,52 +109,53 @@ const SalesList = props => {
   }
 
   const initBookData = books => {
-    let tempInitialData = books.map(d => {
+    let tempInitialBookData = books.map(d => {
       return {
-        id: d.id,
-        book_name: d.book_name,
-        author: d.book_author_name,
-        buy_count: d.buy_count,
-        date: new Date(d.book_added_date).toLocaleString(),
+        book_id: d.id,
+        user_name: d.users_permissions_user.username,
+        book_name: d.book.name,
+        book_buy_count: d.book.sale_quantity,
+        book_buy_price: d.book.book_price,
+        book_date: new Date(d.updated_at).toLocaleString(),
       }
     })
-    set_books(tempInitialData)
+
+    tempInitialBookData.sort(function (a, b) {
+      return b.book_buy_count - a.book_buy_count
+    })
+
+    set_books(tempInitialBookData)
   }
 
-  const initMp3kData = books => {
-    let tempInitialData = books.map(d => {
+  const initEbookData = ebooks => {
+    let tempInitialEbookData = ebooks.map(d => {
       return {
-        id: d.id,
-        book_name: d.book_name,
-        author: d.book_author_name,
-        buy_count: d.buy_count,
-        date: new Date(d.book_added_date).toLocaleString(),
+        ebook_id: d.id,
+        e_user_name: d.users_permissions_user.username,
+        ebook_name: d.book.name,
+        ebook_buy_count: d.book.sale_quantity,
+        ebook_buy_price: d.book.book_price,
+        ebook_date: new Date(d.updated_at).toLocaleString(),
       }
     })
-    set_mp3_books(tempInitialData)
-  }
 
-  const initPdfData = books => {
-    let tempInitialData = books.map(d => {
-      return {
-        id: d.id,
-        book_name: d.book_name,
-        author: d.book_author_name,
-        buy_count: d.buy_count,
-        date: new Date(d.book_added_date).toLocaleString(),
-      }
+    tempInitialEbookData.sort(function (a, b) {
+      return b.ebook_buy_count - a.ebook_buy_count
     })
-    set_pdf_books(tempInitialData)
+
+    set_ebooks(tempInitialEbookData)
   }
 
   const bookDatatable = { columns: bookColumns, rows: books }
-  const mp3Datatable = { columns: bookColumns, rows: books }
-  const pdfDatatable = { columns: bookColumns, rows: books }
+  const ebookDatatable = { columns: ebookColumns, rows: ebooks }
 
   useEffect(() => {
-    initBookData(props.books.books)
-    initMp3kData(props.books.book_mp3)
-    initPdfData(props.books.book_pdf)
+    initBookData(props.books)
+    console.log("props.books")
+    console.log(props.books)
+    initEbookData(props.ebooks)
+    console.log("props.ebooks")
+    console.log(props.ebooks)
   }, [props])
 
   return (
@@ -198,10 +165,10 @@ const SalesList = props => {
           <Col className="col-12">
             <Card>
               <CardBody>
-                <CardTitle>Хамгийн их зарагдсан номнууд</CardTitle>
-                <CardSubtitle className="mb-3"></CardSubtitle>
+                <CardTitle>Хамгийн их зарагдсан ном</CardTitle>
+                <CardSubtitle className="mb-5"></CardSubtitle>
 
-                <Nav pills className="navtab-bg nav-justified">
+                <Nav tabs className="nav-tabs-custom nav-justified">
                   <NavItem>
                     <NavLink
                       style={{ cursor: "pointer" }}
@@ -212,9 +179,10 @@ const SalesList = props => {
                         toggle("1")
                       }}
                     >
-                      Ном
+                      <strong className="font-size-17">Хэвлэмэл ном</strong>
                     </NavLink>
                   </NavItem>
+
                   <NavItem>
                     <NavLink
                       style={{ cursor: "pointer" }}
@@ -225,20 +193,7 @@ const SalesList = props => {
                         toggle("2")
                       }}
                     >
-                      Аудио ном
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      style={{ cursor: "pointer" }}
-                      className={classnames({
-                        active: activeTab === "3",
-                      })}
-                      onClick={() => {
-                        toggle("3")
-                      }}
-                    >
-                      Цахим ном
+                      <strong className="font-size-17"> Цахим ном</strong>
                     </NavLink>
                   </NavItem>
                 </Nav>
@@ -250,30 +205,32 @@ const SalesList = props => {
                       striped
                       bordered
                       data={bookDatatable}
-                      exportToCSV
-                      proSelect
+                      noBottomColumns
+                      noRecordsFoundLabel={"Ном байхгүй"}
+                      infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
+                      entries={5}
+                      entriesOptions={[5, 10, 20]}
+                      paginationLabel={["Өмнөх", "Дараах"]}
+                      searchingLabel={"Хайх"}
+                      searching
                     />
                   </TabPane>
+
                   <TabPane tabId="2" className="p-3">
                     <MDBDataTable
                       proSelect
                       responsive
                       striped
                       bordered
-                      data={mp3Datatable}
-                      exportToCSV
-                      proSelect
-                    />
-                  </TabPane>
-                  <TabPane tabId="3" className="p-3">
-                    <MDBDataTable
-                      proSelect
-                      responsive
-                      striped
-                      bordered
-                      data={pdfDatatable}
-                      exportToCSV
-                      proSelect
+                      data={ebookDatatable}
+                      noBottomColumns
+                      noRecordsFoundLabel={"Ном байхгүй"}
+                      infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
+                      entries={5}
+                      entriesOptions={[5, 10, 20]}
+                      paginationLabel={["Өмнөх", "Дараах"]}
+                      searchingLabel={"Хайх"}
+                      searching
                     />
                   </TabPane>
                 </TabContent>

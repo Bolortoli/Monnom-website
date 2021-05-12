@@ -43,6 +43,7 @@ const GivePermission = props => {
   const [confirm_allow, set_confirm_allow] = useState(false)
   const [success_dialog, setsuccess_dialog] = useState(false)
   const [error_dialog, seterror_dialog] = useState(false)
+  const [loading_dialog, set_loading_dialog] = useState(false)
   const [selected_book_id, set_selected_book_id] = useState(null)
 
   const table_data = {
@@ -128,16 +129,17 @@ const GivePermission = props => {
       },
     })
       .then(res => {
-        console.log(res.data)
+        set_loading_dialog(false)
         set_paid_online_books([...paid_online_books, res.data])
         setsuccess_dialog(true)
       })
       .catch(err => {
+        set_loading_dialog(false)
         seterror_dialog(true)
       })
   }
 
-  async function makeGetReq() {
+  async function fetchData() {
     await axios({
       url: `${process.env.REACT_APP_STRAPI_BASE_URL}/books`,
       method: "GET",
@@ -150,9 +152,7 @@ const GivePermission = props => {
       .then(res => {
         set_books(res.data)
       })
-      .catch(err => {
-        props.setIsNetworking(true)
-      })
+      .catch(err => {})
     await axios({
       url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-ebooks?users_permissions_user.id=${props.selected_user_id}`,
       method: "GET",
@@ -166,7 +166,7 @@ const GivePermission = props => {
         set_paid_online_books(res.data)
       })
       .catch(err => {
-        props.setIsNetworking(true)
+        // props.setIsNetworking(true)
       })
 
     await axios({
@@ -182,7 +182,7 @@ const GivePermission = props => {
         set_paid_books(res.data)
       })
       .catch(err => {
-        props.setIsNetworking(true)
+        // props.setIsNetworking(true)
       })
   }
 
@@ -191,11 +191,63 @@ const GivePermission = props => {
   }, [books, paid_online_books, paid_books])
 
   useEffect(() => {
-    makeGetReq()
+    fetchData()
   }, [])
 
   return (
     <>
+      <Modal
+        size="xl"
+        isOpen={props.modal_toggle}
+        toggle={() => {
+          props.set_modal_toggle(!props.modal_toggle)
+        }}
+        centered={true}
+      >
+        <div className="modal-header">
+          <h5 className="modal-title mt-0">
+            <strong>Худалдан авалтууд</strong>
+          </h5>
+          <button
+            onClick={() => {
+              props.set_modal_toggle(false)
+            }}
+            type="button"
+            className="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div className="modal-body">
+          <MDBDataTable
+            proSelect
+            responsive
+            striped
+            bordered
+            data={table_data}
+            proSelect
+            noBottomColumns
+            noRecordsFoundLabel={"Номын дугаар байхгүй"}
+            infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
+            entries={5}
+            entriesOptions={[5, 10, 20]}
+            paginationLabel={["Өмнөх", "Дараах"]}
+            searchingLabel={"Хайх"}
+            searching
+          />
+        </div>
+      </Modal>
+      {loading_dialog ? (
+        <SweetAlert
+          title="Түр хүлээнэ үү"
+          info
+          showCloseButton={false}
+          showConfirm={false}
+          success
+        ></SweetAlert>
+      ) : null}
       {confirm_allow ? (
         <SweetAlert
           title="Та хэрэглэгчид номын эрх нээх гэж байна. Итгэлтэй байна уу ?"
@@ -207,6 +259,7 @@ const GivePermission = props => {
           cancelBtnBsStyle="danger"
           onConfirm={() => {
             set_confirm_allow(false)
+            set_loading_dialog(true)
             givePermissionToCustomer()
           }}
           onCancel={() => {
@@ -253,49 +306,6 @@ const GivePermission = props => {
           {"Эрх олгох үйлдэл амжилтгүй боллоо"}
         </SweetAlert>
       ) : null}
-      <Modal
-        size="xl"
-        isOpen={props.modal_toggle}
-        toggle={() => {
-          props.set_modal_toggle(!props.modal_toggle)
-        }}
-        centered={true}
-      >
-        <div className="modal-header">
-          <h5 className="modal-title mt-0">
-            <strong>Худалдан авалтууд</strong>
-          </h5>
-          <button
-            onClick={() => {
-              props.set_modal_toggle(false)
-            }}
-            type="button"
-            className="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div className="modal-body">
-          <MDBDataTable
-            proSelect
-            responsive
-            striped
-            bordered
-            data={table_data}
-            proSelect
-            noBottomColumns
-            noRecordsFoundLabel={"Номын дугаар байхгүй"}
-            infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
-            entries={5}
-            entriesOptions={[5, 10, 20]}
-            paginationLabel={["Өмнөх", "Дараах"]}
-            searchingLabel={"Хайх"}
-            searching
-          />
-        </div>
-      </Modal>
     </>
   )
 
