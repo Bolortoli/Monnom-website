@@ -19,6 +19,7 @@ require("dotenv").config()
 
 const Customers = () => {
   const [tableRows, setTableRows] = useState([])
+
   // Check network
   const [isNetworkError, setIsNetworkError] = useState(false)
   const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
@@ -66,17 +67,21 @@ const Customers = () => {
     rows: tableRows,
   }
 
-  const fetchData = async () => {
+  async function fetchData() {
     await axios({
+      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/all-app-users`,
       method: "GET",
       headers: {
         Authorization: `Bearer ${
           JSON.parse(localStorage.getItem("user_information")).jwt
         }`,
       },
-      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/all-app-users`,
     })
       .then(res => {
+        console.log("res.data")
+        console.log(res.data)
+        setIsNetworkError(false)
+        SetIsNetworkLoading(false)
         let tempRows = res.data.map(data => {
           return {
             id: data.id,
@@ -97,21 +102,14 @@ const Customers = () => {
                 Харах
               </a>
             ),
-            pic: (
-              <img
-                style={{ width: "50px", height: "50px", borderRadius: "50%" }}
-                src={`${process.env.REACT_APP_STRAPI_BASE_URL}${data.profile_picture.formats.thumbnail.url}`}
-              ></img>
-            ),
           }
         })
         setTableRows(tempRows)
-        setIsNetworkError(false)
-        SetIsNetworkLoading(false)
       })
       .catch(err => {
-        setIsNetworkError(true)
+        console.log("err")
         SetIsNetworkLoading(false)
+        setIsNetworkError(false)
       })
   }
 

@@ -26,14 +26,6 @@ import axios from "axios"
 require("dotenv").config()
 
 let BookCard = props => {
-  let handleAddToSpecial = e => {
-    if (e.target.checked) {
-      // ontslohoos hasna
-    } else {
-      // ontsloh nemne
-    }
-  }
-
   return (
     <Col xl={3} lg={4} md={4} sm={4}>
       <Card>
@@ -234,9 +226,9 @@ const Books = () => {
             }`,
           },
         })
-          .then(book => {
+          .then(admin => {
             setIsNetworkingError(false)
-            set_admins_info(book.data)
+            set_admins_info(admin.data)
           })
           .catch(err => {
             setIsNetworkingError(true)
@@ -260,29 +252,6 @@ const Books = () => {
 
   useEffect(() => {
     fetchData()
-    // getBookInfo()
-  }, [admin_id])
-
-  async function getBookInfo() {
-    await axios({
-      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-single-by-author/${admin_id}`,
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    })
-      .then(res => {
-        set_book_info(res.data)
-        console.log("hhe")
-        console.log(res.data)
-      })
-      .catch(err => {})
-  }
-
-  useEffect(() => {
-    getBookInfo()
   }, [])
 
   return (
@@ -299,13 +268,10 @@ const Books = () => {
               <Container fluid>
                 <Row>
                   <Col lg={4}>
-                    <Link
-                      to="#"
-                      className="font-size-15 p-2 border border-primary rounded"
-                      onClick={() => set_get_admin(true)}
-                    >
-                      Ном нэмэх
-                    </Link>
+                    <AddBook
+                      admins_info={admins_info}
+                      setIsNetworkingError={setIsNetworkingError}
+                    />
                   </Col>
 
                   <Col xl={4} lg={6} md={8} xs={8} sm={8}>
@@ -415,39 +381,7 @@ const Books = () => {
             )}
           </>
         )}
-        {get_admin ? (
-          <SweetAlert showCloseButton={false} showConfirm={false}>
-            <Row>
-              <Col lg={12} className="d-block text-left">
-                <FormGroup className="select2-container mx-auto">
-                  <label className="control-label">Админ сонгох</label>
-                </FormGroup>
-              </Col>
-              <Col lg={12}>
-                <select
-                  className="form-control"
-                  id="admins"
-                  onChange={e => set_admin_id(e.target.value)}
-                >
-                  {admins_info.map(admin => (
-                    <option value={admin.id}>{admin.username}</option>
-                  ))}
-                </select>
-              </Col>
-              <Col lg={12} className="mt-5">
-                <Button
-                  type="button"
-                  color="primary"
-                  className="btn mr-1"
-                  onClick={() => set_get_admin(false)}
-                >
-                  Буцах
-                </Button>
-                <AddBook />
-              </Col>
-            </Row>
-          </SweetAlert>
-        ) : null}
+
         {confirm_allow ? (
           <SweetAlert
             title={are_you_sure_title}

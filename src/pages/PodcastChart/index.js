@@ -33,24 +33,6 @@ const PodcastList = () => {
         console.log(res.data)
         SetIsNetworkLoading(true)
         set_data(res.data)
-        axios({
-          url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels/${id}`,
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${
-              JSON.parse(localStorage.getItem("user_information")).jwt
-            }`,
-          },
-        })
-          .then(podcasts => {
-            // set_user_podcasts(podcasts.data)
-            // setIsNetworking(false)
-            // SetIsNetworkLoading(true)
-          })
-          .catch(err => {
-            // console.log("err1")
-            // setIsNetworking(true)
-          })
       })
       .catch(err => {
         console.log("err2")
@@ -74,12 +56,7 @@ const PodcastList = () => {
           <>
             {isNetworkLoading ? (
               <Container fluid>
-                {data.length != 0 ? (
-                  <ContactsGrid
-                    podcast={data}
-                    user_podcasts={user_podcasts.user_podcasts}
-                  />
-                ) : null}
+                {data.length != 0 ? <ContactsGrid podcast={data} /> : null}
               </Container>
             ) : (
               <Row>
