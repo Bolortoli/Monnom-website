@@ -17,457 +17,6 @@ import SweetAlert from "react-bootstrap-sweetalert"
 import { Alert } from "reactstrap"
 require("dotenv").config()
 
-const demoData = [
-  {
-    id: 1,
-    is_delivered: false,
-    customer_paid_book: {
-      id: 1,
-      book: 1,
-      users_permissions_user: 3,
-      payment: null,
-      created_at: "2021-05-08T12:57:30.555Z",
-      updated_at: "2021-05-08T12:57:30.561Z",
-    },
-    customer: {
-      id: 2,
-      username: "1234123123",
-      email: "b@b.com",
-      provider: "local",
-      confirmed: false,
-      blocked: false,
-      role: 1,
-      fullname: "admin1",
-      phone: "458912374",
-      gender: "Female",
-      user_role: 4,
-      role_identifier: 4,
-      created_at: "2021-03-27T00:09:10.321Z",
-      updated_at: "2021-03-28T23:21:36.306Z",
-      profile_picture: {
-        id: 1,
-        name: "bo.jpg",
-        alternativeText: "",
-        caption: "",
-        width: 1352,
-        height: 1352,
-        formats: {
-          thumbnail: {
-            name: "thumbnail_bo.jpg",
-            hash: "thumbnail_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 156,
-            height: 156,
-            size: 6.29,
-            path: null,
-            url: "/uploads/thumbnail_bo_80b2972155.jpg",
-          },
-          large: {
-            name: "large_bo.jpg",
-            hash: "large_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 1000,
-            height: 1000,
-            size: 121.04,
-            path: null,
-            url: "/uploads/large_bo_80b2972155.jpg",
-          },
-          medium: {
-            name: "medium_bo.jpg",
-            hash: "medium_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 750,
-            height: 750,
-            size: 73.36,
-            path: null,
-            url: "/uploads/medium_bo_80b2972155.jpg",
-          },
-          small: {
-            name: "small_bo.jpg",
-            hash: "small_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 500,
-            height: 500,
-            size: 38.5,
-            path: null,
-            url: "/uploads/small_bo_80b2972155.jpg",
-          },
-        },
-        hash: "bo_80b2972155",
-        ext: ".jpg",
-        mime: "image/jpeg",
-        size: 211.1,
-        url: "/uploads/bo_80b2972155.jpg",
-        previewUrl: null,
-        provider: "local",
-        provider_metadata: null,
-        created_at: "2021-03-20T02:56:24.458Z",
-        updated_at: "2021-03-20T02:56:24.467Z",
-      },
-    },
-    employee: {
-      id: 3,
-      username: "admin1",
-      email: "admin1@admin.com",
-      provider: "local",
-      confirmed: null,
-      blocked: null,
-      role: 1,
-      fullname: "Bolortoli Munkhsaikhan",
-      phone: "99162127",
-      gender: "Male",
-      user_role: 1,
-      role_identifier: null,
-      created_at: "2021-04-12T15:19:17.404Z",
-      updated_at: "2021-04-12T15:19:17.411Z",
-      profile_picture: null,
-    },
-    order_destination: "Manai gert awaad ir",
-    created_at: "2021-05-08T13:13:34.328Z",
-    updated_at: "2021-05-08T13:13:34.333Z",
-  },
-  {
-    id: 2,
-    is_delivered: true,
-    customer_paid_book: {
-      id: 1,
-      book: 1,
-      users_permissions_user: 3,
-      payment: null,
-      created_at: "2021-05-08T12:57:30.555Z",
-      updated_at: "2021-05-08T12:57:30.561Z",
-    },
-    customer: {
-      id: 2,
-      username: "1234123123",
-      email: "b@b.com",
-      provider: "local",
-      confirmed: false,
-      blocked: false,
-      role: 1,
-      fullname: "admin1",
-      phone: "458912374",
-      gender: "Female",
-      user_role: 4,
-      role_identifier: 4,
-      created_at: "2021-03-27T00:09:10.321Z",
-      updated_at: "2021-03-28T23:21:36.306Z",
-      profile_picture: {
-        id: 1,
-        name: "bo.jpg",
-        alternativeText: "",
-        caption: "",
-        width: 1352,
-        height: 1352,
-        formats: {
-          thumbnail: {
-            name: "thumbnail_bo.jpg",
-            hash: "thumbnail_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 156,
-            height: 156,
-            size: 6.29,
-            path: null,
-            url: "/uploads/thumbnail_bo_80b2972155.jpg",
-          },
-          large: {
-            name: "large_bo.jpg",
-            hash: "large_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 1000,
-            height: 1000,
-            size: 121.04,
-            path: null,
-            url: "/uploads/large_bo_80b2972155.jpg",
-          },
-          medium: {
-            name: "medium_bo.jpg",
-            hash: "medium_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 750,
-            height: 750,
-            size: 73.36,
-            path: null,
-            url: "/uploads/medium_bo_80b2972155.jpg",
-          },
-          small: {
-            name: "small_bo.jpg",
-            hash: "small_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 500,
-            height: 500,
-            size: 38.5,
-            path: null,
-            url: "/uploads/small_bo_80b2972155.jpg",
-          },
-        },
-        hash: "bo_80b2972155",
-        ext: ".jpg",
-        mime: "image/jpeg",
-        size: 211.1,
-        url: "/uploads/bo_80b2972155.jpg",
-        previewUrl: null,
-        provider: "local",
-        provider_metadata: null,
-        created_at: "2021-03-20T02:56:24.458Z",
-        updated_at: "2021-03-20T02:56:24.467Z",
-      },
-    },
-    employee: {
-      id: 3,
-      username: "admin1",
-      email: "admin1@admin.com",
-      provider: "local",
-      confirmed: null,
-      blocked: null,
-      role: 1,
-      fullname: "Bolortoli Munkhsaikhan",
-      phone: "99162127",
-      gender: "Male",
-      user_role: 1,
-      role_identifier: null,
-      created_at: "2021-04-12T15:19:17.404Z",
-      updated_at: "2021-04-12T15:19:17.411Z",
-      profile_picture: null,
-    },
-    order_destination: "Manai gert awaad ir",
-    created_at: "2021-05-08T13:13:34.328Z",
-    updated_at: "2021-05-08T13:13:34.333Z",
-  },
-  {
-    id: 3,
-    is_delivered: false,
-    customer_paid_book: {
-      id: 1,
-      book: 1,
-      users_permissions_user: 3,
-      payment: null,
-      created_at: "2021-05-08T12:57:30.555Z",
-      updated_at: "2021-05-08T12:57:30.561Z",
-    },
-    customer: {
-      id: 2,
-      username: "1234123123",
-      email: "b@b.com",
-      provider: "local",
-      confirmed: false,
-      blocked: false,
-      role: 1,
-      fullname: "admin1",
-      phone: "458912374",
-      gender: "Female",
-      user_role: 4,
-      role_identifier: 4,
-      created_at: "2021-03-27T00:09:10.321Z",
-      updated_at: "2021-03-28T23:21:36.306Z",
-      profile_picture: {
-        id: 1,
-        name: "bo.jpg",
-        alternativeText: "",
-        caption: "",
-        width: 1352,
-        height: 1352,
-        formats: {
-          thumbnail: {
-            name: "thumbnail_bo.jpg",
-            hash: "thumbnail_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 156,
-            height: 156,
-            size: 6.29,
-            path: null,
-            url: "/uploads/thumbnail_bo_80b2972155.jpg",
-          },
-          large: {
-            name: "large_bo.jpg",
-            hash: "large_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 1000,
-            height: 1000,
-            size: 121.04,
-            path: null,
-            url: "/uploads/large_bo_80b2972155.jpg",
-          },
-          medium: {
-            name: "medium_bo.jpg",
-            hash: "medium_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 750,
-            height: 750,
-            size: 73.36,
-            path: null,
-            url: "/uploads/medium_bo_80b2972155.jpg",
-          },
-          small: {
-            name: "small_bo.jpg",
-            hash: "small_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 500,
-            height: 500,
-            size: 38.5,
-            path: null,
-            url: "/uploads/small_bo_80b2972155.jpg",
-          },
-        },
-        hash: "bo_80b2972155",
-        ext: ".jpg",
-        mime: "image/jpeg",
-        size: 211.1,
-        url: "/uploads/bo_80b2972155.jpg",
-        previewUrl: null,
-        provider: "local",
-        provider_metadata: null,
-        created_at: "2021-03-20T02:56:24.458Z",
-        updated_at: "2021-03-20T02:56:24.467Z",
-      },
-    },
-    employee: {
-      id: 3,
-      username: "admin1",
-      email: "admin1@admin.com",
-      provider: "local",
-      confirmed: null,
-      blocked: null,
-      role: 1,
-      fullname: "Bolortoli Munkhsaikhan",
-      phone: "99162127",
-      gender: "Male",
-      user_role: 1,
-      role_identifier: null,
-      created_at: "2021-04-12T15:19:17.404Z",
-      updated_at: "2021-04-12T15:19:17.411Z",
-      profile_picture: null,
-    },
-    order_destination: "Manai gert awaad ir",
-    created_at: "2021-05-08T13:13:34.328Z",
-    updated_at: "2021-05-08T13:13:34.333Z",
-  },
-  {
-    id: 4,
-    is_delivered: true,
-    customer_paid_book: {
-      id: 1,
-      book: 1,
-      users_permissions_user: 3,
-      payment: null,
-      created_at: "2021-05-08T12:57:30.555Z",
-      updated_at: "2021-05-08T12:57:30.561Z",
-    },
-    customer: {
-      id: 2,
-      username: "1234123123",
-      email: "b@b.com",
-      provider: "local",
-      confirmed: false,
-      blocked: false,
-      role: 1,
-      fullname: "admin1",
-      phone: "458912374",
-      gender: "Female",
-      user_role: 4,
-      role_identifier: 4,
-      created_at: "2021-03-27T00:09:10.321Z",
-      updated_at: "2021-03-28T23:21:36.306Z",
-      profile_picture: {
-        id: 1,
-        name: "bo.jpg",
-        alternativeText: "",
-        caption: "",
-        width: 1352,
-        height: 1352,
-        formats: {
-          thumbnail: {
-            name: "thumbnail_bo.jpg",
-            hash: "thumbnail_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 156,
-            height: 156,
-            size: 6.29,
-            path: null,
-            url: "/uploads/thumbnail_bo_80b2972155.jpg",
-          },
-          large: {
-            name: "large_bo.jpg",
-            hash: "large_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 1000,
-            height: 1000,
-            size: 121.04,
-            path: null,
-            url: "/uploads/large_bo_80b2972155.jpg",
-          },
-          medium: {
-            name: "medium_bo.jpg",
-            hash: "medium_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 750,
-            height: 750,
-            size: 73.36,
-            path: null,
-            url: "/uploads/medium_bo_80b2972155.jpg",
-          },
-          small: {
-            name: "small_bo.jpg",
-            hash: "small_bo_80b2972155",
-            ext: ".jpg",
-            mime: "image/jpeg",
-            width: 500,
-            height: 500,
-            size: 38.5,
-            path: null,
-            url: "/uploads/small_bo_80b2972155.jpg",
-          },
-        },
-        hash: "bo_80b2972155",
-        ext: ".jpg",
-        mime: "image/jpeg",
-        size: 211.1,
-        url: "/uploads/bo_80b2972155.jpg",
-        previewUrl: null,
-        provider: "local",
-        provider_metadata: null,
-        created_at: "2021-03-20T02:56:24.458Z",
-        updated_at: "2021-03-20T02:56:24.467Z",
-      },
-    },
-    employee: {
-      id: 3,
-      username: "admin1",
-      email: "admin1@admin.com",
-      provider: "local",
-      confirmed: null,
-      blocked: null,
-      role: 1,
-      fullname: "Bolortoli Munkhsaikhan",
-      phone: "99162127",
-      gender: "Male",
-      user_role: 1,
-      role_identifier: null,
-      created_at: "2021-04-12T15:19:17.404Z",
-      updated_at: "2021-04-12T15:19:17.411Z",
-      profile_picture: null,
-    },
-    order_destination: "Manai gert awaad ir",
-    created_at: "2021-05-08T13:13:34.328Z",
-    updated_at: "2021-05-08T13:13:34.333Z",
-  },
-]
-
 // book section
 const delivered_columns = [
   {
@@ -522,7 +71,7 @@ const not_delivered_columns = [
     width: 100,
   },
   {
-    label: "Хөлс",
+    label: "Цалин",
     field: "salary",
     sort: "asc",
     width: 100,
@@ -562,28 +111,57 @@ const not_delivered_columns = [
 export default function Delivery() {
   const [delivered_data, set_delivered_data] = useState([])
   const [not_delivered_data, set_not_delivered_data] = useState([])
+  const [update_data, set_update_data] = useState(null)
+  const [id, set_id] = useState(0)
 
   const [isNetworkError, SetIsNetworkError] = useState(false)
   const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
+  const [error_dialog, set_error_dialog] = useState(false)
+  const [success_dialog, set_success_dialog] = useState(false)
   const [loading_dialog, set_loading_dialog] = useState(false)
   const [order_id, set_order_id] = useState(null)
   const [confirm_order, set_confirm_order] = useState(false)
-  const [success_dlg, set_success_dlg] = useState(false)
 
   const removeFromNotDelivered = async id => {
-    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}//${id}`
+    console.log("data")
+    console.log(update_data)
+    console.log("id")
+    console.log(id)
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+
+    const url = `${process.env.REACT_APP_STRAPI_BASE_URL}/delivery-registrations/${id}`
 
     await axios
-      .delete(url)
+      .put(
+        url,
+        {
+          is_delivered: true,
+          book_name: update_data.book_name,
+          salary: id,
+          customer_phone: update_data.customer_phone,
+          customer_name: update_data.customer_name,
+          supplier_phone: update_data.supplier_phone,
+          supplier_name: update_data.supplier_name,
+        },
+        config
+      )
       .then(async res => {
         set_loading_dialog(false)
-        set_success_dlg(true)
-        SetIsNetworkLoading(false)
+        set_success_dialog(true)
+        // setTimeout(() => {
+        //   window.location.reload()
+        // }, 2000)
       })
       .catch(e => {
         set_loading_dialog(false)
-        SetIsNetworkLoading(false)
-        SetIsNetworkError(true)
+        set_error_dialog(true)
       })
   }
 
@@ -600,6 +178,7 @@ export default function Delivery() {
       .then(res => {
         SetIsNetworkLoading(false)
         SetIsNetworkError(false)
+        mapping(res.data)
         console.log("res done", res.data)
       })
       .catch(err => {
@@ -611,13 +190,12 @@ export default function Delivery() {
 
   useEffect(() => {
     fetchData()
-    mapping()
   }, [])
 
-  const mapping = () => {
+  const mapping = deliver => {
     let set_delivered_data_temp = []
     let set_not_delivered_data_temp = []
-    demoData.forEach(data => {
+    deliver.forEach(data => {
       if (data.is_delivered)
         set_delivered_data_temp.push({
           book_name: data.book_name,
@@ -638,14 +216,19 @@ export default function Delivery() {
           has_deliver: (
             <Button
               type="submit"
-              className="btn btn-success mx-auto d-block"
-              onClick={(() => set_confirm_order(true), set_order_id(data.id))}
+              className="btn btn-info mx-auto d-block"
+              onClick={() => {
+                set_id(data.id)
+                set_confirm_order(true)
+                set_order_id(data.id)
+              }}
             >
               Баталгаажуулах
             </Button>
           ),
         })
     })
+    set_update_data(set_not_delivered_data_temp[id])
     set_delivered_data(set_delivered_data_temp)
     set_not_delivered_data(set_not_delivered_data_temp)
   }
@@ -698,8 +281,8 @@ export default function Delivery() {
                           data={not_delivered_datatable}
                           proSelect
                           noBottomColumns
-                          noRecordsFoundLabel={"Номын дугаар байхгүй"}
-                          infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
+                          noRecordsFoundLabel={"Хүргэлт байхгүй"}
+                          infoLabel={["", "-ээс", "дахь хүргэлт. Нийт", ""]}
                           entries={5}
                           entriesOptions={[5, 10, 20]}
                           paginationLabel={["Өмнөх", "Дараах"]}
@@ -723,8 +306,8 @@ export default function Delivery() {
                           data={delivered_datatable}
                           proSelect
                           noBottomColumns
-                          noRecordsFoundLabel={"Номын дугаар байхгүй"}
-                          infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
+                          noRecordsFoundLabel={"Хүргэлт байхгүй"}
+                          infoLabel={["", "-ээс", "дахь хүргэлт. Нийт", ""]}
                           entries={5}
                           entriesOptions={[5, 10, 20]}
                           paginationLabel={["Өмнөх", "Дараах"]}
@@ -757,18 +340,19 @@ export default function Delivery() {
               confirmBtnBsStyle="success"
               cancelBtnBsStyle="danger"
               onConfirm={() => {
+                set_loading_dialog(true)
                 set_confirm_order(false)
-                removeFromNotDelivered()
+                removeFromNotDelivered(id)
               }}
               onCancel={() => {
                 set_confirm_order(false)
               }}
             ></SweetAlert>
           ) : null}
-          {success_dlg ? (
+          {success_dialog ? (
             <SweetAlert
               title={"Амжилттай"}
-              timeout={1500}
+              timeout={2000}
               style={{
                 position: "absolute",
                 top: "center",
@@ -778,9 +362,31 @@ export default function Delivery() {
               showConfirm={false}
               success
               onConfirm={() => {
-                set_success_dlg(false)
+                // createPodcast()
+                set_success_dialog(false)
               }}
-            ></SweetAlert>
+            >
+              {"Үйлдэл амжилттай боллоо"}
+            </SweetAlert>
+          ) : null}
+          {error_dialog ? (
+            <SweetAlert
+              title={"Амжилтгүй"}
+              timeout={1500}
+              style={{
+                position: "absolute",
+                top: "center",
+                right: "center",
+              }}
+              showCloseButton={false}
+              showConfirm={false}
+              error
+              onConfirm={() => {
+                set_error_dialog(false)
+              }}
+            >
+              {"Үйлдэл амжилтгүй боллоо"}
+            </SweetAlert>
           ) : null}
         </Container>
       </div>

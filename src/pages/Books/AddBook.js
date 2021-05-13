@@ -203,19 +203,6 @@ const AddBook = props => {
     set_optionGroup_categories(c)
   }
 
-  useEffect(() => {
-    console.log("book id")
-    console.log(props.admins_info)
-    // if (props.available_authors != null) {
-    //   getAuthorsCategoriesInfo(
-    //     props.available_authors,
-    //     props.available_categories
-    //   )
-    // }
-
-    // makeGetReq()
-  }, [props])
-
   // file upload hiih
   const handleAcceptedFiles = files => {
     files.map(file =>

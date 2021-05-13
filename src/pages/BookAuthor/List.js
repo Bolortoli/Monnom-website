@@ -11,12 +11,9 @@ import {
   Label,
   Input,
   FormGroup,
-  Form,
 } from "reactstrap"
-import Switch from "react-switch"
 import SweetAlert from "react-bootstrap-sweetalert"
 import axios from "axios"
-import { update } from "lodash"
 import Select from "react-select"
 
 // book section
@@ -576,10 +573,6 @@ const List = props => {
                 </FormGroup>
               </Col>
             </Row>
-            {/* <b>Cover picture</b>
-          <Col xs={12} className="align-self-end">
-            <img src={cover} className="img-fluid" />
-          </Col> */}
           </SweetAlert>
         ) : null}
         {loading_dialog ? (

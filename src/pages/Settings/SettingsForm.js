@@ -3,6 +3,7 @@ import axios from "axios"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { Card, CardBody, Col, Row, CardTitle, Button, Label } from "reactstrap"
 import Select from "react-select"
+import { Link } from "react-router-dom"
 import { Editor } from "react-draft-wysiwyg"
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
 import {
@@ -13,7 +14,11 @@ import {
 } from "draft-js"
 import draftToHtml from "draftjs-to-html"
 
-const SettingsForm = props => {
+const SettingsForm = () => {
+  // Check network
+  const [isNetworkingError, setIsNetworkingError] = useState(false)
+  const [isNetworkLoading, setIsNetworkLoading] = useState(true)
+
   const [old_author_category, set_old_author_category] = useState([])
   const [new_author_category, set_new_author_category] = useState("")
   const [old_book_category, set_old_book_category] = useState([])
@@ -29,6 +34,12 @@ const SettingsForm = props => {
   const [admin_selected, set_admin_selected] = useState("")
   const [podcast_pic, set_podcast_pic] = useState("")
   const [channel_desc, set_channel_desc] = useState("")
+
+  const [author_category_label, set_author_category_label] = useState("")
+  const [book_category_label, set_book_category_label] = useState("")
+  const [podcast_category_id, set_podcast_category_id] = useState(0)
+  const [book_category_id, set_book_category_id] = useState(0)
+  const [author_category_id, set_author_category_id] = useState(0)
 
   const [confirm_terms, set_confirm_terms] = useState(false)
   const [confirm_save_book, set_confirm_save_book] = useState(false)
@@ -68,7 +79,7 @@ const SettingsForm = props => {
     console.log("author")
     console.log(new_author_category)
 
-    formData.append("book_authors.label", JSON.stringify(new_author_category))
+    formData.append("book_authors.label", new_author_category)
 
     const config = {
       headers: {
@@ -78,10 +89,13 @@ const SettingsForm = props => {
         }`,
       },
     }
+
     await axios
       .post(
         `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`,
-        formData,
+        {
+          book_authors: new_author_category,
+        },
         config
       )
       .then(res => {
@@ -154,9 +168,7 @@ const SettingsForm = props => {
 
   const deleteAuthorCategory = async id => {
     await axios
-      .delete(
-        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page/${new_author_category}`
-      )
+      .delete(`${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`)
       .then(async res => {
         setloading_dialog(false)
         setsuccess_dialog(true)
@@ -169,9 +181,7 @@ const SettingsForm = props => {
 
   const deleteBookCategory = async id => {
     await axios
-      .delete(
-        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page/${new_book_category}`
-      )
+      .delete(`${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`)
       .then(async res => {
         setloading_dialog(false)
         setsuccess_dialog(true)
@@ -183,10 +193,10 @@ const SettingsForm = props => {
   }
 
   const deletePodcastCategory = async id => {
+    console.log("hudlaa da")
+    console.log(podcast_category_id)
     await axios
-      .delete(
-        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page/${new_podcast_category}`
-      )
+      .delete(`${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`)
       .then(async res => {
         setloading_dialog(false)
         setsuccess_dialog(true)
@@ -202,17 +212,10 @@ const SettingsForm = props => {
 
     let categories = selectedMulti_category.map(cat => cat.value.toString())
 
-    let data = {}
-    data["name"] = channel_name
-    data["description"] = channel_desc
-    data["cover_pic"] = podcast_pic
-    data["podcast_categories"] = categories
-
-    formData.append(
-      `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-channels`,
-      "data",
-      JSON.stringify(data)
-    )
+    formData.append("podcast_name", channel_name)
+    formData.append("podcast_author", admin_selected)
+    formData.append("podcast_pic_url", podcast_pic)
+    formData.append("channel_categories", categories)
 
     const config = {
       headers: {
@@ -224,7 +227,11 @@ const SettingsForm = props => {
     }
 
     await axios
-      .post(formData, config)
+      .post(
+        `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels`,
+        formData,
+        config
+      )
       .then(async res => {
         setloading_dialog(false)
         setsuccess_dialog(true)
@@ -317,12 +324,13 @@ const SettingsForm = props => {
       },
     })
       .then(res => {
-        // props.SetIsNetworkingError(false)
+        setIsNetworkLoading(false)
+        setIsNetworkingError(false)
         getAllDatas(res.data)
       })
       .catch(err => {
-        console.log("error")
-        // props.SetIsNetworkingError(true)
+        setIsNetworkLoading(false)
+        setIsNetworkingError(true)
       })
   }
 
@@ -338,8 +346,13 @@ const SettingsForm = props => {
     })
       .then(res => {
         set_all_admins(res.data)
+        setIsNetworkLoading(false)
+        setIsNetworkingError(false)
       })
-      .catch(err => {})
+      .catch(err => {
+        setIsNetworkLoading(false)
+        setIsNetworkingError(true)
+      })
   }
 
   async function fetchAllBooks() {
@@ -354,17 +367,21 @@ const SettingsForm = props => {
     })
       .then(res => {
         set_all_books(res.data)
-        console.log(res.data)
-        console.log(all_books)
+        setIsNetworkLoading(false)
+        setIsNetworkingError(false)
       })
-      .catch(err => {})
+      .catch(err => {
+        setIsNetworkLoading(false)
+        setIsNetworkingError(true)
+      })
   }
 
   const getCategoriesInfo = categories => {
+    console.log("id myu ", categories[0].value)
     const a = categories.map(category => {
       return {
         label: category.label,
-        value: category.id,
+        value: category.value,
       }
     })
     set_podcast_category(a)
@@ -393,618 +410,677 @@ const SettingsForm = props => {
 
   return (
     <Row>
-      <Col lg={12}>
-        <Card>
-          <CardBody>
-            <CardTitle>Үйлчилгээний нөхцөл</CardTitle>
-            {termsData ? (
-              <Editor
-                onEditorStateChange={e => {
-                  console.log(e)
-                  console.log("eeee => ", wysiwyg_content)
-                  set_wysiwyg_content(e)
-                }}
-                defaultEditorState={wysiwyg_content}
-                toolbarOnFocus
-                toolbar={{
-                  options: [
-                    "blockType",
-                    "fontSize",
-                    "list",
-                    "textAlign",
-                    "embedded",
-                    "emoji",
-                    "history",
-                  ],
-                }}
-                toolbarClassName="toolbarClassName"
-                wrapperClassName="wrapperClassName"
-                editorClassName="editorClassName"
-              />
-            ) : null}
-          </CardBody>
-          <CardBody></CardBody>
-        </Card>
-      </Col>
-
-      <Col lg={12} className="text-right mb-3">
-        <Button
-          className="btn btn-success text-dark"
-          style={{ height: "40px" }}
-          color="success"
-          onClick={() => {
-            set_confirm_terms(true)
-          }}
-        >
-          Хадгалах
-        </Button>
-      </Col>
-
-      <Col lg={6}>
-        <Card>
-          <CardTitle className="p-3">Номын зохиолчид</CardTitle>
-          <CardBody>
+      {isNetworkingError ? (
+        <Alert color="danger" role="alert" className="w-100 text-center">
+          Сүлжээ уналаа ! Дахин ачааллна уу ?
+        </Alert>
+      ) : (
+        <>
+          {isNetworkLoading ? (
             <Row>
-              <Col lg={12} className="w-100 mx-auto mb-3">
-                <p>Категори сонгох</p>
-                <select
-                  className="form-control"
-                  id="bookAuthorsCategory"
-                  onChange={e => set_new_author_category(e.target.value)}
-                >
-                  {old_author_category.length != 0
-                    ? old_author_category.map(author => (
-                        <option>{author.label}</option>
-                      ))
-                    : null}
-                </select>
-              </Col>
-              <Col lg={12} className="mb-2">
-                <Label>Зохиолч нэмэх</Label>
-                <Row>
-                  <Col lg={10}>
-                    <input
-                      className="form-control mt-1"
-                      type="text"
-                      placeholder="Зохиогч оруулах"
-                      onChange={e => set_new_author_category(e.target.value)}
-                    />
-                  </Col>
-                  <Col lg={2}>
-                    <Button
-                      to="#"
-                      color="light"
-                      className="mt-1 py-2 px-3 border border-light"
-                      onClick={() => {
-                        set_confirm_add_author(true)
-                      }}
-                    >
-                      Нэмэх
-                    </Button>
-                  </Col>
-                </Row>
-              </Col>
-              <Col lg={12}>
-                <Label>Сонгосон категори</Label>
-                <Row>
-                  <Col lg={10}>
-                    <Label className="form-control mt-1">
-                      {new_author_category}
-                    </Label>
-                  </Col>
-                  <Col lg={2}>
-                    <Button
-                      to="#"
-                      color="light"
-                      className="mt-1 py-2 px-3 border border-light"
-                      onClick={() => {
-                        set_confirm_remove_author(true)
-                      }}
-                    >
-                      Хасах
-                    </Button>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </CardBody>
-        </Card>
-      </Col>
-
-      <Col lg={6}>
-        <Card>
-          <CardTitle className="p-3">Номын категориуд</CardTitle>
-          <CardBody>
-            <Row>
-              <Col lg={12} className="w-100 mx-auto mb-3">
-                <p>Категори сонгох</p>
-                <select
-                  className="form-control"
-                  id="bookCategory"
-                  onChange={e => set_new_book_category(e.target.value)}
-                >
-                  {old_book_category.length != 0
-                    ? old_book_category.map(book => {
-                        return <option value={book.id}>{book.label}</option>
-                      })
-                    : null}
-                </select>
-              </Col>
-
-              <Col className="mb-2" lg={12}>
-                <Label>Төрөл нэмэх</Label>
-                <Row>
-                  <Col lg={10}>
-                    <input
-                      className="form-control mt-1"
-                      type="text"
-                      placeholder="Төрөл оруулах"
-                      onChange={e => set_new_book_category(e.target.value)}
-                    />
-                  </Col>
-                  <Col lg={2}>
-                    <Button
-                      to="#"
-                      color="light"
-                      className="mt-1 py-2 px-3 border border-light"
-                      onClick={() => {
-                        set_confirm_add_book_category(true)
-                      }}
-                    >
-                      Нэмэх
-                    </Button>
-                  </Col>
-                </Row>
-              </Col>
-              <Col lg={12}>
-                <Label>Сонгосон категори</Label>
-                <Row>
-                  <Col lg={10}>
-                    <Label className="form-control mt-1">
-                      {new_book_category}
-                    </Label>
-                  </Col>
-                  <Col lg={2}>
-                    <Button
-                      to="#"
-                      color="light"
-                      className="mt-1 py-2 px-3 border border-light"
-                      onClick={() => {
-                        set_confirm_remove_book_category(true)
-                      }}
-                    >
-                      Хасах
-                    </Button>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </CardBody>
-        </Card>
-      </Col>
-
-      <Col lg={6}>
-        <Card>
-          <CardTitle className="p-3">Подкастын категориуд</CardTitle>
-          <CardBody>
-            <Row>
-              <Col lg={12} className="w-100 mx-auto mb-3">
-                <p>Категори сонгох</p>
-                <select
-                  className="form-control"
-                  id="podcastCategory"
-                  onChange={e => set_new_podcast_category(e.target.value)}
-                >
-                  {old_podcast_category.length != 0
-                    ? old_podcast_category.map(podcast => (
-                        <option>{podcast.label}</option>
-                      ))
-                    : null}
-                </select>
-              </Col>
-
-              <Col className="mb-2" lg={12}>
-                <Label>Төрөл нэмэх</Label>
-                <Row>
-                  <Col lg={10}>
-                    <input
-                      className="form-control mt-1"
-                      type="text"
-                      placeholder="Төрөл оруулах"
-                      onChange={e => set_new_podcast_category(e.target.value)}
-                    />
-                  </Col>
-                  <Col lg={2}>
-                    <Button
-                      to="#"
-                      color="light"
-                      className="mt-1 py-2 px-3 border border-light"
-                      onClick={() => {
-                        set_confirm_add_podcast_category(true)
-                      }}
-                    >
-                      Нэмэх
-                    </Button>
-                  </Col>
-                </Row>
-              </Col>
-              <Col lg={12}>
-                <Label>Сонгосон категори</Label>
-                <Row>
-                  <Col lg={10}>
-                    <Label className="form-control mt-1">
-                      {new_podcast_category}
-                    </Label>
-                  </Col>
-                  <Col lg={2}>
-                    <Button
-                      to="#"
-                      color="light"
-                      className="mt-1 py-2 px-3 border border-light"
-                      onClick={() => {
-                        set_confirm_remove_podcast_category(true)
-                      }}
-                    >
-                      Хасах
-                    </Button>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-          </CardBody>
-        </Card>
-        <Row>
-          <Col lg={12}>
-            <Card>
-              <CardTitle className="p-3">Ном хадгалах</CardTitle>
-              <CardBody>
-                <Row>
-                  {/* <Col lg={3}>
-                <Label>Ном</Label>
-              </Col> */}
-                  <Col lg={9} className="">
-                    <select
-                      className="form-control"
-                      id="allBooks"
-                      onChange={e => set_all_books(e.target.value)}
-                    >
-                      {all_books.length != 0
-                        ? all_books.map(book => <option>{book.name}</option>)
-                        : null}
-                    </select>
-                  </Col>
-                  <Col lg={2}>
-                    <Button
-                      className="btn btn-info text-dark"
-                      onClick={() => {
-                        set_confirm_save_book(true)
-                      }}
-                    >
-                      Хадгалах
-                    </Button>
-                  </Col>
-                </Row>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-      </Col>
-
-      <Col lg={6}>
-        <Card>
-          <CardTitle className="p-3">Подкаст суваг нэмэх</CardTitle>
-          <CardBody>
-            <Row className="mb-3">
-              <Col lg={6}>
-                <p>Сувгийн нэр</p>
-                <input
-                  className="form-control"
-                  type="text"
-                  placeholder="Нэр оруулах"
-                  onChange={e => {
-                    set_channel_name(e.target.value)
-                  }}
-                />
-              </Col>
-              <Col lg={6}>
-                <p>Нийтлэгч</p>
-                <select
-                  className="form-control"
-                  id="allAdmins"
-                  onChange={e => set_admin_selected(e.target.value)}
-                >
-                  {all_admins.length != 0
-                    ? all_admins.map(admin => <option>{admin.username}</option>)
-                    : null}
-                </select>
-              </Col>
-              <Col lg={12} className="mt-3">
-                <p>Категори сонгох</p>
-                <Select
-                  value={selectedMulti_category}
-                  isMulti={true}
-                  placeholder="Сонгох ... "
-                  onChange={e => {
-                    handleMulti_author(e)
-                  }}
-                  options={podcast_category}
-                  classNamePrefix="select2-selection"
-                />
-              </Col>
-            </Row>
-            <Row className="mb-3">
-              <Col lg={7} className="mt-2">
-                <p>Тайлбар</p>
-                <textarea
-                  rows="3"
-                  className="form-control"
-                  onChange={e => set_channel_desc(e.target.value)}
-                ></textarea>
-              </Col>
-
-              <Col lg={5}>
-                <p className="m-0 p-0">Зураг</p>
-                <img
-                  className="rounded"
-                  alt=""
-                  id="img"
-                  className="img-fluid"
-                  src={podcast_pic}
-                />
-                <input
-                  type="file"
-                  id="input"
-                  accept="image/*"
-                  className="invisible"
-                  onChange={imageHandler}
-                />
-                <div className="label">
-                  <label
-                    htmlFor="input"
-                    className="image-upload d-flex justify-content-center"
-                    style={{ cursor: "pointer" }}
-                  >
-                    <i className="bx bx-image-add font-size-20 mr-2"></i>
-                    <p>Зураг оруулах</p>
-                  </label>
+              <Col xs="12">
+                <div className="text-center my-3">
+                  <Link to="#" className="text-success">
+                    <i className="bx bx-hourglass bx-spin mr-2" />
+                    Ачааллаж байна
+                  </Link>
                 </div>
               </Col>
             </Row>
+          ) : (
             <Row>
-              <Col lg={10}></Col>
-              <Col lg={2}>
+              <Col lg={12}>
+                <Card>
+                  <CardBody>
+                    <CardTitle>Үйлчилгээний нөхцөл</CardTitle>
+                    {termsData ? (
+                      <Editor
+                        onEditorStateChange={e => {
+                          console.log(e)
+                          console.log("eeee => ", wysiwyg_content)
+                          set_wysiwyg_content(e)
+                        }}
+                        defaultEditorState={wysiwyg_content}
+                        toolbarOnFocus
+                        toolbar={{
+                          options: [
+                            "blockType",
+                            "fontSize",
+                            "list",
+                            "textAlign",
+                            "embedded",
+                            "emoji",
+                            "history",
+                          ],
+                        }}
+                        toolbarClassName="toolbarClassName"
+                        wrapperClassName="wrapperClassName"
+                        editorClassName="editorClassName"
+                      />
+                    ) : null}
+                  </CardBody>
+                  <CardBody></CardBody>
+                </Card>
+              </Col>
+
+              <Col lg={12} className="text-right mb-3">
                 <Button
-                  onClick={() => {
-                    set_confirm_add_podcast_channel(true)
-                  }}
                   className="btn btn-success text-dark"
+                  style={{ height: "40px" }}
+                  color="success"
+                  onClick={() => {
+                    set_confirm_terms(true)
+                  }}
                 >
-                  Нэмэх
+                  Хадгалах
                 </Button>
               </Col>
-            </Row>
-          </CardBody>
-        </Card>
-      </Col>
 
-      {loading_dialog ? (
-        <SweetAlert
-          title="Түр хүлээнэ үү"
-          info
-          showCloseButton={false}
-          showConfirm={false}
-          success
-        ></SweetAlert>
-      ) : null}
-      {confirm_terms ? (
-        <SweetAlert
-          title="Үйлчилгээний нөхцөлөө өөрчлөх гэж байна"
-          info
-          showCancel
-          confirmBtnText="Тийм"
-          cancelBtnText="Буцах"
-          confirmBtnBsStyle="success"
-          cancelBtnBsStyle="danger"
-          onConfirm={() => {
-            setloading_dialog(true)
-            updateTerms()
-            set_confirm_terms(false)
-          }}
-          onCancel={() => {
-            set_confirm_terms(false)
-          }}
-        ></SweetAlert>
-      ) : null}
-      {confirm_add_author ? (
-        <SweetAlert
-          title="Зохиолч нэмэх"
-          info
-          showCancel
-          confirmBtnText="Тийм"
-          cancelBtnText="Буцах"
-          confirmBtnBsStyle="success"
-          cancelBtnBsStyle="danger"
-          onConfirm={() => {
-            setloading_dialog(true)
-            set_confirm_add_author(false)
-            addAuthorCategory()
-          }}
-          onCancel={() => {
-            set_confirm_add_author(false)
-          }}
-        ></SweetAlert>
-      ) : null}
-      {confirm_remove_author ? (
-        <SweetAlert
-          title="Зохиолч хасах"
-          info
-          showCancel
-          confirmBtnText="Тийм"
-          cancelBtnText="Буцах"
-          confirmBtnBsStyle="success"
-          cancelBtnBsStyle="danger"
-          onConfirm={() => {
-            setloading_dialog(true)
-            set_confirm_remove_author(false)
-            deleteAuthorCategory()
-          }}
-          onCancel={() => {
-            set_confirm_terms(false)
-          }}
-        ></SweetAlert>
-      ) : null}
-      {confirm_add_book_category ? (
-        <SweetAlert
-          title="Категори нэмэх"
-          info
-          showCancel
-          confirmBtnText="Тийм"
-          cancelBtnText="Буцах"
-          confirmBtnBsStyle="success"
-          cancelBtnBsStyle="danger"
-          onConfirm={() => {
-            setloading_dialog(true)
-            set_confirm_add_book_category(false)
-            addBookCategory()
-          }}
-          onCancel={() => {
-            set_confirm_add_book_category(false)
-          }}
-        ></SweetAlert>
-      ) : null}
-      {confirm_remove_book_category ? (
-        <SweetAlert
-          title="Категори хасах "
-          info
-          showCancel
-          confirmBtnText="Тийм"
-          cancelBtnText="Буцах"
-          confirmBtnBsStyle="success"
-          cancelBtnBsStyle="danger"
-          onConfirm={() => {
-            setloading_dialog(true)
-            set_confirm_remove_book_category(false)
-            deleteAuthorCategory()
-          }}
-          onCancel={() => {
-            set_confirm_remove_book_category(false)
-          }}
-        ></SweetAlert>
-      ) : null}
-      {confirm_add_podcast_category ? (
-        <SweetAlert
-          title="Категори нэмэх"
-          info
-          showCancel
-          confirmBtnText="Тийм"
-          cancelBtnText="Буцах"
-          confirmBtnBsStyle="success"
-          cancelBtnBsStyle="danger"
-          onConfirm={() => {
-            setloading_dialog(true)
-            set_confirm_add_podcast_category(false)
-            addPodcastCategory()
-          }}
-          onCancel={() => {
-            set_confirm_add_podcast_category(false)
-          }}
-        ></SweetAlert>
-      ) : null}
-      {confirm_remove_podcast_category ? (
-        <SweetAlert
-          title="Категори хасах"
-          info
-          showCancel
-          confirmBtnText="Тийм"
-          cancelBtnText="Буцах"
-          confirmBtnBsStyle="success"
-          cancelBtnBsStyle="danger"
-          onConfirm={() => {
-            setloading_dialog(true)
-            set_confirm_remove_podcast_category(false)
-            deletePodcastCategory()
-          }}
-          onCancel={() => {
-            set_confirm_remove_podcast_category(false)
-          }}
-        ></SweetAlert>
-      ) : null}
-      {confirm_add_podcast_channel ? (
-        <SweetAlert
-          title="Подкаст суваг нэмэх"
-          info
-          showCancel
-          confirmBtnText="Тийм"
-          cancelBtnText="Буцах"
-          confirmBtnBsStyle="success"
-          cancelBtnBsStyle="danger"
-          onConfirm={() => {
-            setloading_dialog(true)
-            set_confirm_add_podcast_channel(false)
-            createPodcastChannel()
-          }}
-          onCancel={() => {
-            set_confirm_add_podcast_channel(false)
-          }}
-        ></SweetAlert>
-      ) : null}
-      {confirm_save_book ? (
-        <SweetAlert
-          title="Подкаст суваг нэмэх"
-          info
-          showCancel
-          confirmBtnText="Тийм"
-          cancelBtnText="Буцах"
-          confirmBtnBsStyle="success"
-          cancelBtnBsStyle="danger"
-          onConfirm={() => {
-            setloading_dialog(true)
-            set_confirm_save_book(false)
-          }}
-          onCancel={() => {
-            set_confirm_save_book(false)
-          }}
-        ></SweetAlert>
-      ) : null}
-      {success_dialog ? (
-        <SweetAlert
-          title="Амжилттай"
-          timeout={2000}
-          style={{
-            position: "absolute",
-            top: "center",
-            right: "center",
-          }}
-          showCloseButton={false}
-          showConfirm={false}
-          success
-          onConfirm={() => {
-            setsuccess_dialog(false)
-          }}
-        >
-          {"Хэрэглэгчид эрх олгогдлоо"}
-        </SweetAlert>
-      ) : null}
-      {error_dialog ? (
-        <SweetAlert
-          title={"Амжилтгүй"}
-          timeout={2000}
-          style={{
-            position: "absolute",
-            top: "center",
-            right: "center",
-          }}
-          showCloseButton={false}
-          showConfirm={false}
-          error
-          onConfirm={() => {
-            // createPodcast()
-            seterror_dialog(false)
-          }}
-        >
-          {"Эрх олгох үйлдэл амжилтгүй боллоо"}
-        </SweetAlert>
-      ) : null}
+              <Col lg={6}>
+                <Card>
+                  <CardTitle className="p-3">Номын зохиолчид</CardTitle>
+                  <CardBody>
+                    <Row>
+                      <Col lg={12} className="w-100 mx-auto mb-3">
+                        <p>Категори сонгох</p>
+                        <select
+                          className="form-control"
+                          id="bookAuthorsCategory"
+                          onChange={e => {
+                            set_author_category_id(e.target.value)
+                            console.log("id [ ", e.target.value)
+                          }}
+                        >
+                          {old_author_category.length != 0
+                            ? old_author_category.map(author => (
+                                <option value={author.value}>
+                                  {author.label}
+                                </option>
+                              ))
+                            : null}
+                        </select>
+                      </Col>
+                      <Col lg={12} className="mb-2">
+                        <Label>Зохиолч нэмэх</Label>
+                        <Row>
+                          <Col lg={10}>
+                            <input
+                              className="form-control mt-1"
+                              type="text"
+                              placeholder="Зохиогч оруулах"
+                              onChange={e =>
+                                set_new_author_category(e.target.value)
+                              }
+                            />
+                          </Col>
+                          <Col lg={2}>
+                            <Button
+                              to="#"
+                              color="light"
+                              className="mt-1 py-2 px-3 border border-light"
+                              onClick={() => {
+                                set_confirm_add_author(true)
+                              }}
+                            >
+                              Нэмэх
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col lg={12}>
+                        <Label>Сонгосон категори</Label>
+                        <Row>
+                          <Col lg={10}>
+                            <Label className="form-control mt-1">
+                              {old_author_category.length != 0 &&
+                              author_category_id != 0
+                                ? old_author_category[author_category_id - 1]
+                                    .label
+                                : null}
+                            </Label>
+                          </Col>
+                          <Col lg={2}>
+                            <Button
+                              to="#"
+                              color="light"
+                              className="mt-1 py-2 px-3 border border-light"
+                              onClick={() => {
+                                set_confirm_remove_author(true)
+                              }}
+                            >
+                              Хасах
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </CardBody>
+                </Card>
+              </Col>
+
+              <Col lg={6}>
+                <Card>
+                  <CardTitle className="p-3">Номын категориуд</CardTitle>
+                  <CardBody>
+                    <Row>
+                      <Col lg={12} className="w-100 mx-auto mb-3">
+                        <p>Категори сонгох</p>
+                        <select
+                          className="form-control"
+                          id="bookCategory"
+                          onChange={e => set_book_category_id(e.target.value)}
+                        >
+                          {old_book_category.length != 0
+                            ? old_book_category.map(book => {
+                                return (
+                                  <option value={book.value}>
+                                    {book.label}
+                                  </option>
+                                )
+                              })
+                            : null}
+                        </select>
+                      </Col>
+
+                      <Col className="mb-2" lg={12}>
+                        <Label>Төрөл нэмэх</Label>
+                        <Row>
+                          <Col lg={10}>
+                            <input
+                              className="form-control mt-1"
+                              type="text"
+                              placeholder="Төрөл оруулах"
+                              onChange={e =>
+                                set_new_book_category(e.target.value)
+                              }
+                            />
+                          </Col>
+                          <Col lg={2}>
+                            <Button
+                              to="#"
+                              color="light"
+                              className="mt-1 py-2 px-3 border border-light"
+                              onClick={() => {
+                                set_confirm_add_book_category(true)
+                              }}
+                            >
+                              Нэмэх
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col lg={12}>
+                        <Label>Сонгосон категори</Label>
+                        <Row>
+                          <Col lg={10}>
+                            <Label className="form-control mt-1">
+                              {old_book_category.length != 0 &&
+                              book_category_id != 0
+                                ? old_book_category[book_category_id - 1].label
+                                : null}
+                            </Label>
+                          </Col>
+                          <Col lg={2}>
+                            <Button
+                              to="#"
+                              color="light"
+                              className="mt-1 py-2 px-3 border border-light"
+                              onClick={() => {
+                                set_confirm_remove_book_category(true)
+                              }}
+                            >
+                              Хасах
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </CardBody>
+                </Card>
+              </Col>
+
+              <Col lg={6}>
+                <Card>
+                  <CardTitle className="p-3">Подкастын категориуд</CardTitle>
+                  <CardBody>
+                    <Row>
+                      <Col lg={12} className="w-100 mx-auto mb-3">
+                        <p>Категори сонгох</p>
+                        <select
+                          className="form-control"
+                          id="podcastCategory"
+                          onChange={e => {
+                            set_podcast_category_id(e.target.value)
+                          }}
+                        >
+                          {old_podcast_category.length != 0
+                            ? old_podcast_category.map(podcast => (
+                                <option value={podcast.value}>
+                                  {podcast.label}
+                                </option>
+                              ))
+                            : null}
+                        </select>
+                      </Col>
+
+                      <Col className="mb-2" lg={12}>
+                        <Label>Төрөл нэмэх</Label>
+                        <Row>
+                          <Col lg={10}>
+                            <input
+                              className="form-control mt-1"
+                              type="text"
+                              placeholder="Төрөл оруулах"
+                              onChange={e =>
+                                set_new_podcast_category(e.target.value)
+                              }
+                            />
+                          </Col>
+                          <Col lg={2}>
+                            <Button
+                              to="#"
+                              color="light"
+                              className="mt-1 py-2 px-3 border border-light"
+                              onClick={() => {
+                                set_confirm_add_podcast_category(true)
+                              }}
+                            >
+                              Нэмэх
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col lg={12}>
+                        <Label>Сонгосон категори</Label>
+                        <Row>
+                          <Col lg={10}>
+                            <Label className="form-control mt-1">
+                              {old_podcast_category.length != 0 &&
+                              podcast_category_id != 0
+                                ? old_podcast_category[podcast_category_id - 1]
+                                    .label
+                                : []}
+                            </Label>
+                          </Col>
+                          <Col lg={2}>
+                            <Button
+                              to="#"
+                              color="light"
+                              className="mt-1 py-2 px-3 border border-light"
+                              onClick={() => {
+                                set_confirm_remove_podcast_category(true)
+                              }}
+                            >
+                              Хасах
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </CardBody>
+                </Card>
+                <Row>
+                  <Col lg={12}>
+                    <Card>
+                      <CardTitle className="p-3">Ном хадгалах</CardTitle>
+                      <CardBody>
+                        <Row>
+                          {/* <Col lg={3}>
+                    <Label>Ном</Label>
+                  </Col> */}
+                          <Col lg={9} className="">
+                            <select
+                              className="form-control"
+                              id="allBooks"
+                              onChange={e => set_all_books(e.target.value)}
+                            >
+                              {all_books.length != 0
+                                ? all_books.map(book => (
+                                    <option>{book.name}</option>
+                                  ))
+                                : null}
+                            </select>
+                          </Col>
+                          <Col lg={2}>
+                            <Button
+                              className="btn btn-info text-dark"
+                              onClick={() => {
+                                set_confirm_save_book(true)
+                              }}
+                            >
+                              Хадгалах
+                            </Button>
+                          </Col>
+                        </Row>
+                      </CardBody>
+                    </Card>
+                  </Col>
+                </Row>
+              </Col>
+
+              <Col lg={6}>
+                <Card>
+                  <CardTitle className="p-3">Подкаст суваг нэмэх</CardTitle>
+                  <CardBody>
+                    <Row className="mb-3">
+                      <Col lg={6}>
+                        <p>Сувгийн нэр</p>
+                        <input
+                          className="form-control"
+                          type="text"
+                          placeholder="Нэр оруулах"
+                          onChange={e => {
+                            set_channel_name(e.target.value)
+                          }}
+                        />
+                      </Col>
+                      <Col lg={6}>
+                        <p>Нийтлэгч</p>
+                        <select
+                          className="form-control"
+                          id="allAdmins"
+                          onChange={e => set_admin_selected(e.target.value)}
+                        >
+                          {all_admins.length != 0
+                            ? all_admins.map(admin => (
+                                <option>{admin.username}</option>
+                              ))
+                            : null}
+                        </select>
+                      </Col>
+                      <Col lg={12} className="mt-3">
+                        <p>Категори сонгох</p>
+                        <Select
+                          value={selectedMulti_category}
+                          isMulti={true}
+                          placeholder="Сонгох ... "
+                          onChange={e => {
+                            handleMulti_author(e)
+                          }}
+                          options={podcast_category}
+                          classNamePrefix="select2-selection"
+                        />
+                      </Col>
+                    </Row>
+                    <Row className="mb-3">
+                      <Col lg={7} className="mt-2">
+                        <p>Тайлбар</p>
+                        <textarea
+                          rows="3"
+                          className="form-control"
+                          onChange={e => set_channel_desc(e.target.value)}
+                        ></textarea>
+                      </Col>
+
+                      <Col lg={5}>
+                        <p className="m-0 p-0">Зураг</p>
+                        <img
+                          className="rounded"
+                          alt=""
+                          id="img"
+                          className="img-fluid"
+                          src={podcast_pic}
+                        />
+                        <input
+                          type="file"
+                          id="input"
+                          accept="image/*"
+                          className="invisible"
+                          onChange={imageHandler}
+                        />
+                        <div className="label">
+                          <label
+                            htmlFor="input"
+                            className="image-upload d-flex justify-content-center"
+                            style={{ cursor: "pointer" }}
+                          >
+                            <i className="bx bx-image-add font-size-20 mr-2"></i>
+                            <p>Зураг оруулах</p>
+                          </label>
+                        </div>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={10}></Col>
+                      <Col lg={2}>
+                        <Button
+                          onClick={() => {
+                            set_confirm_add_podcast_channel(true)
+                          }}
+                          className="btn btn-success text-dark"
+                        >
+                          Нэмэх
+                        </Button>
+                      </Col>
+                    </Row>
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+          )}
+        </>
+      )}
+
+      <Row>
+        {loading_dialog ? (
+          <SweetAlert
+            title="Түр хүлээнэ үү"
+            info
+            showCloseButton={false}
+            showConfirm={false}
+            success
+          ></SweetAlert>
+        ) : null}
+        {confirm_terms ? (
+          <SweetAlert
+            title="Үйлчилгээний нөхцөлөө өөрчлөх гэж байна"
+            info
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Буцах"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              setloading_dialog(true)
+              updateTerms()
+              set_confirm_terms(false)
+            }}
+            onCancel={() => {
+              set_confirm_terms(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {confirm_add_author ? (
+          <SweetAlert
+            title="Зохиолч нэмэх"
+            info
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Буцах"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              setloading_dialog(true)
+              set_confirm_add_author(false)
+              addAuthorCategory()
+            }}
+            onCancel={() => {
+              set_confirm_add_author(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {confirm_remove_author ? (
+          <SweetAlert
+            title="Зохиолч хасах"
+            info
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Буцах"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              setloading_dialog(true)
+              set_confirm_remove_author(false)
+              deleteAuthorCategory(author_category_id)
+            }}
+            onCancel={() => {
+              set_confirm_terms(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {confirm_add_book_category ? (
+          <SweetAlert
+            title="Категори нэмэх"
+            info
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Буцах"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              setloading_dialog(true)
+              set_confirm_add_book_category(false)
+              addBookCategory()
+            }}
+            onCancel={() => {
+              set_confirm_add_book_category(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {confirm_remove_book_category ? (
+          <SweetAlert
+            title="Категори хасах "
+            info
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Буцах"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              setloading_dialog(true)
+              set_confirm_remove_book_category(false)
+              deleteBookCategory(book_category_id)
+            }}
+            onCancel={() => {
+              set_confirm_remove_book_category(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {confirm_add_podcast_category ? (
+          <SweetAlert
+            title="Категори нэмэх"
+            info
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Буцах"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              setloading_dialog(true)
+              set_confirm_add_podcast_category(false)
+              addPodcastCategory()
+            }}
+            onCancel={() => {
+              set_confirm_add_podcast_category(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {confirm_remove_podcast_category ? (
+          <SweetAlert
+            title="Категори хасах"
+            info
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Буцах"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              setloading_dialog(true)
+              set_confirm_remove_podcast_category(false)
+              deletePodcastCategory(podcast_category_id)
+            }}
+            onCancel={() => {
+              set_confirm_remove_podcast_category(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {confirm_add_podcast_channel ? (
+          <SweetAlert
+            title="Подкаст суваг нэмэх"
+            info
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Буцах"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              setloading_dialog(true)
+              set_confirm_add_podcast_channel(false)
+              createPodcastChannel()
+            }}
+            onCancel={() => {
+              set_confirm_add_podcast_channel(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {confirm_save_book ? (
+          <SweetAlert
+            title="Подкаст суваг нэмэх"
+            info
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Буцах"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              setloading_dialog(true)
+              set_confirm_save_book(false)
+            }}
+            onCancel={() => {
+              set_confirm_save_book(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+        {success_dialog ? (
+          <SweetAlert
+            title="Амжилттай"
+            timeout={2000}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            success
+            onConfirm={() => {
+              setsuccess_dialog(false)
+            }}
+          >
+            {"Хэрэглэгчид эрх олгогдлоо"}
+          </SweetAlert>
+        ) : null}
+        {error_dialog ? (
+          <SweetAlert
+            title={"Амжилтгүй"}
+            timeout={2000}
+            style={{
+              position: "absolute",
+              top: "center",
+              right: "center",
+            }}
+            showCloseButton={false}
+            showConfirm={false}
+            error
+            onConfirm={() => {
+              // createPodcast()
+              seterror_dialog(false)
+            }}
+          >
+            {"Эрх олгох үйлдэл амжилтгүй боллоо"}
+          </SweetAlert>
+        ) : null}
+      </Row>
     </Row>
   )
 }
