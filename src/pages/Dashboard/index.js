@@ -16,28 +16,32 @@ const Dashboard = () => {
   const reports1 = [
     {
       title: "Нийт Подкастын сувгууд",
-      iconClass: "bx bx-user",
+      iconClass: "bx bx-play-circle",
       description: "1000",
     },
     {
       title: "Нийт Подкастын хандалт",
-      iconClass: " bx bx-user-check",
-      description: "1000",
-    },
-    {
-      title: "Нийт Радио сувгууд",
       iconClass: "bx bx-user",
       description: "1000",
     },
     {
-      title: "Нийт Аудио Ном",
-      iconClass: " bx bx-user-check",
+      title: "Нийт Радио сувгууд",
+      iconClass: "bx bx-bullseye",
       description: "1000",
     },
-    { title: "Нийт Ай Бүүк", iconClass: "bx bx-user", description: "1000" },
+    {
+      title: "Нийт Аудио Ном",
+      iconClass: "bx bx-headphone",
+      description: "1000",
+    },
+    {
+      title: "Нийт Ай Бүүк",
+      iconClass: "bx bxs-file-blank",
+      description: "1000",
+    },
     {
       title: "Нийт Ном",
-      iconClass: " bx bx-user-check",
+      iconClass: "bx bx-wifi-0",
       description: "1000",
     },
   ]

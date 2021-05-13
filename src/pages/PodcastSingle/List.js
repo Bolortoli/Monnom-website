@@ -62,6 +62,7 @@ const List = props => {
   const [coverImage, setCoverImage] = useState("")
   const [delete_podcast_id, set_delete_podcast_id] = useState(null)
   const [success_dialog, setsuccess_dialog] = useState(false)
+  const [loading_dialog, setloading_dialog] = useState(false)
   const [error_dialog, seterror_dialog] = useState(false)
 
   // update, delete hiih state uud
@@ -96,11 +97,16 @@ const List = props => {
       },
     })
       .then(async res => {
+        setloading_dialog(false)
+
         setsuccess_dialog(true)
-        window.location.reload()
+
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
       })
       .catch(e => {
-        console.log(e)
+        setloading_dialog(false)
         seterror_dialog(true)
       })
   }
@@ -111,11 +117,15 @@ const List = props => {
     await axios
       .delete(url)
       .then(async res => {
+        setloading_dialog(false)
         setsuccess_dialog(true)
-        window.location.reload()
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
         set_confirm_delete(false)
       })
       .catch(e => {
+        setloading_dialog(false)
         seterror_dialog(true)
         set_confirm_delete(false)
       })
@@ -311,6 +321,15 @@ const List = props => {
             </Row>
           </SweetAlert>
         ) : null}
+        {loading_dialog ? (
+          <SweetAlert
+            title="Түр хүлээнэ үү"
+            info
+            showCloseButton={false}
+            showConfirm={false}
+            success
+          ></SweetAlert>
+        ) : null}
         {confirm_edit ? (
           <SweetAlert
             title="Та итгэлтэй байна уу ?"
@@ -322,6 +341,7 @@ const List = props => {
             cancelBtnBsStyle="danger"
             onConfirm={() => {
               set_confirm_edit(false)
+              setloading_dialog(true)
               setEditPodcastModal(false)
               updatePodcast(delete_podcast_id)
             }}
@@ -381,6 +401,7 @@ const List = props => {
             confirmBtnBsStyle="success"
             cancelBtnBsStyle="danger"
             onConfirm={() => {
+              setloading_dialog(true)
               deletePodcast(delete_podcast_id)
             }}
             onCancel={() => {
@@ -393,7 +414,7 @@ const List = props => {
           <Card>
             <CardBody>
               <div className="d-flex justify-content-between">
-                <CardTitle>Жагсаал</CardTitle>
+                <CardTitle>Жагсаалт</CardTitle>
                 <CardTitle className="text-right">
                   <AddPodcast latestEpisodeNumber={latestEpisodeNumber} />
                 </CardTitle>

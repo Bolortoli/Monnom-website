@@ -121,6 +121,7 @@ const List = props => {
   const [edit_book_comments, set_edit_book_comments] = useState([])
   const [success_dialog, setsuccess_dialog] = useState(false)
   const [error_dialog, seterror_dialog] = useState(false)
+  const [loading_dialog, setloading_dialog] = useState(false)
 
   // axios oor huselt ywuulj update hiih
   const updateBook = async () => {
@@ -152,12 +153,14 @@ const List = props => {
         config
       )
       .then(async res => {
+        setloading_dialog(false)
         setsuccess_dialog(true)
         setTimeout(() => {
           window.location.reload()
         }, 2000)
       })
       .catch(e => {
+        setloading_dialog(false)
         seterror_dialog(true)
       })
   }
@@ -167,12 +170,14 @@ const List = props => {
     await axios
       .delete(`${process.env.REACT_APP_STRAPI_BASE_URL}/books/${id}`)
       .then(async res => {
+        setloading_dialog(false)
         setsuccess_dialog(true)
         setTimeout(() => {
           window.location.reload()
         }, 2000)
       })
       .catch(e => {
+        setloading_dialog(false)
         seterror_dialog(true)
       })
   }
@@ -249,6 +254,7 @@ const List = props => {
         sale_quantity: d.sale_quantity,
         book_comments: (
           <Link
+            className="d-block text-center"
             onClick={() => {
               set_book_comments_section(true)
               set_edit_book_comments(d.book_comments)
@@ -265,7 +271,7 @@ const List = props => {
             style={{ border: "none" }}
           >
             {d.book_author.map(author => (
-              <option className="p-0 m-0">{author.name}</option>
+              <option className="p-0 m-0 w-100 text-left">{author.name}</option>
             ))}
           </select>
         ),
@@ -277,7 +283,7 @@ const List = props => {
             style={{ border: "none" }}
           >
             {d.book_category.map(author => (
-              <option className="p-0 m-0">{author.name}</option>
+              <option className="d-block w-100 text-left">{author.name}</option>
             ))}
           </select>
         ),
@@ -445,7 +451,7 @@ const List = props => {
             <Row>
               <Col xs="12" className="mb-3 mt-2">
                 <Row className="mb-2">
-                  <Col lg={3} className="m-auto">
+                  <Col lg={2} className="m-auto">
                     <Label
                       className="my-auto text-left d-block"
                       for="kyclastname-input"
@@ -453,7 +459,7 @@ const List = props => {
                       Нэр
                     </Label>
                   </Col>
-                  <Col lg={9}>
+                  <Col lg={10}>
                     <Input
                       type="text"
                       value={edit_book_name}
@@ -464,15 +470,13 @@ const List = props => {
                   </Col>
                 </Row>
                 <Row className="mb-2">
-                  <Col lg={3} className="m-auto">
+                  <Col lg={12}>
                     <Label
-                      className="my-auto d-block text-left"
+                      className="d-block text-left mb-2"
                       for="kyclastname-input"
                     >
                       Зохиолч
                     </Label>
-                  </Col>
-                  <Col lg={9}>
                     <Select
                       value={selectedMulti_author}
                       isMulti={true}
@@ -487,15 +491,13 @@ const List = props => {
                   </Col>
                 </Row>
                 <Row className="mb-2">
-                  <Col lg={3} className="m-auto">
+                  <Col lg={12}>
                     <Label
-                      className="my-auto d-block text-left"
+                      className="d-block text-left mb-2"
                       for="kyclastname-input"
                     >
                       Категори
                     </Label>
-                  </Col>
-                  <Col lg={9}>
                     <Select
                       value={selectedMulti_category}
                       isMulti={true}
@@ -566,7 +568,9 @@ const List = props => {
             <Row>
               <Col lg={12}>
                 <FormGroup>
-                  <Label htmlFor="productdesc">Тайлбар</Label>
+                  <Label htmlFor="productdesc" className="w-100 text-left">
+                    Тайлбар
+                  </Label>
                   <textarea
                     className="form-control"
                     id="productdesc"
@@ -585,6 +589,15 @@ const List = props => {
           </Col> */}
           </SweetAlert>
         ) : null}
+        {loading_dialog ? (
+          <SweetAlert
+            title="Түр хүлээнэ үү"
+            info
+            showCloseButton={false}
+            showConfirm={false}
+            success
+          ></SweetAlert>
+        ) : null}
         {confirm_edit ? (
           <SweetAlert
             title="Та итгэлтэй байна уу ?"
@@ -595,8 +608,9 @@ const List = props => {
             confirmBtnBsStyle="success"
             cancelBtnBsStyle="danger"
             onConfirm={() => {
-              updateBook()
               set_confirm_edit(false)
+              setloading_dialog(true)
+              updateBook()
               set_edit_user_step(false)
               setsuccess_dlg(true)
               setdynamic_title("Амжилттай")
@@ -659,6 +673,7 @@ const List = props => {
             cancelBtnBsStyle="danger"
             onConfirm={() => {
               set_confirm_delete(false)
+              setloading_dialog(true)
               deleteBook(delete_book_id)
             }}
             onCancel={() => {
@@ -706,8 +721,8 @@ const List = props => {
                 bordered
                 data={book_datatable}
                 noBottomColumns
-                noRecordsFoundLabel={"Подкастын дугаар байхгүй"}
-                infoLabel={["", "-ээс", "дахь подкаст. Нийт", ""]}
+                noRecordsFoundLabel={"Ном байхгүй"}
+                infoLabel={["", "-ээс", "дахь ном. Нийт", ""]}
                 entries={5}
                 entriesOptions={[5, 10, 20]}
                 paginationLabel={["Өмнөх", "Дараах"]}

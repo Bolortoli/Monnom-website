@@ -14,7 +14,7 @@ const PodcastSinglePage = () => {
 
   // Check network
   const [isNetworkingError, setIsNetworkingError] = useState(false)
-  const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
+  const [isNetworkLoading, SetIsNetworkLoading] = useState(false)
 
   async function fetchData() {
     await axios({
@@ -29,6 +29,7 @@ const PodcastSinglePage = () => {
       .then(res => {
         set_data(res.data)
         setIsNetworkingError(false)
+        SetIsNetworkLoading(true)
       })
       .catch(err => {
         setIsNetworkingError(false)

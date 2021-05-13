@@ -25,11 +25,10 @@ import SweetAlert from "react-bootstrap-sweetalert"
 
 //Dropzone
 import Dropzone from "react-dropzone"
-import { useParams } from "react-router-dom"
+
 // require('dotenv').config()
 
 const AddPodcast = props => {
-  const { id } = useParams()
   var latestEpisodeNumber = props.latestEpisodeNumber
   const [modal, setModal] = useState(false)
   const [activeTab, set_activeTab] = useState(1)
@@ -192,10 +191,7 @@ const AddPodcast = props => {
           togglemodal()
         }}
       >
-        <i
-          className="bx bx-plus-medical font-size-18 d-block text-center"
-          id="edittooltip"
-        />
+        Подкаст нэмэх
       </Button>
 
       <Col xs={1} class="position-relative">
@@ -268,7 +264,6 @@ const AddPodcast = props => {
                               <Label for="kyclastname-input">Нэр</Label>
                               <Input
                                 type="text"
-                                className="podcast_channel"
                                 required
                                 value={podcast_name_value}
                                 onChange={e => {

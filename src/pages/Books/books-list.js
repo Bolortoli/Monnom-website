@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
 import SweetAlert from "react-bootstrap-sweetalert"
 import { Link } from "react-router-dom"
 import {
@@ -14,8 +15,11 @@ import {
   Pagination,
   PaginationLink,
   PaginationItem,
+  FormGroup,
+  Button,
 } from "reactstrap"
 
+import AddBook from "./AddBook"
 import Breadcrumbs from "../../components/Common/Breadcrumb"
 
 import axios from "axios"
@@ -160,7 +164,13 @@ const Books = () => {
   var ITEMS_PER_PAGE = 2
 
   const [booksList, setBooksList] = useState([])
+  const [admins_info, set_admins_info] = useState([])
+  const [book_info, set_book_info] = useState(null)
   const [searchItms, setSearchItms] = useState("")
+  const [admins_select, set_admins_select] = useState(true)
+  const [shiftBookform, set_shiftBookform] = useState(false)
+  const [get_admin, set_get_admin] = useState(false)
+  const [admin_id, set_admin_id] = useState(1)
   const [isNetworkingError, setIsNetworkingError] = useState(false)
   const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
   const [confirm_allow, set_confirm_allow] = useState(false)
@@ -215,7 +225,23 @@ const Books = () => {
     })
       .then(res => {
         setBooksList(res.data)
-        setIsNetworkingError(false)
+        axios({
+          url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/all-admins-list`,
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${
+              JSON.parse(localStorage.getItem("user_information")).jwt
+            }`,
+          },
+        })
+          .then(book => {
+            setIsNetworkingError(false)
+            set_admins_info(book.data)
+          })
+          .catch(err => {
+            setIsNetworkingError(true)
+            SetIsNetworkLoading(true)
+          })
       })
       .catch(err => {
         setIsNetworkingError(true)
@@ -228,12 +254,35 @@ const Books = () => {
     for (let i = 1; i <= Math.ceil(booksList.length / ITEMS_PER_PAGE); i++) {
       tempPaginations.push(i)
     }
-    console.log(tempPaginations)
+
     set_pagination_pages(tempPaginations)
   }, [booksList])
 
   useEffect(() => {
     fetchData()
+    // getBookInfo()
+  }, [admin_id])
+
+  async function getBookInfo() {
+    await axios({
+      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-single-by-author/${admin_id}`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
+      .then(res => {
+        set_book_info(res.data)
+        console.log("hhe")
+        console.log(res.data)
+      })
+      .catch(err => {})
+  }
+
+  useEffect(() => {
+    getBookInfo()
   }, [])
 
   return (
@@ -246,10 +295,19 @@ const Books = () => {
           </Alert>
         ) : (
           <>
-            {isNetworkLoading ? (
+            {isNetworkLoading && admins_info.length != 0 ? (
               <Container fluid>
                 <Row>
-                  <Col lg={4} />
+                  <Col lg={4}>
+                    <Link
+                      to="#"
+                      className="font-size-15 p-2 border border-primary rounded"
+                      onClick={() => set_get_admin(true)}
+                    >
+                      Ном нэмэх
+                    </Link>
+                  </Col>
+
                   <Col xl={4} lg={6} md={8} xs={8} sm={8}>
                     <form className="app-search d-none d-lg-block">
                       <div className="position-relative">
@@ -265,7 +323,7 @@ const Books = () => {
                       </div>
                     </form>
                   </Col>
-                  <Col lg={4}>
+                  <Col lg={3}>
                     <Pagination
                       style={{ backgroundColor: "red" }}
                       aria-label="Page navigation example"
@@ -357,6 +415,39 @@ const Books = () => {
             )}
           </>
         )}
+        {get_admin ? (
+          <SweetAlert showCloseButton={false} showConfirm={false}>
+            <Row>
+              <Col lg={12} className="d-block text-left">
+                <FormGroup className="select2-container mx-auto">
+                  <label className="control-label">Админ сонгох</label>
+                </FormGroup>
+              </Col>
+              <Col lg={12}>
+                <select
+                  className="form-control"
+                  id="admins"
+                  onChange={e => set_admin_id(e.target.value)}
+                >
+                  {admins_info.map(admin => (
+                    <option value={admin.id}>{admin.username}</option>
+                  ))}
+                </select>
+              </Col>
+              <Col lg={12} className="mt-5">
+                <Button
+                  type="button"
+                  color="primary"
+                  className="btn mr-1"
+                  onClick={() => set_get_admin(false)}
+                >
+                  Буцах
+                </Button>
+                <AddBook />
+              </Col>
+            </Row>
+          </SweetAlert>
+        ) : null}
         {confirm_allow ? (
           <SweetAlert
             title={are_you_sure_title}

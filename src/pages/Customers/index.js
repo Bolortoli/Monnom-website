@@ -8,6 +8,7 @@ import {
   CardTitle,
   Alert,
 } from "reactstrap"
+import { Link } from "react-router-dom"
 
 import Breadcrumbs from "../../components/Common/Breadcrumb"
 import GivePermission from "./givePermission"
@@ -18,7 +19,9 @@ require("dotenv").config()
 
 const Customers = () => {
   const [tableRows, setTableRows] = useState([])
-  const [isNetworking, setIsNetworking] = useState(false)
+  // Check network
+  const [isNetworkError, setIsNetworkError] = useState(false)
+  const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
   const [selected_user_id, set_selected_user_id] = useState(null)
   const [modal_toggle, set_modal_toggle] = useState(false)
 
@@ -103,10 +106,12 @@ const Customers = () => {
           }
         })
         setTableRows(tempRows)
-        setIsNetworking(false)
+        setIsNetworkError(false)
+        SetIsNetworkLoading(false)
       })
       .catch(err => {
-        setIsNetworking(true)
+        setIsNetworkError(true)
+        SetIsNetworkLoading(false)
       })
   }
 
@@ -122,41 +127,56 @@ const Customers = () => {
             title="Хэрэглэгчид"
             breadcrumbItem="Хэрэглэгчдийн жагсаалт"
           />
-          {isNetworking ? (
+          {isNetworkError ? (
             <Alert color="danger" role="alert">
               Сүлжээ уналаа ! Дахин ачааллна уу ?
             </Alert>
           ) : (
-            <Row>
-              {modal_toggle ? (
-                <GivePermission
-                  set_modal_toggle={set_modal_toggle}
-                  modal_toggle={modal_toggle}
-                  selected_user_id={selected_user_id}
-                  setIsNetworking={setIsNetworking}
-                />
-              ) : null}
-              <Col className="col-12">
-                <Card>
-                  <CardBody>
-                    <CardTitle>Хэрэглэгчдийн жагсаалт</CardTitle>
-                    <MDBDataTable
-                      responsive
-                      bordered
-                      data={data}
-                      noBottomColumns
-                      noRecordsFoundLabel={"Хэрэглэгч байхгүй"}
-                      infoLabel={["", "-ээс", "дахь хэрэглэгч. Нийт", ""]}
-                      entries={5}
-                      entriesOptions={[5, 10, 20]}
-                      paginationLabel={["Өмнөх", "Дараах"]}
-                      searchingLabel={"Хайх"}
-                      searching
+            <>
+              {isNetworkLoading ? (
+                <Row>
+                  <Col xs="12">
+                    <div className="text-center my-3">
+                      <Link to="#" className="text-success">
+                        <i className="bx bx-hourglass bx-spin mr-2" />
+                        Ачааллаж байна
+                      </Link>
+                    </div>
+                  </Col>
+                </Row>
+              ) : (
+                <Row>
+                  {modal_toggle ? (
+                    <GivePermission
+                      set_modal_toggle={set_modal_toggle}
+                      modal_toggle={modal_toggle}
+                      selected_user_id={selected_user_id}
+                      setIsNetworkError={setIsNetworkError}
                     />
-                  </CardBody>
-                </Card>
-              </Col>
-            </Row>
+                  ) : null}
+                  <Col className="col-12">
+                    <Card>
+                      <CardBody>
+                        <CardTitle>Хэрэглэгчдийн жагсаалт</CardTitle>
+                        <MDBDataTable
+                          responsive
+                          bordered
+                          data={data}
+                          noBottomColumns
+                          noRecordsFoundLabel={"Хэрэглэгч байхгүй"}
+                          infoLabel={["", "-ээс", "дахь хэрэглэгч. Нийт", ""]}
+                          entries={5}
+                          entriesOptions={[5, 10, 20]}
+                          paginationLabel={["Өмнөх", "Дараах"]}
+                          searchingLabel={"Хайх"}
+                          searching
+                        />
+                      </CardBody>
+                    </Card>
+                  </Col>
+                </Row>
+              )}
+            </>
           )}
         </Container>
       </div>

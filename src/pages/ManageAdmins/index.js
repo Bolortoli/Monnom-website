@@ -34,6 +34,7 @@ const ManageAdmins = () => {
   const [usersList, setUsersList] = useState([])
   const [addAdminStep1, setAddAdminStep1] = useState(false)
   const [profile_picture_create, set_profile_picture_create] = useState(null)
+  const [loading_dialog, setloading_dialog] = useState(false)
 
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
@@ -161,6 +162,9 @@ const ManageAdmins = () => {
             tempResponse.profile_picture = res.data[0]
             setsuccess_dialog(true)
             SetIsNetworkLoading(false)
+            setTimeout(() => {
+              window.location.reload()
+            }, 2000)
           })
           .catch(err => {
             seterror_dialog(true)
@@ -482,6 +486,7 @@ const ManageAdmins = () => {
                         user={user}
                         key={"_user_" + key}
                         initializeUsersList={initializeUsersList}
+                        setloading_dialog={setloading_dialog}
                       />
                     ))}
                   </Row>
@@ -500,6 +505,15 @@ const ManageAdmins = () => {
               )}
             </>
           )}
+          {loading_dialog ? (
+            <SweetAlert
+              title="Түр хүлээнэ үү"
+              info
+              showCloseButton={false}
+              showConfirm={false}
+              success
+            ></SweetAlert>
+          ) : null}
           {success_dialog ? (
             <SweetAlert
               title={"Амжилттай"}

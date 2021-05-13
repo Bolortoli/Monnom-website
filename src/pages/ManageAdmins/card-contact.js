@@ -75,14 +75,16 @@ const CardContact = props => {
       },
     })
       .then(res => {
-        console.log(res.data)
-        console.log(props.initializeUsersList([res.data]))
+        // console.log(res.data)
+        // console.log(props.initializeUsersList([res.data]))
+        props.setloading_dialog(false)
         props.success(true)
         set_edit_form_loading(false)
         set_user(props.initializeUsersList([res.data])[0])
         set_user_update_modal_center(false)
       })
       .catch(err => {
+        props.setloading_dialog(false)
         props.error(true)
         set_edit_form_loading(false)
         console.log(err)
@@ -339,7 +341,10 @@ const CardContact = props => {
                   >
                     <button
                       type="reset"
-                      onClick={() => sendEditUserRequest(user.id)}
+                      onClick={() => {
+                        props.setloading_dialog(true)
+                        sendEditUserRequest(user.id)
+                      }}
                       className="btn btn-success waves-effect btn-label waves-light"
                     >
                       <i className="bx bx-check-double label-icon"></i> Засах

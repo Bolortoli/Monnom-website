@@ -19,7 +19,6 @@ import List from "./List"
 import axios from "axios"
 
 const PodcastDetail = props => {
-  // console.log(props.user)
   const [data, set_data] = useState(null)
 
   const [edit_detail, set_edit_detail] = useState(false)

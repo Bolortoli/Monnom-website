@@ -86,7 +86,7 @@ const AddBook = props => {
     data["has_audio"] = audio_book_files.length != 0 ? true : false
     data["has_pdf"] = book_files.length != 0 ? true : false
     data["book_categories"] = categories
-    data["users_permissions_user"] = props.user_id
+    data["users_permissions_user"] = props.admin_id
     data["youtube_intro"] = youtube_url_value
     data["introduction"] = book_introduction_value
     data["book_authors"] = authors
@@ -177,12 +177,17 @@ const AddBook = props => {
   }
 
   useEffect(() => {
-    getAuthorsCategoriesInfo(
-      props.available_authors,
-      props.available_categories
-    )
+    console.log("book id")
+    console.log(props.admin_id)
+    if (props.available_authors != null) {
+      getAuthorsCategoriesInfo(
+        props.available_authors,
+        props.available_categories
+      )
+    }
+
     // makeGetReq()
-  }, [])
+  }, [props])
 
   // file upload hiih
   const handleAcceptedFiles = files => {
@@ -374,55 +379,22 @@ const AddBook = props => {
 
   return (
     <React.Fragment>
-      <Button type="button" color="success" onClick={togglemodal}>
-        <i
-          className="bx bx-plus-medical font-size-18 text-center"
-          id="edittooltip"
-        />
+      <Button
+        className="btn btn-success ml-1"
+        type="button"
+        color="success"
+        onClick={() => {
+          togglemodal()
+        }}
+      >
+        Үргэлжлүүлэх 
       </Button>
+      {/* {props.shiftBookform ? togglemodal() : null} */}
       {netWork === false ? (
         <Col xs={1} class="position-relative">
-          {confirm_edit ? (
-            <SweetAlert
-              title="Та итгэлтэй байна уу ?"
-              warning
-              showCancel
-              confirmBtnText="Тийм"
-              cancelBtnText="Болих"
-              confirmBtnBsStyle="success"
-              cancelBtnBsStyle="danger"
-              onConfirm={() => {
-                set_confirm_edit(false)
-                setloading_dialog(true)
-                createBook()
-              }}
-              onCancel={() => {
-                set_confirm_edit(false)
-                togglemodal()
-              }}
-            ></SweetAlert>
-          ) : null}
-          {success_dlg ? (
-            <SweetAlert
-              title={"Амжилттай"}
-              timeout={1500}
-              style={{
-                position: "absolute",
-                top: "center",
-                right: "center",
-              }}
-              showCloseButton={false}
-              showConfirm={false}
-              success
-              onConfirm={() => {
-                setsuccess_dlg(false)
-              }}
-            >
-              {"Та шинэ подкаст амжилттай нэмлээ."}
-            </SweetAlert>
-          ) : null}
           <Card>
             <Modal
+              style={{ zIndex: "101" }}
               isOpen={modal}
               role="dialog"
               size="lg"
@@ -988,7 +960,7 @@ const AddBook = props => {
                               selectedFiles != ""
                             ) {
                               togglemodal()
-                              
+
                               set_confirm_edit(true)
                             }
                           }}
@@ -1003,6 +975,45 @@ const AddBook = props => {
             </Modal>
           </Card>
         </Col>
+      ) : null}
+      {confirm_edit ? (
+        <SweetAlert
+          title="Та итгэлтэй байна уу ?"
+          warning
+          showCancel
+          confirmBtnText="Тийм"
+          cancelBtnText="Болих"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            set_confirm_edit(false)
+            setloading_dialog(true)
+            createBook()
+          }}
+          onCancel={() => {
+            set_confirm_edit(false)
+            togglemodal()
+          }}
+        ></SweetAlert>
+      ) : null}
+      {success_dlg ? (
+        <SweetAlert
+          title={"Амжилттай"}
+          timeout={1500}
+          style={{
+            position: "absolute",
+            top: "center",
+            right: "center",
+          }}
+          showCloseButton={false}
+          showConfirm={false}
+          success
+          onConfirm={() => {
+            setsuccess_dlg(false)
+          }}
+        >
+          {"Та шинэ подкаст амжилттай нэмлээ."}
+        </SweetAlert>
       ) : null}
       {loading_dialog ? (
         <SweetAlert

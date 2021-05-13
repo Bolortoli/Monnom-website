@@ -15,14 +15,13 @@ import {
   PaginationLink,
 } from "reactstrap"
 import axios from "axios"
-require("dotenv").config()
+import AddPodcast from "./AddPodcast"
 
 const ContactsGrid = props => {
   const [data, set_data] = useState([])
   const ITEMS_PER_PAGE = 12
 
   const [searchItms, setSearchItms] = useState("")
-  const [load, setLoad] = useState(false)
   const [confirm_allow, set_confirm_allow] = useState(false)
   const [pagination_current, set_pagination_current] = useState(1)
   const [pagination_pages, set_pagination_pages] = useState([])
@@ -33,9 +32,9 @@ const ContactsGrid = props => {
   })
   const [success_dialog, setsuccess_dialog] = useState(false)
   const [error_dialog, seterror_dialog] = useState(false)
+  const [loading_dialog, setloading_dialog] = useState(false)
 
   async function featurePodcastChannel() {
-    setLoad(true)
     await axios({
       url: `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-channels/${channel_info_to_update.id}`,
       method: "PUT",
@@ -49,14 +48,14 @@ const ContactsGrid = props => {
       },
     })
       .then(res => {
-        setLoad(false)
+        setloading_dialog(false)
+        setsuccess_dialog(true)
         let tempChannels = Object.assign(data)
         tempChannels.find(channel => channel.id === res.data.id).is_featured =
           res.data.is_featured
-        setsuccess_dialog(true)
       })
       .catch(err => {
-        setLoad(false)
+        setloading_dialog(false)
         seterror_dialog(true)
       })
   }
@@ -77,7 +76,9 @@ const ContactsGrid = props => {
   return (
     <React.Fragment>
       <Row>
-        <Col lg={4}></Col>
+        <Col lg={4}>
+          <AddPodcast latestEpisodeNumber={props.user_podcasts} />
+        </Col>
 
         <Col xl={4} lg={6} md={8} xs={8} sm={8}>
           <form className="app-search d-none d-lg-block">
@@ -139,151 +140,149 @@ const ContactsGrid = props => {
           </Pagination>
         </Col>
       </Row>
-      {load ? (
-        <Row>
-          <Col xs="12">
-            <div className="text-center my-3">
-              <Link to="#" className="text-success">
-                <i className="bx bx-hourglass bx-spin mr-2" />
-                Уншиж байна
-              </Link>
-            </div>
-          </Col>
-        </Row>
-      ) : (
-        <Row>
-          {data
-            ? data
-                .filter(val => {
-                  if (searchItms === "") {
-                    return val
-                  } else if (
-                    val.podcast_name
-                      .toLocaleLowerCase()
-                      .includes(searchItms.toLocaleLowerCase())
-                  ) {
-                    return val
-                  }
-                })
 
-                .map(podcast => {
-                  try {
-                    if (
-                      podcast.pagination_number <=
-                        pagination_current * ITEMS_PER_PAGE &&
-                      podcast.pagination_number >
-                        pagination_current * ITEMS_PER_PAGE - ITEMS_PER_PAGE
-                    )
-                      return (
-                        <Col xl={3} lg={4} md={4} sm={4} xs={6}>
-                          <Card>
-                            <CardImg
-                              top
-                              src={
-                                process.env.REACT_APP_STRAPI_BASE_URL +
-                                podcast.podcast_pic_url
-                              }
-                              alt={podcast.podcast_name}
-                              className="img-fluid mx-auto"
-                              style={{
-                                width: "98%",
-                                height: "30vh",
-                                overflow: "visible",
-                              }}
-                            />
-                            <CardBody>
-                              <CardTitle className="mt-0 d-flex">
-                                <h3 className="mr-2">
-                                  {podcast.podcast_name.slice(0, 30)}
-                                  {podcast.pagination_number}
-                                </h3>
-                                <h3>- {podcast.episode_count}</h3>
-                              </CardTitle>
-                              <CardText>
-                                <Row>
-                                  <Col xl={6} className="text-left">
-                                    Нэмэгдсэн огноо:
-                                  </Col>
-                                  <Col xl={6} className="text-right">
-                                    <b>
-                                      {new Date(
-                                        podcast.podcast_added_date
-                                      ).toLocaleDateString()}
-                                    </b>
-                                  </Col>
-                                </Row>
-                                <Row className="mt-2">
-                                  <Col xl={6} className="text-left">
-                                    Нэр:
-                                  </Col>
-                                  <Col xl={6} className="text-right">
-                                    <b>
-                                      {podcast.podcast_author.firstname.slice(
-                                        0,
-                                        14
-                                      )}
-                                    </b>
-                                  </Col>
-                                </Row>
-                              </CardText>
+      <Row>
+        {data
+          ? data
+              .filter(val => {
+                if (searchItms === "") {
+                  return val
+                } else if (
+                  val.podcast_name
+                    .toLocaleLowerCase()
+                    .includes(searchItms.toLocaleLowerCase())
+                ) {
+                  return val
+                }
+              })
+
+              .map(podcast => {
+                try {
+                  if (
+                    podcast.pagination_number <=
+                      pagination_current * ITEMS_PER_PAGE &&
+                    podcast.pagination_number >
+                      pagination_current * ITEMS_PER_PAGE - ITEMS_PER_PAGE
+                  )
+                    return (
+                      <Col xl={3} lg={4} md={4} sm={4} xs={6}>
+                        <Card>
+                          <CardImg
+                            top
+                            src={
+                              process.env.REACT_APP_STRAPI_BASE_URL +
+                              podcast.podcast_pic_url
+                            }
+                            alt={podcast.podcast_name}
+                            className="img-fluid mx-auto"
+                            style={{
+                              width: "98%",
+                              height: "30vh",
+                              overflow: "visible",
+                            }}
+                          />
+                          <CardBody>
+                            <CardTitle className="mt-0 d-flex">
+                              <h3 className="mr-2">
+                                {podcast.podcast_name.slice(0, 30)}
+                                {podcast.pagination_number}
+                              </h3>
+                              <h3>- {podcast.episode_count}</h3>
+                            </CardTitle>
+                            <CardText>
                               <Row>
                                 <Col xl={6} className="text-left">
-                                  <Link
-                                    to={"/podcastSingle/" + podcast.id}
-                                    className="btn btn-primary waves-effect waves-light"
-                                  >
-                                    Дэлгэрэнгүй
-                                  </Link>
+                                  Нэмэгдсэн огноо:
                                 </Col>
-                                <Col
-                                  xl={6}
-                                  className="text-right d-flex align-items-center justify-content-center"
-                                >
-                                  <div class="custom-control custom-checkbox">
-                                    <input
-                                      type="checkbox"
-                                      class="custom-control-input"
-                                      id={`customCheck1-${podcast.id}`}
-                                      onClick={() => {
-                                        if (podcast.is_featured) {
-                                          console.log("podcast.podcast_name")
-                                          set_are_you_sure_title(
-                                            `${podcast.podcast_name} сувгийг онцлох сувгаас хасах гэж байна. Та итгэлтэй байна уу?`
-                                          )
-                                        } else {
-                                          console.log(podcast.podcast_name)
-                                          set_are_you_sure_title(
-                                            `${podcast.podcast_name} сувгийг онцлох суваг болгох гэж байна. Та итгэлтэй байна уу?`
-                                          )
-                                        }
-                                        set_channel_info_to_update({
-                                          id: podcast.id,
-                                          state: podcast.is_featured,
-                                        })
-                                        set_confirm_allow(true)
-                                      }}
-                                      checked={podcast.is_featured}
-                                    />
-                                    <label
-                                      class="custom-control-label"
-                                      for={`customCheck1-${podcast.id}`}
-                                    >
-                                      Онцлох
-                                    </label>
-                                  </div>
+                                <Col xl={6} className="text-right">
+                                  <b>
+                                    {new Date(
+                                      podcast.podcast_added_date
+                                    ).toLocaleDateString()}
+                                  </b>
                                 </Col>
                               </Row>
-                            </CardBody>
-                          </Card>
-                        </Col>
-                      )
-                  } catch (e) {
-                    ;<Alert color="primary">ERROR! {e}</Alert>
-                  }
-                })
-            : null}
-        </Row>
-      )}
+                              <Row className="mt-2">
+                                <Col xl={6} className="text-left">
+                                  Нэр:
+                                </Col>
+                                <Col xl={6} className="text-right">
+                                  <b>
+                                    {podcast.podcast_author.firstname.slice(
+                                      0,
+                                      14
+                                    )}
+                                  </b>
+                                </Col>
+                              </Row>
+                            </CardText>
+                            <Row>
+                              <Col xl={6} className="text-left">
+                                <Link
+                                  to={"/podcastSingle/" + podcast.id}
+                                  className="btn btn-primary waves-effect waves-light"
+                                >
+                                  Дэлгэрэнгүй
+                                </Link>
+                              </Col>
+                              <Col
+                                xl={6}
+                                className="text-right d-flex align-items-center justify-content-center"
+                              >
+                                <div class="custom-control custom-checkbox">
+                                  <input
+                                    type="checkbox"
+                                    class="custom-control-input"
+                                    id={`customCheck1-${podcast.id}`}
+                                    onClick={() => {
+                                      if (podcast.is_featured) {
+                                        console.log("podcast.podcast_name")
+                                        set_are_you_sure_title(
+                                          `${podcast.podcast_name} сувгийг онцлох сувгаас хасах гэж байна. Та итгэлтэй байна уу?`
+                                        )
+                                      } else {
+                                        console.log(podcast.podcast_name)
+                                        set_are_you_sure_title(
+                                          `${podcast.podcast_name} сувгийг онцлох суваг болгох гэж байна. Та итгэлтэй байна уу?`
+                                        )
+                                      }
+                                      set_channel_info_to_update({
+                                        id: podcast.id,
+                                        state: podcast.is_featured,
+                                      })
+                                      set_confirm_allow(true)
+                                    }}
+                                    checked={podcast.is_featured}
+                                  />
+                                  <label
+                                    class="custom-control-label"
+                                    for={`customCheck1-${podcast.id}`}
+                                  >
+                                    Онцлох
+                                  </label>
+                                </div>
+                              </Col>
+                            </Row>
+                          </CardBody>
+                        </Card>
+                      </Col>
+                    )
+                } catch (e) {
+                  ;<Alert color="primary">ERROR! {e}</Alert>
+                }
+              })
+          : null}
+      </Row>
+
+      {loading_dialog ? (
+        <SweetAlert
+          title="Түр хүлээнэ үү"
+          info
+          showCloseButton={false}
+          showConfirm={false}
+          success
+        ></SweetAlert>
+      ) : null}
       {confirm_allow ? (
         <SweetAlert
           title={are_you_sure_title}
@@ -295,6 +294,7 @@ const ContactsGrid = props => {
           cancelBtnBsStyle="danger"
           onConfirm={() => {
             set_confirm_allow(false)
+            setloading_dialog(true)
             featurePodcastChannel()
           }}
           onCancel={() => {
