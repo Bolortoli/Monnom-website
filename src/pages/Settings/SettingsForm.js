@@ -31,15 +31,15 @@ const SettingsForm = () => {
   const [channel_name, set_channel_name] = useState("")
   const [podcast_category, set_podcast_category] = useState([])
   const [selectedMulti_category, setSelectedMulti_category] = useState(null)
-  const [admin_selected, set_admin_selected] = useState("")
+  const [admin_selected, set_admin_selected] = useState(null)
   const [podcast_pic, set_podcast_pic] = useState("")
   const [channel_desc, set_channel_desc] = useState("")
 
-  const [author_category_label, set_author_category_label] = useState("")
-  const [book_category_label, set_book_category_label] = useState("")
-  const [podcast_category_id, set_podcast_category_id] = useState(0)
-  const [book_category_id, set_book_category_id] = useState(0)
-  const [author_category_id, set_author_category_id] = useState(0)
+  const [channel_cover_pic, set_channel_cover_pic] = useState(null)
+  const [podcast_category_id, set_podcast_category_id] = useState(null)
+  const [book_category_id, set_book_category_id] = useState(null)
+  const [author_category_id, set_author_category_id] = useState(null)
+  const [special_book_id, set_special_book_id] = useState(null)
 
   const [confirm_terms, set_confirm_terms] = useState(false)
   const [confirm_save_book, set_confirm_save_book] = useState(false)
@@ -74,39 +74,6 @@ const SettingsForm = () => {
   )
   const [termsData, setTermsData] = useState(false)
 
-  const addAuthorCategory = async () => {
-    const formData = new FormData()
-    console.log("author")
-    console.log(new_author_category)
-
-    formData.append("book_authors.label", new_author_category)
-
-    const config = {
-      headers: {
-        "content-type": "multipart/form-data",
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    }
-
-    await axios
-      .post(
-        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`,
-        {
-          book_authors: new_author_category,
-        },
-        config
-      )
-      .then(res => {
-        setloading_dialog(false)
-        setsuccess_dialog(true)
-      })
-      .catch(err => {
-        setloading_dialog(false)
-        seterror_dialog(true)
-      })
-  }
 
   const addBookCategory = async () => {
     const formData = new FormData()
@@ -115,7 +82,6 @@ const SettingsForm = () => {
 
     const config = {
       headers: {
-        "content-type": "multipart/form-data",
         Authorization: `Bearer ${
           JSON.parse(localStorage.getItem("user_information")).jwt
         }`,
@@ -123,13 +89,18 @@ const SettingsForm = () => {
     }
     await axios
       .post(
-        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`,
-        formData,
+        `${process.env.REACT_APP_STRAPI_BASE_URL}/book-categories`,
+        {
+          name: new_book_category
+        },
         config
       )
       .then(res => {
         setloading_dialog(false)
         setsuccess_dialog(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000);
       })
       .catch(err => {
         setloading_dialog(false)
@@ -137,41 +108,54 @@ const SettingsForm = () => {
       })
   }
 
-  const addPodcastCategory = async () => {
-    const formData = new FormData()
-
-    formData.append("book_authors.label", new_podcast_category)
+  const addBookAuthor = async () => {
 
     const config = {
       headers: {
-        "content-type": "multipart/form-data",
         Authorization: `Bearer ${
           JSON.parse(localStorage.getItem("user_information")).jwt
         }`,
       },
     }
+
     await axios
       .post(
-        `${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`,
-        formData,
+        `${process.env.REACT_APP_STRAPI_BASE_URL}/book-authors`,
+        {
+          author_name: new_author_category,
+        },
         config
       )
       .then(res => {
         setloading_dialog(false)
         setsuccess_dialog(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000);
       })
       .catch(err => {
         setloading_dialog(false)
         seterror_dialog(true)
       })
   }
-
-  const deleteAuthorCategory = async id => {
+  
+  const deleteBookCategory = async id => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+    
     await axios
-      .delete(`${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`)
+      .delete(`${process.env.REACT_APP_STRAPI_BASE_URL}/book-categories/${book_category_id}`, config)
       .then(async res => {
         setloading_dialog(false)
         setsuccess_dialog(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000);
       })
       .catch(res => {
         setloading_dialog(false)
@@ -179,12 +163,22 @@ const SettingsForm = () => {
       })
   }
 
-  const deleteBookCategory = async id => {
+  const deleteBookAuthor = async id => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
     await axios
-      .delete(`${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`)
+      .delete(`${process.env.REACT_APP_STRAPI_BASE_URL}/book-authors/${id}`, config)
       .then(async res => {
         setloading_dialog(false)
         setsuccess_dialog(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000);
       })
       .catch(res => {
         setloading_dialog(false)
@@ -193,13 +187,21 @@ const SettingsForm = () => {
   }
 
   const deletePodcastCategory = async id => {
-    console.log("hudlaa da")
-    console.log(podcast_category_id)
+    const config = {
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
     await axios
-      .delete(`${process.env.REACT_APP_EXPRESS_BASE_URL}/settings-page`)
+      .delete(`${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-categories/${id}`, config)
       .then(async res => {
         setloading_dialog(false)
         setsuccess_dialog(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000);
       })
       .catch(res => {
         setloading_dialog(false)
@@ -207,34 +209,29 @@ const SettingsForm = () => {
       })
   }
 
-  const createPodcastChannel = async () => {
-    const formData = new FormData()
-
-    let categories = selectedMulti_category.map(cat => cat.value.toString())
-
-    formData.append("podcast_name", channel_name)
-    formData.append("podcast_author", admin_selected)
-    formData.append("podcast_pic_url", podcast_pic)
-    formData.append("channel_categories", categories)
-
+  const addPodcastCategory = async () => {
+    
     const config = {
       headers: {
-        "content-type": "multipart/form-data",
         Authorization: `Bearer ${
           JSON.parse(localStorage.getItem("user_information")).jwt
         }`,
       },
     }
-
     await axios
       .post(
-        `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels`,
-        formData,
+        `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-categories`,
+        {
+          name: new_podcast_category
+        },
         config
       )
-      .then(async res => {
+      .then(res => {
         setloading_dialog(false)
         setsuccess_dialog(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000);
       })
       .catch(err => {
         setloading_dialog(false)
@@ -243,7 +240,9 @@ const SettingsForm = () => {
   }
 
   const saveBook = async () => {
-    const formData = new FormData()
+    setloading_dialog(true)
+
+    console.log(special_book_id)
 
     const config = {
       headers: {
@@ -255,13 +254,16 @@ const SettingsForm = () => {
 
     await axios
       .put(
-        `${process.env.REACT_APP_STRAPI_BASE_URL}/books/${delete_book_id}`,
-        {},
+        `${process.env.REACT_APP_STRAPI_BASE_URL}/special-book/`,
+        {book: special_book_id},
         config
       )
       .then(async => {
         setloading_dialog(false)
         setsuccess_dialog(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000);
       })
       .catch(err => {
         setloading_dialog(false)
@@ -269,6 +271,47 @@ const SettingsForm = () => {
       })
   }
 
+  const createPodcastChannel = async () => {
+    const formData = new FormData()
+
+    let data = {
+      name: channel_name,
+      users_permissions_user: admin_selected,
+      description: channel_desc,
+      podcast_categories: selectedMulti_category.map(cat => cat.value.toString())
+    }
+
+    formData.append("data", JSON.stringify(data))
+    formData.append("files.cover_pic", channel_cover_pic)
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },  
+    }
+
+    await axios
+      .post(
+        `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-channels`,
+        formData,
+        config
+      )
+      .then(async res => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000);
+      })
+      .catch(err => {
+        setloading_dialog(false)
+        seterror_dialog(true)
+      })
+  }
+  
   const updateTerms = async () => {
     const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/terms-and-conditions`
     const formData = new FormData()
@@ -336,7 +379,7 @@ const SettingsForm = () => {
 
   async function fetchAdmins() {
     await axios({
-      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/all-admins-list`,
+      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/all-admins-settings`,
       method: "GET",
       headers: {
         Authorization: `Bearer ${
@@ -406,6 +449,7 @@ const SettingsForm = () => {
       }
     }
     reader.readAsDataURL(e.target.files[0])
+    set_channel_cover_pic(e.target.files[0])
   }
 
   return (
@@ -482,7 +526,7 @@ const SettingsForm = () => {
                   <CardBody>
                     <Row>
                       <Col lg={12} className="w-100 mx-auto mb-3">
-                        <p>Категори сонгох</p>
+                        <p>Зохиолч сонгох</p>
                         <select
                           className="form-control"
                           id="bookAuthorsCategory"
@@ -491,6 +535,9 @@ const SettingsForm = () => {
                             console.log("id [ ", e.target.value)
                           }}
                         >
+                          <option selected defaultValue hidden value={null}>
+                            --Сонгох--
+                          </option>
                           {old_author_category.length != 0
                             ? old_author_category.map(author => (
                                 <option value={author.value}>
@@ -528,15 +575,11 @@ const SettingsForm = () => {
                         </Row>
                       </Col>
                       <Col lg={12}>
-                        <Label>Сонгосон категори</Label>
+                        <Label>Сонгосон зохиолч</Label>
                         <Row>
                           <Col lg={10}>
                             <Label className="form-control mt-1">
-                              {old_author_category.length != 0 &&
-                              author_category_id != 0
-                                ? old_author_category[author_category_id - 1]
-                                    .label
-                                : null}
+                              {author_category_id != null ? old_author_category.find(author => author.value == author_category_id).label : null}
                             </Label>
                           </Col>
                           <Col lg={2}>
@@ -570,6 +613,9 @@ const SettingsForm = () => {
                           id="bookCategory"
                           onChange={e => set_book_category_id(e.target.value)}
                         >
+                          <option selected defaultValue hidden value={null}>
+                            --Сонгох--
+                          </option>
                           {old_book_category.length != 0
                             ? old_book_category.map(book => {
                                 return (
@@ -614,10 +660,7 @@ const SettingsForm = () => {
                         <Row>
                           <Col lg={10}>
                             <Label className="form-control mt-1">
-                              {old_book_category.length != 0 &&
-                              book_category_id != 0
-                                ? old_book_category[book_category_id - 1].label
-                                : null}
+                            {book_category_id != null ? old_book_category.find(category => category.value == book_category_id).label : null}
                             </Label>
                           </Col>
                           <Col lg={2}>
@@ -650,9 +693,14 @@ const SettingsForm = () => {
                           className="form-control"
                           id="podcastCategory"
                           onChange={e => {
+                            console.log(e.target.value)
                             set_podcast_category_id(e.target.value)
                           }}
                         >
+                          <option selected defaultValue hidden value={null}>
+                            --Сонгох--
+                          </option>
+                  
                           {old_podcast_category.length != 0
                             ? old_podcast_category.map(podcast => (
                                 <option value={podcast.value}>
@@ -667,24 +715,11 @@ const SettingsForm = () => {
                         <Label>Төрөл нэмэх</Label>
                         <Row>
                           <Col lg={10}>
-                            <input
-                              className="form-control mt-1"
-                              type="text"
-                              placeholder="Төрөл оруулах"
-                              onChange={e =>
-                                set_new_podcast_category(e.target.value)
-                              }
+                            <input className="form-control mt-1" type="text" placeholder="Төрөл оруулах" onChange={e => set_new_podcast_category(e.target.value) }
                             />
                           </Col>
                           <Col lg={2}>
-                            <Button
-                              to="#"
-                              color="light"
-                              className="mt-1 py-2 px-3 border border-light"
-                              onClick={() => {
-                                set_confirm_add_podcast_category(true)
-                              }}
-                            >
+                            <Button to="#" color="light" className="mt-1 py-2 px-3 border border-light" onClick={() => {set_confirm_add_podcast_category(true)}}>
                               Нэмэх
                             </Button>
                           </Col>
@@ -695,11 +730,7 @@ const SettingsForm = () => {
                         <Row>
                           <Col lg={10}>
                             <Label className="form-control mt-1">
-                              {old_podcast_category.length != 0 &&
-                              podcast_category_id != 0
-                                ? old_podcast_category[podcast_category_id - 1]
-                                    .label
-                                : []}
+                              {podcast_category_id != null ? old_podcast_category.find(category => category.value == podcast_category_id).label : null}
                             </Label>
                           </Col>
                           <Col lg={2}>
@@ -722,7 +753,7 @@ const SettingsForm = () => {
                 <Row>
                   <Col lg={12}>
                     <Card>
-                      <CardTitle className="p-3">Ном хадгалах</CardTitle>
+                      <CardTitle className="p-3">Онцгой ном хадгалах</CardTitle>
                       <CardBody>
                         <Row>
                           {/* <Col lg={3}>
@@ -732,11 +763,14 @@ const SettingsForm = () => {
                             <select
                               className="form-control"
                               id="allBooks"
-                              onChange={e => set_all_books(e.target.value)}
+                              onChange={e => set_special_book_id(e.target.value)}
                             >
+                              <option selected defaultValue hidden value={null}>
+                                --Сонгох--
+                              </option>
                               {all_books.length != 0
                                 ? all_books.map(book => (
-                                    <option>{book.name}</option>
+                                    <option value={book.id} >{book.name}</option>
                                   ))
                                 : null}
                             </select>
@@ -779,11 +813,16 @@ const SettingsForm = () => {
                         <select
                           className="form-control"
                           id="allAdmins"
-                          onChange={e => set_admin_selected(e.target.value)}
+                          onChange={e => {
+                            set_admin_selected(e.target.value)
+                          }}
                         >
+                          <option selected defaultValue hidden value={null}>
+                            --Сонгох--
+                          </option>
                           {all_admins.length != 0
                             ? all_admins.map(admin => (
-                                <option>{admin.username}</option>
+                                <option value={admin.id}>{admin.username}</option>
                               ))
                             : null}
                         </select>
@@ -902,7 +941,7 @@ const SettingsForm = () => {
             onConfirm={() => {
               setloading_dialog(true)
               set_confirm_add_author(false)
-              addAuthorCategory()
+              addBookAuthor()
             }}
             onCancel={() => {
               set_confirm_add_author(false)
@@ -921,7 +960,7 @@ const SettingsForm = () => {
             onConfirm={() => {
               setloading_dialog(true)
               set_confirm_remove_author(false)
-              deleteAuthorCategory(author_category_id)
+              deleteBookAuthor(author_category_id)
             }}
             onCancel={() => {
               set_confirm_terms(false)
@@ -1016,7 +1055,11 @@ const SettingsForm = () => {
             onConfirm={() => {
               setloading_dialog(true)
               set_confirm_add_podcast_channel(false)
-              createPodcastChannel()
+              if (channel_cover_pic == null || admin_selected == null)
+                seterror_dialog(false)
+              else {
+                createPodcastChannel()
+              }
             }}
             onCancel={() => {
               set_confirm_add_podcast_channel(false)
@@ -1025,7 +1068,7 @@ const SettingsForm = () => {
         ) : null}
         {confirm_save_book ? (
           <SweetAlert
-            title="Подкаст суваг нэмэх"
+            title="Онцгой ном хадгалах"
             info
             showCancel
             confirmBtnText="Тийм"
@@ -1033,7 +1076,8 @@ const SettingsForm = () => {
             confirmBtnBsStyle="success"
             cancelBtnBsStyle="danger"
             onConfirm={() => {
-              setloading_dialog(true)
+              if (special_book_id != null)
+                saveBook()
               set_confirm_save_book(false)
             }}
             onCancel={() => {

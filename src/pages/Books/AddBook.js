@@ -27,7 +27,7 @@ import SweetAlert from "react-bootstrap-sweetalert"
 import Select from "react-select"
 
 const AddBook = props => {
-  const [admin_id, set_admin_id] = useState(1)
+  const [admin_id, set_admin_id] = useState(null)
 
   const [netWork, set_netWork] = useState(false)
   const [modal, setModal] = useState(false)
@@ -119,46 +119,88 @@ const AddBook = props => {
       .post(`${process.env.REACT_APP_STRAPI_BASE_URL}/books`, formData, config)
       .then(async res => {
         let tempAudioRequests = []
-        for (let i = 0; i < audio_book_files_for_save.length; i++) {
-          console.log(audio_book_files_for_save[i])
-          let tempFormData = new FormData()
-          let data = {
-            chapter_name: audio_book_files_for_save[i].name
-              .split(".")
-              .slice(0, -1)
-              .join("."),
-            book: res.data.id,
-            number: i,
-          }
-          tempFormData.append("data", JSON.stringify(data))
-          tempFormData.append("files.mp3_file", audio_book_files_for_save[i])
-          tempAudioRequests.push(
-            axios.post(
-              `${process.env.REACT_APP_STRAPI_BASE_URL}/book-audios`,
-              tempFormData,
-              config
-            )
+        let promises = []
+
+        audio_book_files_for_save.forEach((file, index) => {
+          promises.push(
+            getAudioFileDuration(audio_book_files_for_save[index])
+              .then(resp => {
+                let audio_duration = resp
+                console.log(audio_duration)
+                console.log("let audio_duration = res")
+                let tempFormData = new FormData()
+                let data = {
+                  chapter_name: audio_book_files_for_save[index].name
+                    .split(".")
+                    .slice(0, -1)
+                    .join("."),
+                  book: res.data.id,
+                  number: index,
+                  audio_duration: audio_duration.toString(),
+                }
+                tempFormData.append("data", JSON.stringify(data))
+                tempFormData.append(
+                  "files.mp3_file",
+                  audio_book_files_for_save[index]
+                )
+                tempAudioRequests.push({
+                  url: `${process.env.REACT_APP_STRAPI_BASE_URL}/book-audios`,
+                  formdata: tempFormData,
+                })
+              })
+              .catch(err => {
+                console.log(err)
+              })
           )
-        }
-        axios
-          .all(tempAudioRequests)
+        })
+
+        Promise.all(promises)
           .then(() => {
-            setloading_dialog(false)
-            setsuccess_dialog(true)
-            setTimeout(() => {
-              window.location.reload()
-            }, 2000)
+            axios
+              .all(
+                tempAudioRequests.map(tempRequest =>
+                  axios.post(tempRequest.url, tempRequest.formdata, config)
+                )
+              )
+              .then(() => {
+                setloading_dialog(false)
+                setsuccess_dialog(true)
+                setTimeout(() => {
+                  window.location.reload()
+                }, 2000)
+              })
+              .catch(err => {
+                setloading_dialog(false)
+                seterror_dialog(true)
+              })
           })
-          .catch(err => {
+          .catch(e => {
+            console.log(e)
             setloading_dialog(false)
             seterror_dialog(true)
           })
       })
-      .catch(e => {
-        seterror_dialog(true)
-      })
+
   }
 
+  const getAudioFileDuration = file =>
+    new Promise((resolve, reject) => {
+      let reader = new FileReader()
+
+      reader.onload = function (event) {
+        let audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)()
+        audioContext.decodeAudioData(event.target.result).then(buffer => {
+          let duration = buffer.duration
+          console.log(
+            "The duration of the song is of: " + duration + " seconds"
+          )
+          resolve(duration)
+        })
+      }
+      reader.readAsArrayBuffer(file)
+    })
+  
   async function getBookInfo() {
     console.log(admin_id)
     await axios({
@@ -313,7 +355,13 @@ const AddBook = props => {
   const uploadAudioBook = e => {
     var files = e.target.files
 
-    set_audio_book_files_for_save(files)
+    let tempfiles = []
+    console.log(files)
+    for (let i = 0; i < files.length; i++) {
+      tempfiles.push(files[i])
+    }
+
+    set_audio_book_files_for_save(tempfiles)
     set_audio_book_files(getItems(files))
     if (audio_book_files.length == 0 && book_files.length == 0) {
       set_next_button_label("Алгасах")
@@ -390,6 +438,8 @@ const AddBook = props => {
     setselectedMulti_author(selected_author)
     set_author_of_book_message("")
   }
+
+  useEffect(() => getBookInfo(), [])
 
   return (
     <React.Fragment>
@@ -496,9 +546,12 @@ const AddBook = props => {
                                   id="admins"
                                   onChange={e => {
                                     set_admin_id(e.target.value)
-                                    getBookInfo()
+                                    // getBookInfo()
                                   }}
                                 >
+                                  <option selected defaultValue hidden value={null}>
+                                    --Сонгох--
+                                  </option>
                                   {props.admins_info.length != 0
                                     ? props.admins_info.map(admin => (
                                         <option value={admin.id}>
