@@ -1,71 +1,70 @@
-import React from "react";
-import ReactApexChart from "react-apexcharts";
+import React, { useState, useEffect } from "react"
+import ReactApexChart from "react-apexcharts"
 
-const BookAnalysis = () => {
+const BookAnalysis = props => {
+  const [categories, set_categories] = useState([])
+  const [book_series, set_book_series] = useState([])
+  const [online_book_series, set_online_book_series] = useState([])
+
+  useEffect(() => {
+    let tempCategories = []
+    let tempBookSeries = []
+    let tempOnlineBookSeries = []
+
+    props.books.forEach(book => {
+      tempCategories.push(book.id)
+      tempBookSeries.push(book.book_sales_count)
+      tempOnlineBookSeries.push(book.online_book_sales_count)
+
+      set_categories(tempCategories)
+      set_book_series(tempBookSeries)
+      set_online_book_series(tempOnlineBookSeries)
+    })
+
+    console.log("props.books")
+    console.log(props.books)
+  }, [])
+
   const series = [
     {
-      name: "Ном",
-      data: [45, 52, 38, 24, 33, 26, 21, 20, 6, 8, 15, 10],
-    },
-    {
-      name: "Аудио ном",
-      data: [36, 42, 60, 42, 13, 18, 29, 37, 36, 51, 32, 35],
+      name: "Хэвлэмэл ном",
+      data: book_series,
     },
     {
       name: "Цахим ном",
-      data: [89, 56, 74, 98, 72, 38, 64, 46, 84, 58, 46, 49],
+      data: online_book_series,
     },
-  ];
+  ]
   const options = {
     chart: { zoom: { enabled: !1 }, toolbar: { show: !1 } },
     colors: ["#556ee6", "#f46a6a", "#34c38f"],
     dataLabels: { enabled: !1 },
     stroke: { width: [3, 4, 3], curve: "straight", dashArray: [0, 8, 5] },
-    title: { text: "Орлогын график", align: "left" },
+    title: { text: "Борлуулалтын график", align: "left" },
     markers: { size: 0, hover: { sizeOffset: 6 } },
     xaxis: {
-      categories: [
-        "01 Jan",
-        "02 Jan",
-        "03 Jan",
-        "04 Jan",
-        "05 Jan",
-        "06 Jan",
-        "07 Jan",
-        "08 Jan",
-        "09 Jan",
-        "10 Jan",
-        "11 Jan",
-        "12 Jan",
-      ],
+      categories: categories,
     },
     tooltip: {
       y: [
         {
           title: {
             formatter: function (e) {
-              return e + " (mins)";
+              return e + " борлуулалт"
             },
           },
         },
         {
           title: {
             formatter: function (e) {
-              return e + " per session";
-            },
-          },
-        },
-        {
-          title: {
-            formatter: function (e) {
-              return e;
+              return e + " борлуулалт"
             },
           },
         },
       ],
     },
     grid: { borderColor: "#f1f1f1" },
-  };
+  }
 
   return (
     <ReactApexChart
@@ -74,7 +73,7 @@ const BookAnalysis = () => {
       type="line"
       height="380"
     />
-  );
-};
+  )
+}
 
-export default BookAnalysis;
+export default BookAnalysis

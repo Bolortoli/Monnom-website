@@ -19,6 +19,12 @@ import Select from "react-select"
 // book section
 const columns = [
   {
+    label: "ID",
+    field: "book_id",
+    // sort: "asc",
+    width: 150,
+  },
+  {
     label: "Нэр",
     field: "book_name",
     // sort: "asc",
@@ -232,6 +238,7 @@ const List = props => {
     console.log(booksData)
     let tempInitialData = booksData.map(d => {
       return {
+        book_id: d.id,
         book_name: d.book_name,
         // book_author: d.book_author.name,
         book_date: new Date(d.book_added_date).toLocaleString("mn-MN", {

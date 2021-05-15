@@ -153,7 +153,7 @@ let BookCard = props => {
 }
 
 const Books = () => {
-  var ITEMS_PER_PAGE = 12
+  var ITEMS_PER_PAGE = 2
 
   const [booksList, setBooksList] = useState([])
   const [admins_info, set_admins_info] = useState([])

@@ -62,11 +62,7 @@ const ContactsGrid = props => {
   useEffect(() => {
     set_data(props.podcast.podcastChannels)
     let tempPaginations = []
-    for (
-      let i = 1;
-      i <= Math.ceil(props.podcast.podcastChannels.length / ITEMS_PER_PAGE);
-      i++
-    ) {
+    for (let i = 1; i <= Math.ceil(props.podcast.podcastChannels.length / ITEMS_PER_PAGE); i++) {
       tempPaginations.push(i)
     }
     set_pagination_pages(tempPaginations)
@@ -201,11 +197,11 @@ const ContactsGrid = props => {
                               </Row>
                               <Row className="mt-2">
                                 <Col xl={6} className="text-left">
-                                  Нэр:
+                                  Нийтлэгч:
                                 </Col>
                                 <Col xl={6} className="text-right">
                                   <b>
-                                    {podcast.podcast_author.firstname.slice(
+                                    {podcast.podcast_author?.firstname?.slice(
                                       0,
                                       14
                                     )}
@@ -265,7 +261,8 @@ const ContactsGrid = props => {
                       </Col>
                     )
                 } catch (e) {
-                  ;<Alert color="primary">ERROR! {e}</Alert>
+                  console.log(e)
+                  // return (<Alert color="primary">ERROR! {e}</Alert>)
                 }
               })
           : null}

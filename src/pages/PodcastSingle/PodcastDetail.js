@@ -175,14 +175,14 @@ const PodcastDetail = props => {
                       <tbody>
                         <tr>
                           <th scope="row">
-                            Хэрэглэгчийн овог : {data.user_lastname}
+                            Хэрэглэгчийн нэр : {data.user_fullname}
                           </th>
                         </tr>
-                        <tr>
+                        {/* <tr>
                           <th scope="row">
                             Хэрэглэгчийн нэр : {data.user_firstname}
                           </th>
-                        </tr>
+                        </tr> */}
                       </tbody>
                     </Table>
                   </div>

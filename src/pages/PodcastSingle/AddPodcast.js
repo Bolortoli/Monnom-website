@@ -22,8 +22,6 @@ import classnames from "classnames"
 import { Link } from "react-router-dom"
 import axios from "axios"
 import SweetAlert from "react-bootstrap-sweetalert"
-
-//Dropzone
 import Dropzone from "react-dropzone"
 import { useParams } from "react-router-dom"
 // require('dotenv').config()
@@ -54,6 +52,7 @@ const AddPodcast = props => {
   const [checked, set_checked] = useState(false)
   const [episode_picture, set_episode_picture] = useState(null)
   const [profileImage, set_profileImage] = useState()
+  const [mp3_file_duration, set_mp3_file_duration] = useState(0)
   const [selectedFiles, set_selectedFiles] = useState([])
 
   // update and delete
@@ -68,6 +67,7 @@ const AddPodcast = props => {
       episode_description: podcast_description_value,
       podcast_channel: id,
       episode_number: latestEpisodeNumber + 1,
+      mp3_duration: mp3_file_duration,
     }
     console.log(tempSendData)
     podcastDataToUpload.append("data", JSON.stringify(tempSendData))
@@ -137,6 +137,23 @@ const AddPodcast = props => {
         formattedSize: formatBytes(file.size),
       })
     )
+
+    var file = files[0]
+
+    var reader = new FileReader()
+
+    reader.onload = function (event) {
+      var audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)()
+
+      audioContext.decodeAudioData(event.target.result, function (buffer) {
+        var duration = buffer.duration
+        // console.log("The duration of the song is of: " + duration + " seconds")
+        set_mp3_file_duration(duration.toString())
+      })
+    }
+
+    reader.readAsArrayBuffer(file)
 
     set_selectedFiles(files[0])
     set_file_upload_name_message("")
