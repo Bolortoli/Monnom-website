@@ -27,6 +27,7 @@ const SettingsForm = () => {
   const [new_podcast_category, set_new_podcast_category] = useState("")
   const [all_admins, set_all_admins] = useState([])
   const [all_books, set_all_books] = useState([])
+  const [all_channels, set_all_channels] = useState([])
 
   const [channel_name, set_channel_name] = useState("")
   const [podcast_category, set_podcast_category] = useState([])
@@ -40,11 +41,14 @@ const SettingsForm = () => {
   const [podcast_category_id, set_podcast_category_id] = useState(0)
   const [book_category_id, set_book_category_id] = useState(0)
   const [author_category_id, set_author_category_id] = useState(0)
+  const [insert_book_id, set_insert_book_id] = useState(0)
+  const [insert_channels_id, set_insert_channels_id] = useState(0)
 
   const [confirm_terms, set_confirm_terms] = useState(false)
   const [confirm_save_book, set_confirm_save_book] = useState(false)
   const [confirm_add_author, set_confirm_add_author] = useState(false)
   const [confirm_remove_author, set_confirm_remove_author] = useState(false)
+  const [confirm_delete_channel, set_confirm_delete_channel] = useState(false)
   const [confirm_add_book_category, set_confirm_add_book_category] = useState(
     false
   )
@@ -269,6 +273,20 @@ const SettingsForm = () => {
       })
   }
 
+  const deletePodcastChannel = async id => {
+    console.log("id [> ", id)
+    await axios
+      .delete(`${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-channels/${id}`)
+      .then(async res => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+      })
+      .catch(res => {
+        setloading_dialog(false)
+        seterror_dialog(true)
+      })
+  }
+
   const updateTerms = async () => {
     const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}/terms-and-conditions`
     const formData = new FormData()
@@ -376,6 +394,27 @@ const SettingsForm = () => {
       })
   }
 
+  async function fetchAllChannels() {
+    await axios({
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-channels`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
+      .then(res => {
+        setIsNetworkLoading(false)
+        setIsNetworkingError(false)
+        set_all_channels(res.data)
+      })
+      .catch(err => {
+        setIsNetworkLoading(false)
+        setIsNetworkingError(true)
+      })
+  }
+
   const getCategoriesInfo = categories => {
     console.log("id myu ", categories[0].value)
     const a = categories.map(category => {
@@ -395,6 +434,7 @@ const SettingsForm = () => {
     fetchData()
     fetchAdmins()
     fetchAllBooks()
+    fetchAllChannels()
   }, [])
 
   // zurag solih
@@ -725,18 +765,15 @@ const SettingsForm = () => {
                       <CardTitle className="p-3">Ном хадгалах</CardTitle>
                       <CardBody>
                         <Row>
-                          {/* <Col lg={3}>
-                    <Label>Ном</Label>
-                  </Col> */}
                           <Col lg={9} className="">
                             <select
                               className="form-control"
                               id="allBooks"
-                              onChange={e => set_all_books(e.target.value)}
+                              onChange={e => set_insert_book_id(e.target.value)}
                             >
                               {all_books.length != 0
                                 ? all_books.map(book => (
-                                    <option>{book.name}</option>
+                                    <option value={book.id}>{book.name}</option>
                                   ))
                                 : null}
                             </select>
@@ -855,6 +892,46 @@ const SettingsForm = () => {
                     </Row>
                   </CardBody>
                 </Card>
+                <Row>
+                  <Col lg={12}>
+                    <Card>
+                      <CardTitle className="p-3">
+                        Подкаст суваг устгах
+                      </CardTitle>
+                      <CardBody>
+                        <Row>
+                          <Col lg={9} className="">
+                            <select
+                              className="form-control"
+                              id="allChannels"
+                              onChange={e =>
+                                set_insert_channels_id(e.target.value)
+                              }
+                            >
+                              {all_channels.length != 0
+                                ? all_channels.map(channel => (
+                                    <option value={channel.id}>
+                                      {channel.name}
+                                    </option>
+                                  ))
+                                : null}
+                            </select>
+                          </Col>
+                          <Col lg={2}>
+                            <Button
+                              className="btn btn-info"
+                              onClick={() => {
+                                set_confirm_delete_channel(true)
+                              }}
+                            >
+                              Устгах
+                            </Button>
+                          </Col>
+                        </Row>
+                      </CardBody>
+                    </Card>
+                  </Col>
+                </Row>
               </Col>
             </Row>
           )}
@@ -1038,6 +1115,26 @@ const SettingsForm = () => {
             }}
             onCancel={() => {
               set_confirm_save_book(false)
+            }}
+          ></SweetAlert>
+        ) : null}
+
+        {confirm_delete_channel ? (
+          <SweetAlert
+            title="Подкаст суваг устгах"
+            info
+            showCancel
+            confirmBtnText="Тийм"
+            cancelBtnText="Буцах"
+            confirmBtnBsStyle="success"
+            cancelBtnBsStyle="danger"
+            onConfirm={() => {
+              setloading_dialog(true)
+              set_confirm_delete_channel(false)
+              deletePodcastChannel(insert_channels_id)
+            }}
+            onCancel={() => {
+              set_confirm_delete_channel(false)
             }}
           ></SweetAlert>
         ) : null}
