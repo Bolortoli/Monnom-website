@@ -122,10 +122,10 @@ const Login = props => {
                         <h5 className="text-primary">Тавтай морил !</h5>
                         <p className="text-muted">
                           Админы удирдлагын вэб нэвтрэх
-                          <br />
+                          {/* <br />
                           {username}
                           <br />
-                          {password}
+                          {password} */}
                         </p>
                       </div>
 
