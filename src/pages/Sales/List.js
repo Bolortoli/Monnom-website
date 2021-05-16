@@ -77,7 +77,7 @@ const ebookColumns = [
     sort: "desc",
   },
   {
-    label: "Борлогдсон тоо",
+    label: "Уншсан тоо",
     field: "ebook_buy_count",
     sort: "desc",
     width: 70,
@@ -133,8 +133,8 @@ const SalesList = props => {
         ebook_id: d.id,
         e_user_name: d.users_permissions_user.username,
         ebook_name: d.book.name,
-        ebook_buy_count: d.book.sale_quantity,
-        ebook_buy_price: d.book.book_price,
+        ebook_buy_count: d.book.read_count,
+        ebook_buy_price: d.book.online_book_price,
         ebook_date: new Date(d.updated_at).toLocaleString(),
       }
     })
@@ -151,11 +151,7 @@ const SalesList = props => {
 
   useEffect(() => {
     initBookData(props.books)
-    console.log("props.books")
-    console.log(props.books)
     initEbookData(props.ebooks)
-    console.log("props.ebooks")
-    console.log(props.ebooks)
   }, [props])
 
   return (

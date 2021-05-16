@@ -14,29 +14,6 @@ const LiveChannel = () => {
   // Check network
   const [isNetworking, setIsNetworking] = useState(false)
 
-  async function makeGetReq() {
-    await axios({
-      url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels/`,
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    })
-      .then(res => {
-        set_data(res.data)
-        setIsNetworking(false)
-      })
-      .catch(err => {
-        setIsNetworking(true)
-      })
-  }
-
-  useEffect(() => {
-    // makeGetReq()
-  }, [])
-
   return (
     <React.Fragment>
       <LiveChannelContextProvider>

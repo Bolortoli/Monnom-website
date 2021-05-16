@@ -16,6 +16,9 @@ const CardContact = props => {
   const [user, set_user] = useState(props.user)
   // console.log(user);
   const [user_desc_modal_center, set_user_desc_modal_center] = useState(false)
+  const [user_delete_modal_center, set_user_delete_modal_center] = useState(
+    false
+  )
   const [user_update_modal_center, set_user_update_modal_center] = useState(
     false
   )
@@ -82,12 +85,32 @@ const CardContact = props => {
         set_edit_form_loading(false)
         set_user(props.initializeUsersList([res.data])[0])
         set_user_update_modal_center(false)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
       })
       .catch(err => {
         props.setloading_dialog(false)
         props.error(true)
         set_edit_form_loading(false)
         console.log(err)
+      })
+  }
+
+  const sendDeleteUserRequest = async user_id => {
+    await axios
+      .delete(`${process.env.REACT_APP_STRAPI_BASE_URL}/users/${user.id}`)
+      .then(res => {
+        props.setloading_dialog(false)
+        props.success(true)
+        set_user_delete_modal_center(false)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+      })
+      .catch(res => {
+        props.setloading_dialog(false)
+        props.error(true)
       })
   }
 
@@ -115,6 +138,11 @@ const CardContact = props => {
 
   function toggle_user_update_modal() {
     set_user_update_modal_center(!user_update_modal_center)
+    removeBodyCss()
+  }
+
+  function toggle_user_delete_modal() {
+    set_user_delete_modal_center(!user_delete_modal_center)
     removeBodyCss()
   }
 
@@ -183,6 +211,20 @@ const CardContact = props => {
                     target={"message" + user.id}
                   >
                     Засварлах
+                  </UncontrolledTooltip>
+                </Link>
+              </div>
+              <div className="flex-fill">
+                <Link
+                  onClick={() => toggle_user_delete_modal()}
+                  id={"remove" + user.id}
+                >
+                  <i className="bx bx-trash-alt" />
+                  <UncontrolledTooltip
+                    placement="top"
+                    target={"remove" + user.id}
+                  >
+                    Устгах
                   </UncontrolledTooltip>
                 </Link>
               </div>
@@ -370,6 +412,42 @@ const CardContact = props => {
               </Col>
             </Row>
           )}
+        </div>
+      </Modal>
+      <Modal
+        isOpen={user_delete_modal_center}
+        toggle={() => {
+          toggle_user_delete_modal()
+        }}
+        centered={true}
+      >
+        <div className="modal-header">
+          <h5 className="modal-title mt-0">
+            <b>Ажилтны мэдээлэл устгах</b>
+          </h5>
+          <button
+            type="button"
+            onClick={() => {
+              set_user_delete_modal_center(false)
+            }}
+            className="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div className="m-3 text-right">
+          <button
+            type="reset"
+            onClick={() => {
+              props.setloading_dialog(true)
+              sendDeleteUserRequest(user.id)
+            }}
+            className="btn btn-danger waves-effect btn-label waves-light"
+          >
+            <i className="bx bx-check-double label-icon"></i> Устгах
+          </button>
         </div>
       </Modal>
     </React.Fragment>

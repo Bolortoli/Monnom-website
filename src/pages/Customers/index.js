@@ -155,16 +155,16 @@ const Customers = () => {
                   <Col className="col-12">
                     <Card>
                       <CardBody>
-                        <CardTitle>Хэрэглэгчдийн жагсаалт</CardTitle>
                         <MDBDataTable
+                          proSelect
                           responsive
                           bordered
                           data={data}
                           noBottomColumns
                           noRecordsFoundLabel={"Хэрэглэгч байхгүй"}
                           infoLabel={["", "-ээс", "дахь хэрэглэгч. Нийт", ""]}
-                          entries={5}
-                          entriesOptions={[5, 10, 20]}
+                          entries={10}
+                          entriesOptions={[10, 15, 20]}
                           paginationLabel={["Өмнөх", "Дараах"]}
                           searchingLabel={"Хайх"}
                           searching

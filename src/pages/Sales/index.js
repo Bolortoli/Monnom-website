@@ -6,46 +6,8 @@ import { Link } from "react-router-dom"
 
 import SalesList from "./List"
 
-const demoData = {
-  books: [
-    {
-      id: 1,
-      book_name: "Helgui chono",
-      book_author_name: "Tuulai",
-      buy_count: 12400,
-      price: "20$",
-      book_added_date: "2005/12/04",
-    },
-    {
-      id: 2,
-      book_name: "Heltei chono",
-      book_author_name: "Chono ooroo",
-      buy_count: 124000,
-      price: 100,
-      book_added_date: "2006/01/10",
-    },
-  ],
-  book_pdf: [
-    {
-      id: 1,
-      book_name: "sdegsg",
-      book_author_name: "sgds",
-      buy_count: 124000,
-      price: 100,
-      book_added_date: "2006/01/10",
-    },
-    {
-      id: 2,
-      book_name: "dgvdsgds",
-      book_author_name: "Chono ooroo",
-      buy_count: 124000,
-      price: 100,
-      book_added_date: "2006/01/10",
-    },
-  ],
-}
-
 const Sales = () => {
+  const [data, set_data] = useState([])
   const [ebook_data, set_ebook_data] = useState([])
   const [book_data, set_book_data] = useState([])
 
@@ -64,7 +26,8 @@ const Sales = () => {
       },
     })
       .then(res => {
-        set_ebook_data(res.data)
+        division(res.data)
+
         SetIsNetworkLoading(false)
         setIsNetworkError(false)
       })
@@ -74,30 +37,51 @@ const Sales = () => {
       })
   }
 
-  async function fetchBookData() {
-    await axios({
-      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-books`,
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    })
-      .then(res => {
-        set_book_data(res.data)
-        setIsNetworkError(false)
-        SetIsNetworkLoading(false)
+  function division(allBooks) {
+    let ebooks = []
+    let books = []
+
+    {
+      allBooks.map(book => {
+        if (book.book.has_sale && book.book.has_pdf) {
+          books.push(book)
+          ebooks.push(book)
+        } else if (book.book.has_sale && !book.book.has_pdf) {
+          books.push(book)
+        } else if (!book.book.has_sale && book.book.has_pdf) {
+          ebooks.push(book)
+        }
       })
-      .catch(err => {
-        SetIsNetworkLoading(false)
-        setIsNetworkError(true)
-      })
+    }
+
+    set_book_data(books)
+    set_ebook_data(ebooks)
   }
+
+  // async function fetchBookData() {
+  //   await axios({
+  //     url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-books`,
+  //     method: "GET",
+  //     headers: {
+  //       Authorization: `Bearer ${
+  //         JSON.parse(localStorage.getItem("user_information")).jwt
+  //       }`,
+  //     },
+  //   })
+  //     .then(res => {
+  //       set_book_data(res.data)
+  //       setIsNetworkError(false)
+  //       SetIsNetworkLoading(false)
+  //     })
+  //     .catch(err => {
+  //       SetIsNetworkLoading(false)
+  //       setIsNetworkError(true)
+  //     })
+  // }
 
   useEffect(() => {
     fetchEbookData()
-    fetchBookData()
+    // fetchBookData()
   }, [])
 
   return (
@@ -121,8 +105,10 @@ const Sales = () => {
                   </div>
                 </Col>
               </Row>
-            ) : (
+            ) : book_data.length != 0 && ebook_data.length != 0 ? (
               <SalesList books={book_data} ebooks={ebook_data} />
+            ) : (
+              []
             )}
           </>
         )}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import axios from "axios"
 import { Card, CardBody, Button, Label, Input } from "reactstrap"
 import SweetAlert from "react-bootstrap-sweetalert"
 import Switch from "react-switch"
@@ -9,9 +10,9 @@ const RighBar = props => {
   const { edit_live_channel, set_edit_live_channel } = useLiveChannelStates()
 
   const [confirm_edit, set_confirm_edit] = useState(false)
-  const [success_dlg, setsuccess_dlg] = useState(false)
-  const [dynamic_title, setdynamic_title] = useState("")
-  const [dynamic_description, setdynamic_description] = useState("")
+  const [success_dlg, set_success_dlg] = useState(false)
+  const [error_dialog, set_error_dialog] = useState(false)
+  const [loading_dialog, set_loading_dialog] = useState(false)
 
   // edit hiih state
   const [edit_live_name, set_edit_live_name] = useState("")
@@ -19,12 +20,8 @@ const RighBar = props => {
   const [edit_live_state, set_edit_live_state] = useState(false)
 
   const editLiveInfo = async () => {
-    const url = `${process.env.REACT_APP_EXPRESS_BASE_URL}`
-    const formData = new FormData()
-    formData.append("live_name", edit_live_name)
-    formData.append("live_desc", edit_live_desc)
-    formData.append("state", edit_live_state)
-
+    console.log("id", edit_live_channel)
+    console.log("radios", selectedCard[edit_live_channel].radio_channel_audios)
     const config = {
       headers: {
         "content-type": "multipart/form-data",
@@ -33,9 +30,25 @@ const RighBar = props => {
         }`,
       },
     }
-    await axios.post(url, formData, config).then(async res => {
-      console.log(res.data)
-    })
+    await axios
+      .put(
+        `${process.env.REACT_APP_STRAPI_BASE_URL}/radio-channels/${edit_live_channel}`,
+        {
+          name: edit_live_name,
+          description: edit_live_desc,
+          radio_channel_audios:
+            selectedCard[edit_live_channel].radio_channel_audios,
+        },
+        config
+      )
+      .then(res => {
+        set_loading_dialog(false)
+        set_success_dlg(true)
+      })
+      .catch(err => {
+        set_loading_dialog(false)
+        set_error_dialog(true)
+      })
   }
 
   // live iin tolow solih
@@ -46,8 +59,8 @@ const RighBar = props => {
   useEffect(() => {
     if (selectedCard[edit_live_channel]) {
       set_edit_live_state(selectedCard[edit_live_channel].state)
-      set_edit_live_name(selectedCard[edit_live_channel].live_name)
-      set_edit_live_desc(selectedCard[edit_live_channel].live_desc)
+      set_edit_live_name(selectedCard[edit_live_channel].name)
+      set_edit_live_desc(selectedCard[edit_live_channel].description)
     }
   }, [edit_live_channel])
 
@@ -94,7 +107,7 @@ const RighBar = props => {
       </Card>
       {confirm_edit ? (
         <SweetAlert
-          title="Та итгэлтэй байна уу ?"
+          title="Лайв сувагт өөрчлөлт хийх гэж байна ?"
           warning
           showCancel
           confirmBtnText="Тийм"
@@ -103,10 +116,9 @@ const RighBar = props => {
           cancelBtnBsStyle="danger"
           onConfirm={() => {
             // setSelectedCard(edit_live_name);
+            editLiveInfo()
+            set_loading_dialog(true)
             set_confirm_edit(false)
-            setsuccess_dlg(true)
-            setdynamic_title("Амжилттай")
-            setdynamic_description("Шинэчлэлт амжилттай хийгдлээ.")
           }}
           onCancel={() => {
             set_confirm_edit(false)
@@ -116,7 +128,7 @@ const RighBar = props => {
       {success_dlg ? (
         <SweetAlert
           success
-          title={dynamic_title}
+          title="Амжилттай"
           timeout={1500}
           style={{
             position: "absolute",
@@ -126,20 +138,48 @@ const RighBar = props => {
           showCloseButton={false}
           showConfirm={false}
           onConfirm={() => {
-            setsuccess_dlg(false)
+            set_success_dlg(false)
           }}
         >
-          {dynamic_description}
+          Шинэчлэлт амжилттай хийгдлээ.
         </SweetAlert>
+      ) : null}
+      {error_dialog ? (
+        <SweetAlert
+          title={"Амжилтгүй"}
+          timeout={2000}
+          style={{
+            position: "absolute",
+            top: "center",
+            right: "center",
+          }}
+          showCloseButton={false}
+          showConfirm={false}
+          error
+          onConfirm={() => {
+            // createPodcast()
+            set_error_dialog(false)
+          }}
+        >
+          {"Үйлдэл амжилтгүй боллоо"}
+        </SweetAlert>
+      ) : null}
+      {loading_dialog ? (
+        <SweetAlert
+          title="Түр хүлээнэ үү"
+          info
+          showCloseButton={false}
+          showConfirm={false}
+          success
+        ></SweetAlert>
       ) : null}
       <Card>
         <CardBody className="d-flex align-items-center">
           <Label className="mr-3">Нийт файлийн тоо</Label>
           <Label className="text-dark font-size-15">
             {selectedCard[edit_live_channel]
-              ? selectedCard[edit_live_channel].lives.length
-              : null}
-            {console.log("sssss", selectedCard)}
+              ? selectedCard[edit_live_channel].radio_channel_audios.length
+              : []}
           </Label>
         </CardBody>
       </Card>

@@ -23,11 +23,15 @@ const PodcastDetail = props => {
 
   const [edit_detail, set_edit_detail] = useState(false)
   const [confirm_edit, set_confirm_edit] = useState(false)
+  const [delete_confirm_comment, set_delete_confirm_comment] = useState(false)
   const [success_dialog, setsuccess_dialog] = useState(false)
   const [error_dialog, seterror_dialog] = useState(false)
+  const [loading_dialog, setloading_dialog] = useState(false)
+
   // update hiih state
   const [edit_podcast_channel, set_edit_podcast_channel] = useState("")
   const [edit_podcast_desc, set_edit_podcast_desc] = useState("")
+  const [delete_channel_comment, set_delete_channel_comment] = useState(null)
 
   // update using formdata
   const updatePodcastInfo = async () => {
@@ -52,6 +56,22 @@ const PodcastDetail = props => {
         console.log(res.data)
       })
       .catch(err => {
+        seterror_dialog(true)
+      })
+  }
+
+  const deleteChannelComment = async () => {
+    await axios
+      .delete(`${process.env.REACT_APP_STRAPI_BASE_URL}/`)
+      .then(async res => {
+        setloading_dialog(false)
+        setsuccess_dialog(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+      })
+      .catch(res => {
+        setloading_dialog(false)
         seterror_dialog(true)
       })
   }
@@ -123,15 +143,24 @@ const PodcastDetail = props => {
                 <CardBody>
                   <CardTitle className="d-flex justify-content-between">
                     <p>Сувгийн дэлгэрэнгүй</p>
-                    <i
-                      className="bx bx-edit font-size-20 text-primary"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        set_edit_podcast_channel(data.channel_name)
-                        set_edit_podcast_desc(data.channel_description)
-                        set_edit_detail(true)
-                      }}
-                    />
+                    <div>
+                      <i
+                        className="bx bx-comment-dots font-size-20 text-warning"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          set_delete_confirm_comment(true)
+                        }}
+                      />
+                      <i
+                        className="bx bx-edit font-size-20 text-primary ml-2"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          set_edit_podcast_channel(data.channel_name)
+                          set_edit_podcast_desc(data.channel_description)
+                          set_edit_detail(true)
+                        }}
+                      />
+                    </div>
                   </CardTitle>
                   <div className="table-responsive">
                     <Table className="table-nowrap mb-0">
@@ -178,11 +207,6 @@ const PodcastDetail = props => {
                             Хэрэглэгчийн нэр : {data.user_fullname}
                           </th>
                         </tr>
-                        {/* <tr>
-                          <th scope="row">
-                            Хэрэглэгчийн нэр : {data.user_firstname}
-                          </th>
-                        </tr> */}
                       </tbody>
                     </Table>
                   </div>
@@ -257,6 +281,36 @@ const PodcastDetail = props => {
             </Row>
           </SweetAlert>
         ) : null}
+        {delete_confirm_comment ? (
+          <SweetAlert
+            showCancel
+            title="Сэтгэгдэл"
+            cancelBtnBsStyle="primary"
+            confirmBtnBsStyle="danger"
+            confirmBtnText="Устгах"
+            cancelBtnText="Буцах"
+            style={{
+              padding: "2em",
+              borderRadius: "20px",
+            }}
+            onConfirm={() => {
+              deleteChannelComment()
+              set_delete_confirm_comment(false)
+              setloading_dialog(true)
+            }}
+            onCancel={() => {
+              set_delete_confirm_comment(false)
+            }}
+          >
+            <Row>
+              <Card>
+                <Col xl={12}>
+                  <Label>{delete_channel_comment}</Label>
+                </Col>
+              </Card>
+            </Row>
+          </SweetAlert>
+        ) : null}
         {confirm_edit ? (
           <SweetAlert
             title="Та итгэлтэй байна уу ?"
@@ -317,6 +371,15 @@ const PodcastDetail = props => {
           >
             {"Үйлдэл амжилтгүй боллоо"}
           </SweetAlert>
+        ) : null}
+        {loading_dialog ? (
+          <SweetAlert
+            title="Түр хүлээнэ үү"
+            info
+            showCloseButton={false}
+            showConfirm={false}
+            success
+          ></SweetAlert>
         ) : null}
       </Container>
     </React.Fragment>

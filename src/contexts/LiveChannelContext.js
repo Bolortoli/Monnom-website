@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext } from "react"
+import React, { createContext, useState, useEffect, useContext } from "react"
+import axios from "axios"
 
 let LiveChannelContext = createContext()
 const demoData = [
@@ -45,16 +46,46 @@ const demoData = [
     ],
   },
 ]
+
 function LiveChannelContextProvider({ children }) {
-  const [live_channels, set_live_channels] = useState(demoData)
-  const [liveState, setLiveState] = useState(demoData[0])
-  const [selectedCard, setSelectedCard] = useState(demoData)
+  const [live_channels, set_live_channels] = useState([])
+  const [selectedCard, setSelectedCard] = useState([])
   const [edit_live_channel, set_edit_live_channel] = useState(0)
-  return (
+
+  // Check network
+  const [isNetworking, setIsNetworking] = useState(false)
+
+  async function fetchData() {
+    console.log("hhe daata")
+    await axios({
+      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/radio-channels/`,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    })
+      .then(res => {
+        console.log("hhe daata")
+        console.log(res.data)
+        set_live_channels(res.data)
+        setSelectedCard(res.data)
+        setIsNetworking(false)
+      })
+      .catch(err => {
+        setIsNetworking(true)
+      })
+  }
+
+  useEffect(() => {
+    console.log("useEffect")
+    fetchData()
+  }, [])
+
+  return live_channels.length != 0 && selectedCard.length != 0 ? (
     <LiveChannelContext.Provider
       value={{
-        liveState,
-        setLiveState,
         selectedCard,
         setSelectedCard,
         live_channels,
@@ -65,13 +96,28 @@ function LiveChannelContextProvider({ children }) {
     >
       {children}
     </LiveChannelContext.Provider>
+  ) : (
+    []
   )
+
+  // return (
+  //   <LiveChannelContext.Provider
+  //     value={{
+  //       selectedCard,
+  //       setSelectedCard,
+  //       live_channels,
+  //       set_live_channels,
+  //       edit_live_channel,
+  //       set_edit_live_channel,
+  //     }}
+  //   >
+  //     {children}
+  //   </LiveChannelContext.Provider>
+  // )
 }
 
 let useLiveChannelStates = () => {
   let {
-    liveState,
-    setLiveState,
     selectedCard,
     setSelectedCard,
     live_channels,
@@ -81,8 +127,6 @@ let useLiveChannelStates = () => {
   } = useContext(LiveChannelContext)
 
   return {
-    liveState,
-    setLiveState,
     selectedCard,
     setSelectedCard,
     live_channels,

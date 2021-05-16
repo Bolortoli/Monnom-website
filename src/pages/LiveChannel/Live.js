@@ -11,6 +11,19 @@ const getItems = files => {
   Object.keys(files).map((key, index) => {
     tempArray.push({
       id: `item-${index}`,
+      content: files[key].audio_name,
+      size: files[key].audio.size,
+    })
+  })
+  return tempArray
+}
+
+const getUploadItems = files => {
+  // return [];
+  let tempArray = []
+  Object.keys(files).map((key, index) => {
+    tempArray.push({
+      id: `item-${index}`,
       content: files[key].name,
       size: files[key].size,
     })
@@ -107,7 +120,7 @@ const Live = () => {
   // mp3 file upload hiih, nemeh
   const uploadLiveFiles = e => {
     var files = e.target.files
-    set_upload_files(getItems(files))
+    set_upload_files(getUploadItems(files))
   }
 
   // upload hiij bga mp3 file aa ustgah
@@ -135,9 +148,13 @@ const Live = () => {
     set_upload_files(items)
   }
   useEffect(() => {
-    if (selectedCard[edit_live_channel].lives.length)
-      set_old_files(getItems(selectedCard[edit_live_channel].lives))
-  }, [edit_live_channel])
+    // console.log("effect")
+    // console.log(selectedCard[edit_live_channel])
+    if (selectedCard[edit_live_channel].radio_channel_audios.length != 0)
+      set_old_files(
+        getItems(selectedCard[edit_live_channel].radio_channel_audios)
+      )
+  }, [])
   // huuchin file uudiin zooh, indexuudiig zaaj ogoh
   const oldOnDragEnd = result => {
     // dropped outside the list
@@ -176,8 +193,8 @@ const Live = () => {
               <div className="mt-2">
                 <h5>
                   {selectedCard[edit_live_channel]
-                    ? selectedCard[edit_live_channel].live_name
-                    : selectedCard[0].live_name}
+                    ? selectedCard[edit_live_channel].name
+                    : selectedCard[0].name}
                 </h5>
               </div>
             </Col>
