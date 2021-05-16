@@ -17,15 +17,12 @@ import { useLiveChannelStates } from "../../contexts/LiveChannelContext"
 
 const LeftBar = () => {
   const { live_channels, set_live_channels } = useLiveChannelStates()
-  console.log("leftBar => ", live_channels)
   const { edit_live_channel, set_edit_live_channel } = useLiveChannelStates()
 
   const [isOpen, setIsOpen] = useState(false)
-  const [change_live, set_change_live] = useState(false)
 
   const [add_live_channel, set_add_live_channel] = useState(false)
   const [confirm_add, set_confirm_add] = useState(false)
-  const [confirm_delete, set_confirm_delete] = useState(false)
   const [success_dlg, set_success_dlg] = useState(false)
   const [error_dialog, set_error_dialog] = useState(false)
   const [loading_dialog, set_loading_dialog] = useState(false)
@@ -35,24 +32,21 @@ const LeftBar = () => {
 
   // create new live channel
   const createLive = async () => {
-    const formData = new FormData()
-    formData.append("live_name", create_live_name)
-    formData.append("live_desc", create_live_desc)
-    formData.append("radio_channel_audios", [])
-
     const config = {
       headers: {
-        "content-type": "multipart/form-data",
-        Authorization: `Bearer ${JSON.parse(
-          localStorage.getItem("user_information").jwt
-        )}`,
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
       },
     }
 
     await axios
       .post(
-        `${process.env.REACT_APP_STAPI_BASE_URL}/radio-channels/`,
-        formData,
+        `${process.env.REACT_APP_STRAPI_BASE_URL}/radio-channels/`,
+        {
+          name: create_live_name,
+          description: create_live_desc,
+        },
         config
       )
       .then(res => {
@@ -67,27 +61,6 @@ const LeftBar = () => {
         set_error_dialog(true)
       })
   }
-
-  // delete live channel
-  const deleteLive = async id => {
-    await axios
-      .delete(
-        `${process.env.REACT_APP_STRAPI_BASE_URL}/radio-channels/${edit_live_channel}`
-      )
-      .then(async res => {
-        set_loading_dialog(false)
-        set_success_dialog(true)
-        setTimeout(() => {
-          window.location.reload()
-        }, 2000)
-      })
-      .catch(res => {
-        set_loading_dialog(false)
-        set_error_dialog(true)
-      })
-  }
-
-  const toggle = () => setIsOpen(!isOpen)
 
   return (
     <React.Fragment>
@@ -112,8 +85,6 @@ const LeftBar = () => {
                           <Link
                             className="text-body font-weight-medium py-1 d-flex align-items-center"
                             onClick={() => {
-                              toggle()
-                              set_change_live(true)
                               set_edit_live_channel(channel.id)
                             }}
                             to="#"
@@ -123,28 +94,7 @@ const LeftBar = () => {
                               style={{ color: channel.state ? "red" : "#000" }}
                             ></i>
                             {channel.name}
-                            <i
-                              className={
-                                isOpen
-                                  ? "mdi mdi-chevron-up accor-down-icon ml-auto"
-                                  : "mdi mdi-chevron-down accor-down-icon ml-auto"
-                              }
-                            />
                           </Link>
-                          <Collapse isOpen={isOpen}>
-                            <div className="card border-0 shadow-none pl-2 mb-0">
-                              <ul className="list-unstyled mb-0">
-                                <Link
-                                  to="#"
-                                  className="d-flex align-items-center"
-                                  onClick={() => set_confirm_delete(true)}
-                                >
-                                  <span className="mr-auto">Устгах</span>
-                                  <i className="dripicons-cross ml-auto font-size-16"></i>
-                                </Link>
-                              </ul>
-                            </div>
-                          </Collapse>
                         </div>
                       </li>
                     ))
@@ -154,7 +104,6 @@ const LeftBar = () => {
           </div>
         </CardBody>
       </Card>
-
       {add_live_channel ? (
         <SweetAlert
           showCancel
@@ -209,25 +158,6 @@ const LeftBar = () => {
           }}
           onCancel={() => {
             set_confirm_add(false)
-          }}
-        ></SweetAlert>
-      ) : null}
-      {confirm_delete ? (
-        <SweetAlert
-          title="Лайв сувгыг устгах ?"
-          info
-          showCancel
-          confirmBtnText="Тийм!"
-          cancelBtnText="Болих"
-          confirmBtnBsStyle="success"
-          cancelBtnBsStyle="danger"
-          onConfirm={() => {
-            deleteLive(edit_live_channel)
-            set_loading_dialog(true)
-            set_confirm_delete(false)
-          }}
-          onCancel={() => {
-            set_confirm_delete(false)
           }}
         ></SweetAlert>
       ) : null}

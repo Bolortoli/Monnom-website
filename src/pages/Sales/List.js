@@ -38,7 +38,7 @@ const bookColumns = [
     sort: "desc",
   },
   {
-    label: "Борлогдсон тоо",
+    label: "Зарагдсан тоо",
     field: "book_buy_count",
     sort: "desc",
     width: 70,
@@ -50,7 +50,7 @@ const bookColumns = [
     width: 70,
   },
   {
-    label: "Хүсэлтийн огноо",
+    label: "Бүртгэгдсэн огноо",
     field: "book_date",
     sort: "desc",
     width: 100,
@@ -77,7 +77,7 @@ const ebookColumns = [
     sort: "desc",
   },
   {
-    label: "Уншсан тоо",
+    label: "Зарагдсан тоо",
     field: "ebook_buy_count",
     sort: "desc",
     width: 70,
@@ -89,7 +89,7 @@ const ebookColumns = [
     width: 70,
   },
   {
-    label: "Хүсэлтийн огноо",
+    label: "Бүртгэгдсэн огноо",
     field: "ebook_date",
     sort: "desc",
     width: 100,
@@ -109,15 +109,22 @@ const SalesList = props => {
   }
 
   const initBookData = books => {
-    let tempInitialBookData = books.map(d => {
-      return {
-        book_id: d.id,
-        user_name: d.users_permissions_user.username,
-        book_name: d.book.name,
-        book_buy_count: d.book.sale_quantity,
-        book_buy_price: d.book.book_price,
-        book_date: new Date(d.updated_at).toLocaleString(),
-      }
+    let tempInitialBookData = []
+    books.forEach(d => {
+      let tempBook = tempInitialBookData.find(book => book.book_id == d.book.id)
+      if (tempBook != undefined && tempInitialBookData.length != 0)
+        tempBook.ebook_buy_count += 1
+      else
+        tempInitialBookData.push({
+          book_id: d.book.id,
+          user_name: d.users_permissions_user.username,
+          book_name: d.book.name,
+          book_buy_count: 1,
+          book_buy_price: d.book.online_book_price,
+          book_date: new Date(d.updated_at).toLocaleString("mn-MN", {
+            timeZone: "Asia/Ulaanbaatar",
+          }),
+        })
     })
 
     tempInitialBookData.sort(function (a, b) {
@@ -128,15 +135,24 @@ const SalesList = props => {
   }
 
   const initEbookData = ebooks => {
-    let tempInitialEbookData = ebooks.map(d => {
-      return {
-        ebook_id: d.id,
-        e_user_name: d.users_permissions_user.username,
-        ebook_name: d.book.name,
-        ebook_buy_count: d.book.read_count,
-        ebook_buy_price: d.book.online_book_price,
-        ebook_date: new Date(d.updated_at).toLocaleString(),
-      }
+    let tempInitialEbookData = []
+    ebooks.forEach(d => {
+      let tempBook = tempInitialEbookData.find(
+        ebook => ebook.ebook_id == d.book.id
+      )
+      if (tempBook != undefined && tempInitialEbookData.length != 0)
+        tempBook.ebook_buy_count += 1
+      else
+        tempInitialEbookData.push({
+          ebook_id: d.book.id,
+          e_user_name: d.users_permissions_user.username,
+          ebook_name: d.book.name,
+          ebook_buy_count: 1,
+          ebook_buy_price: d.book.online_book_price,
+          ebook_date: new Date(d.updated_at).toLocaleString("mn-MN", {
+            timeZone: "Asia/Ulaanbaatar",
+          }),
+        })
     })
 
     tempInitialEbookData.sort(function (a, b) {
@@ -161,7 +177,6 @@ const SalesList = props => {
           <Col className="col-12">
             <Card>
               <CardBody>
-                <CardTitle>Хамгийн их зарагдсан ном</CardTitle>
                 <CardSubtitle className="mb-5"></CardSubtitle>
 
                 <Nav tabs className="nav-tabs-custom nav-justified">

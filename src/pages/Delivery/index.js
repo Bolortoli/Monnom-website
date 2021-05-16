@@ -10,6 +10,7 @@ import {
   CardBody,
   CardTitle,
   Button,
+  Modal,
 } from "reactstrap"
 import { MDBDataTable } from "mdbreact"
 import Breadcrumbs from "../../components/Common/Breadcrumb"
@@ -17,64 +18,11 @@ import SweetAlert from "react-bootstrap-sweetalert"
 import { Alert } from "reactstrap"
 require("dotenv").config()
 
-// book section
-const delivered_columns = [
-  {
-    label: "Нэр",
-    field: "book_name",
-    sort: "asc",
-    width: 100,
-  },
-  {
-    label: "Цалин",
-    field: "salary",
-    sort: "asc",
-    width: 100,
-  },
-  {
-    label: "Хэрэглэгчийн утас",
-    field: "customer_phone",
-    sort: "disabled",
-    width: "100",
-  },
-  {
-    label: "Хэрэглэгчийн нэр",
-    field: "customer_name",
-    sort: "disabled",
-    width: 100,
-  },
-  {
-    label: "Хүргэгчийн нэр",
-    field: "supplier_name",
-    sort: "asc",
-    width: 100,
-  },
-  {
-    label: "Хүргэгчийн утас",
-    field: "supplier_phone",
-    sort: "disabled",
-    width: 100,
-  },
-  // {
-  //   label: "Хүргэлт",
-  //   field: "has_deliver",
-  //   sort: "disabled",
-  //   width: 50,
-  // },
-]
-
 const not_delivered_columns = [
   {
-    label: "Нэр",
+    label: "Номын нэр",
     field: "book_name",
     sort: "asc",
-    width: 100,
-  },
-  {
-    label: "Цалин",
-    field: "salary",
-    sort: "asc",
-    width: 100,
   },
   {
     label: "Хэрэглэгчийн утас",
@@ -86,25 +34,63 @@ const not_delivered_columns = [
     label: "Хэрэглэгчийн нэр",
     field: "customer_name",
     sort: "disabled",
-    width: 100,
   },
   {
     label: "Хүргэгчийн нэр",
     field: "supplier_name",
     sort: "asc",
-    width: 100,
   },
   {
     label: "Хүргэгчийн утас",
     field: "supplier_phone",
     sort: "disabled",
-    width: 100,
+  },
+  {
+    label: "Хүргэх хаяг",
+    field: "destination",
+    sort: "asc",
+  },
+  {
+    label: "Огноо",
+    field: "created_at",
+    sort: "disabled",
   },
   {
     label: "Хүргэлт",
     field: "has_deliver",
     sort: "disabled",
-    width: 50,
+  },
+]
+
+const delivered_columns = [
+  {
+    label: "Номын нэр",
+    field: "book_name",
+    sort: "asc",
+  },
+  {
+    label: "Хэрэглэгчийн утас",
+    field: "customer_phone",
+    sort: "disabled",
+  },
+  {
+    label: "Хэрэглэгчийн нэр",
+    field: "customer_name",
+    sort: "disabled",
+  },
+  {
+    label: "Хүргэгчийн нэр",
+    field: "supplier_name",
+    sort: "asc",
+  },
+  {
+    label: "Хүргэсэн хаяг",
+    field: "destination",
+    sort: "asc",
+  },
+  {
+    label: "Огноо",
+    field: "updated_at",
   },
 ]
 
@@ -121,6 +107,8 @@ export default function Delivery() {
   const [loading_dialog, set_loading_dialog] = useState(false)
   const [order_id, set_order_id] = useState(null)
   const [confirm_order, set_confirm_order] = useState(false)
+  const [book_desc_modal_center, set_book_desc_modal_center] = useState(false)
+  const [book_for_description, set_book_for_description] = useState({})
 
   const removeFromNotDelivered = async id => {
     console.log("data")
@@ -143,12 +131,6 @@ export default function Delivery() {
         url,
         {
           is_delivered: true,
-          book_name: update_data.book_name,
-          salary: id,
-          customer_phone: update_data.customer_phone,
-          customer_name: update_data.customer_name,
-          supplier_phone: update_data.supplier_phone,
-          supplier_name: update_data.supplier_name,
         },
         config
       )
@@ -166,53 +148,102 @@ export default function Delivery() {
   }
 
   async function fetchData() {
-    await axios({
-      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/delivery-registrations`,
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    })
-      .then(res => {
-        SetIsNetworkLoading(false)
-        SetIsNetworkError(false)
-        mapping(res.data)
-        console.log("res done", res.data)
+    try {
+      let delivery = await axios({
+        url: `${process.env.REACT_APP_STRAPI_BASE_URL}/delivery-registrations`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem("user_information")).jwt
+          }`,
+        },
+      }).catch(err => {
+        throw "error"
       })
-      .catch(err => {
-        console.log("error deliver")
-        SetIsNetworkError(false)
-        SetIsNetworkError(true)
+
+      let books = await axios({
+        url: `${process.env.REACT_APP_STRAPI_BASE_URL}/books`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem("user_information")).jwt
+          }`,
+        },
+      }).catch(err => {
+        throw "error"
       })
+
+      delivery = delivery.data
+      books = books.data
+
+      initializeData(delivery, books)
+      SetIsNetworkLoading(false)
+    } catch (err) {
+      SetIsNetworkLoading(false)
+    }
   }
 
   useEffect(() => {
     fetchData()
   }, [])
 
-  const mapping = deliver => {
+  const initializeData = (deliver, books) => {
     let set_delivered_data_temp = []
     let set_not_delivered_data_temp = []
     deliver.forEach(data => {
       if (data.is_delivered)
         set_delivered_data_temp.push({
-          book_name: data.book_name,
-          salary: data.id,
+          book_name: (
+            <a
+              href="#"
+              onClick={() => {
+                set_book_for_description(
+                  books.find(book => book.id == data.customer_paid_book.book)
+                )
+                set_book_desc_modal_center(true)
+              }}
+            >
+              {
+                books.find(book => book.id == data.customer_paid_book.book)
+                  ?.name
+              }
+            </a>
+          ),
+          destination: data.order_destination,
           customer_phone: data.customer?.phone,
           customer_name: data.customer?.username,
-          supplier_phone: data.employee?.username,
-          supplier_name: data.employee?.phone,
+          supplier_phone: data.employee?.phone,
+          supplier_name: data.employee?.fullname,
+          updated_at: new Date(data.updated_at).toLocaleString("mn-MN", {
+            timeZone: "Asia/Ulaanbaatar",
+          }),
         })
       else
         set_not_delivered_data_temp.push({
-          book_name: data.book_name,
-          salary: data.id,
+          book_name: (
+            <a
+              href="#"
+              onClick={() => {
+                set_book_for_description(
+                  books.find(book => book.id == data.customer_paid_book.book)
+                )
+                set_book_desc_modal_center(true)
+              }}
+            >
+              {
+                books.find(book => book.id == data.customer_paid_book.book)
+                  ?.name
+              }
+            </a>
+          ),
+          destination: data.order_destination,
           customer_phone: data.customer.phone,
-          customer_name: data.customer.username,
-          supplier_phone: data.employee.username,
-          supplier_name: data.employee.phone,
+          customer_name: data.customer.fullname,
+          supplier_phone: data.employee.phone,
+          supplier_name: data.employee.fullname,
+          created_at: new Date(data.created_at).toLocaleString("mn-MN", {
+            timeZone: "Asia/Ulaanbaatar",
+          }),
           has_deliver: (
             <Button
               type="submit"
@@ -223,7 +254,7 @@ export default function Delivery() {
                 set_order_id(data.id)
               }}
             >
-              Баталгаажуулах
+              Дуусгах
             </Button>
           ),
         })
@@ -271,7 +302,7 @@ export default function Delivery() {
                     <Card>
                       <CardBody>
                         <CardTitle className="font-size-20">
-                          Хүргэгдээгүй
+                          Хүргэгдээгүй захиалгууд
                         </CardTitle>
                         <MDBDataTable
                           proSelect
@@ -296,7 +327,7 @@ export default function Delivery() {
                     <Card>
                       <CardBody>
                         <CardTitle className="font-size-20">
-                          Хүргэгдсэн
+                          Хүргэгдсэн захиалгууд
                         </CardTitle>
                         <MDBDataTable
                           proSelect
@@ -388,8 +419,85 @@ export default function Delivery() {
               {"Үйлдэл амжилтгүй боллоо"}
             </SweetAlert>
           ) : null}
+          <Modal
+            size="lg"
+            isOpen={book_desc_modal_center}
+            toggle={() => {
+              set_book_desc_modal_center(!book_desc_modal_center)
+            }}
+            centered={true}
+          >
+            <div className="modal-header">
+              <h5 className="modal-title mt-0">Номын мэдээлэл </h5>
+              <button
+                type="button"
+                onClick={() => {
+                  set_book_desc_modal_center(false)
+                }}
+                className="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <Row>
+                <Col xs={5}>
+                  {book_for_description?.picture ? (
+                    <img
+                      alt={book_for_description?.name + " name"}
+                      src={`${process.env.REACT_APP_STRAPI_BASE_URL}${book_for_description?.picture.url}`}
+                      height="200"
+                      width="100%"
+                    />
+                  ) : null}
+                </Col>
+                <Col xs={7}>
+                  <table style={{ width: "100%" }}>
+                    <tr>
+                      <td>
+                        <b>Номын нэр:</b>
+                      </td>
+                      <td>{book_for_description?.name}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <b>Үнэ:</b>
+                      </td>
+                      <td>{book_for_description?.book_price}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <b>Зохиолчид:</b>
+                      </td>
+                      <td>{getAuthorsName(book_for_description)}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <b>Бүртгэгдсэн огноо:</b>
+                      </td>
+                      <td>
+                        {new Date(
+                          book_for_description?.created_at
+                        ).toLocaleString()}
+                      </td>
+                    </tr>
+                  </table>
+                </Col>
+              </Row>
+            </div>
+          </Modal>
         </Container>
       </div>
     </React.Fragment>
   )
+  function getAuthorsName(book) {
+    let authors = ""
+    if (book.book_authors != undefined)
+      book?.book_authors.forEach(
+        author => (authors += `${author.author_name}   `)
+      )
+    return authors
+  }
 }

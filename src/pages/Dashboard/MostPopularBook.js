@@ -29,13 +29,8 @@ const MostPopularBook = () => {
   return (
     <Card>
       <CardBody>
-        <CardTitle>Хамгийн эрэлттэй ном</CardTitle>
-        <CardSubtitle className="mb-3">
-          {/* Use the tab JavaScript plugin—include it individually or through the
-          compiled <code className="highlighter-rouge">bootstrap.js</code>{" "}
-          file—to extend our navigational tabs and pills to create tabbable
-          panes of local content, even via dropdown menus. */}
-        </CardSubtitle>
+        <CardTitle>Хамгийн их борлуулалттай ном</CardTitle>
+        <CardSubtitle className="mb-3"></CardSubtitle>
 
         <Nav pills className="navtab-bg nav-justified">
           <NavItem>

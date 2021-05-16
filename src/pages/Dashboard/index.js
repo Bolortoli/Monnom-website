@@ -20,7 +20,7 @@ const Dashboard = () => {
       description: "1000",
     },
     {
-      title: "Нийт Подкастын хандалт",
+      title: "Нийт Подкастын дагагчид",
       iconClass: "bx bx-user",
       description: "1000",
     },
@@ -114,7 +114,7 @@ const Dashboard = () => {
             <Col lg={6}>
               <Card>
                 <CardBody>
-                  <CardTitle className="mb-4">Хандалтууд</CardTitle>
+                  <CardTitle className="mb-4">Хэрэглэгчид (насаар)</CardTitle>
                   <Accessions />
                 </CardBody>
               </Card>
@@ -122,7 +122,7 @@ const Dashboard = () => {
             <Col lg={6}>
               <Card>
                 <CardBody>
-                  <CardTitle className="mb-4">Хандалт хугацаагаар</CardTitle>
+                  <CardTitle className="mb-4">Цахим номын борлуулалт</CardTitle>
                   <AccessPeriod />
                 </CardBody>
               </Card>
@@ -130,7 +130,7 @@ const Dashboard = () => {
             <Col lg={6}>
               <Card>
                 <CardBody>
-                  <CardTitle className="mb-4">Хандалт хүйсээр</CardTitle>
+                  <CardTitle className="mb-4">Хэрэглэгчид (хүйсээр)</CardTitle>
                   <AccessByGender />
                 </CardBody>
               </Card>
@@ -138,7 +138,9 @@ const Dashboard = () => {
             <Col lg={6}>
               <Card>
                 <CardBody>
-                  <CardTitle className="mb-4">Орлогын мэдээлэл</CardTitle>
+                  <CardTitle className="mb-4">
+                    Хэвлэмэл номын борлуулалт
+                  </CardTitle>
                   <IncomeInformation />
                 </CardBody>
               </Card>

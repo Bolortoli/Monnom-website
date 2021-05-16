@@ -16,25 +16,40 @@ const Sales = () => {
   const [isNetworkLoading, SetIsNetworkLoading] = useState(true)
 
   async function fetchEbookData() {
-    await axios({
-      url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-ebooks`,
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    })
-      .then(res => {
-        division(res.data)
+    try {
+      let books = await axios({
+        url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-books`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem("user_information")).jwt
+          }`,
+        },
+      }).catch(err => {
+        throw "error"
+      })
 
-        SetIsNetworkLoading(false)
-        setIsNetworkError(false)
+      let ebooks = await axios({
+        url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-ebooks`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem("user_information")).jwt
+          }`,
+        },
+      }).catch(err => {
+        throw "error"
       })
-      .catch(err => {
-        SetIsNetworkLoading(false)
-        setIsNetworkError(true)
-      })
+
+      set_book_data(books.data)
+      set_ebook_data(ebooks.data)
+
+      SetIsNetworkLoading(false)
+      setIsNetworkError(false)
+    } catch (error) {
+      SetIsNetworkLoading(false)
+      setIsNetworkError(true)
+    }
   }
 
   function division(allBooks) {
@@ -42,14 +57,12 @@ const Sales = () => {
     let books = []
 
     {
-      allBooks.map(book => {
-        if (book.book.has_sale && book.book.has_pdf) {
-          books.push(book)
+      allBooks.forEach(book => {
+        if (book.book.has_audio || book.book.has_pdf) {
           ebooks.push(book)
-        } else if (book.book.has_sale && !book.book.has_pdf) {
+        }
+        if (book.book.has_sale) {
           books.push(book)
-        } else if (!book.book.has_sale && book.book.has_pdf) {
-          ebooks.push(book)
         }
       })
     }

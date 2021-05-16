@@ -10,6 +10,7 @@ const RighBar = props => {
   const { edit_live_channel, set_edit_live_channel } = useLiveChannelStates()
 
   const [confirm_edit, set_confirm_edit] = useState(false)
+  const [confirm_delete, set_confirm_delete] = useState(false)
   const [success_dlg, set_success_dlg] = useState(false)
   const [error_dialog, set_error_dialog] = useState(false)
   const [loading_dialog, set_loading_dialog] = useState(false)
@@ -20,11 +21,8 @@ const RighBar = props => {
   const [edit_live_state, set_edit_live_state] = useState(false)
 
   const editLiveInfo = async () => {
-    console.log("id", edit_live_channel)
-    console.log("radios", selectedCard[edit_live_channel].radio_channel_audios)
     const config = {
       headers: {
-        "content-type": "multipart/form-data",
         Authorization: `Bearer ${
           JSON.parse(localStorage.getItem("user_information")).jwt
         }`,
@@ -36,16 +34,46 @@ const RighBar = props => {
         {
           name: edit_live_name,
           description: edit_live_desc,
-          radio_channel_audios:
-            selectedCard[edit_live_channel].radio_channel_audios,
+          is_active: edit_live_state,
         },
         config
       )
       .then(res => {
         set_loading_dialog(false)
         set_success_dlg(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
       })
       .catch(err => {
+        set_loading_dialog(false)
+        set_error_dialog(true)
+      })
+  }
+
+  // delete live channel
+  const deleteLive = async () => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${
+          JSON.parse(localStorage.getItem("user_information")).jwt
+        }`,
+      },
+    }
+
+    await axios
+      .delete(
+        `${process.env.REACT_APP_STRAPI_BASE_URL}/radio-channels/${edit_live_channel}`,
+        config
+      )
+      .then(async res => {
+        set_loading_dialog(false)
+        set_success_dlg(true)
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+      })
+      .catch(res => {
         set_loading_dialog(false)
         set_error_dialog(true)
       })
@@ -57,54 +85,90 @@ const RighBar = props => {
   }
 
   useEffect(() => {
-    if (selectedCard[edit_live_channel]) {
-      set_edit_live_state(selectedCard[edit_live_channel].state)
-      set_edit_live_name(selectedCard[edit_live_channel].name)
-      set_edit_live_desc(selectedCard[edit_live_channel].description)
+    if (edit_live_channel != null) {
+      let tempCard = selectedCard.find(card => card.id == edit_live_channel)
+      console.log(tempCard)
+      set_edit_live_state(tempCard.is_active)
+      set_edit_live_name(tempCard.name)
+      set_edit_live_desc(tempCard.description)
     }
   }, [edit_live_channel])
 
   return (
     <React.Fragment>
-      <Card>
-        <CardBody>
-          <h4 className="mb-3">
-            <strong>Засварлах</strong>
-          </h4>
-          <Label>Нэр</Label>
-          <Input
-            className="mb-3"
-            type="text"
-            value={edit_live_name}
-            onChange={e => set_edit_live_name(e.target.value)}
-          />
-          <Label>Тайлбар</Label>
-          <Input
-            type="textarea"
-            style={{
-              minHeight: "100px",
-            }}
-            value={edit_live_desc}
-            onChange={e => {
-              set_edit_live_desc(e.target.value)
-            }}
-          />
-          <div className="d-flex justify-content-between align-items-center my-3">
-            <Label className="my-auto">Төлөв</Label>
-            <label className="d-flex w-50 my-auto justify-content-around">
-              <Switch onChange={handleChange} checked={edit_live_state} />
-            </label>
-          </div>
-          <Button
-            className="btn btn-success text-right"
-            onClick={() => {
-              set_confirm_edit(true)
-            }}
-          >
-            Хадгалах
-          </Button>
-        </CardBody>
-      </Card>
+      {edit_live_channel != null && (
+        <>
+          <Card>
+            <CardBody>
+              <h4 className="mb-3">
+                <strong>Засварлах</strong>
+              </h4>
+              <Label>Нэр</Label>
+              <Input
+                className="mb-3"
+                type="text"
+                value={edit_live_name}
+                onChange={e => set_edit_live_name(e.target.value)}
+              />
+              <Label>Тайлбар</Label>
+              <Input
+                type="textarea"
+                style={{
+                  minHeight: "100px",
+                }}
+                value={edit_live_desc}
+                onChange={e => {
+                  set_edit_live_desc(e.target.value)
+                }}
+              />
+              <div className="d-flex justify-content-between align-items-center my-3">
+                <Label className="my-auto">Төлөв</Label>
+                <label className="d-flex w-50 my-auto justify-content-around">
+                  <Switch onChange={handleChange} checked={edit_live_state} />
+                </label>
+              </div>
+              <div className="d-flex justify-content-between">
+                <Button
+                  className="btn btn-success text-right"
+                  onClick={() => {
+                    set_confirm_edit(true)
+                  }}
+                >
+                  Хадгалах
+                </Button>
+
+                <Button
+                  className="btn btn-danger text-right"
+                  onClick={() => {
+                    set_confirm_delete(true)
+                  }}
+                >
+                  Устгах
+                </Button>
+              </div>
+            </CardBody>
+          </Card>
+        </>
+      )}
+      {confirm_delete ? (
+        <SweetAlert
+          title="Лайв сувгыг устгах ?"
+          info
+          showCancel
+          confirmBtnText="Тийм!"
+          cancelBtnText="Болих"
+          confirmBtnBsStyle="success"
+          cancelBtnBsStyle="danger"
+          onConfirm={() => {
+            deleteLive()
+            set_loading_dialog(true)
+            set_confirm_delete(false)
+          }}
+          onCancel={() => {
+            set_confirm_delete(false)
+          }}
+        ></SweetAlert>
+      ) : null}
       {confirm_edit ? (
         <SweetAlert
           title="Лайв сувагт өөрчлөлт хийх гэж байна ?"
@@ -173,16 +237,6 @@ const RighBar = props => {
           success
         ></SweetAlert>
       ) : null}
-      <Card>
-        <CardBody className="d-flex align-items-center">
-          <Label className="mr-3">Нийт файлийн тоо</Label>
-          <Label className="text-dark font-size-15">
-            {selectedCard[edit_live_channel]
-              ? selectedCard[edit_live_channel].radio_channel_audios.length
-              : []}
-          </Label>
-        </CardBody>
-      </Card>
     </React.Fragment>
   )
 }

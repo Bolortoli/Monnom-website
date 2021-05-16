@@ -16,12 +16,10 @@ const CardContact = props => {
   const [user, set_user] = useState(props.user)
   // console.log(user);
   const [user_desc_modal_center, set_user_desc_modal_center] = useState(false)
-  const [user_delete_modal_center, set_user_delete_modal_center] = useState(
-    false
-  )
-  const [user_update_modal_center, set_user_update_modal_center] = useState(
-    false
-  )
+  const [user_delete_modal_center, set_user_delete_modal_center] =
+    useState(false)
+  const [user_update_modal_center, set_user_update_modal_center] =
+    useState(false)
   const [edit_username, set_edit_username] = useState("")
   const [edit_password, set_edit_password] = useState("")
   const [edit_phone, set_edit_phone] = useState("")
@@ -48,7 +46,6 @@ const CardContact = props => {
   ]
 
   const sendEditUserRequest = user_id => {
-    set_edit_form_loading(true)
     let tempData = { id: user_id }
     if (edit_username !== "")
       tempData = { ...tempData, username: edit_username }
@@ -66,7 +63,7 @@ const CardContact = props => {
       set_user_update_modal_center(false)
       return
     }
-    // console.log(tempData);
+    set_edit_form_loading(true)
     axios({
       method: "PUT",
       url: `${process.env.REACT_APP_STRAPI_BASE_URL}/users/${user.id}`,
@@ -98,12 +95,12 @@ const CardContact = props => {
   }
 
   const sendDeleteUserRequest = async user_id => {
+    props.setloading_dialog(true)
     await axios
       .delete(`${process.env.REACT_APP_STRAPI_BASE_URL}/users/${user.id}`)
       .then(res => {
         props.setloading_dialog(false)
         props.success(true)
-        set_user_delete_modal_center(false)
         setTimeout(() => {
           window.location.reload()
         }, 2000)
@@ -216,20 +213,6 @@ const CardContact = props => {
               </div>
               <div className="flex-fill">
                 <Link
-                  onClick={() => toggle_user_delete_modal()}
-                  id={"remove" + user.id}
-                >
-                  <i className="bx bx-trash-alt" />
-                  <UncontrolledTooltip
-                    placement="top"
-                    target={"remove" + user.id}
-                  >
-                    Устгах
-                  </UncontrolledTooltip>
-                </Link>
-              </div>
-              <div className="flex-fill">
-                <Link
                   id={"project" + user.id}
                   onClick={() => toggle_user_desc_modal()}
                 >
@@ -242,17 +225,6 @@ const CardContact = props => {
                   </UncontrolledTooltip>
                 </Link>
               </div>
-              {/* <div className="flex-fill">
-								<Link to="#" id={"profile" + user.id}>
-									<i className="bx bx-user-circle" />
-									<UncontrolledTooltip
-										placement="top"
-										target={"profile" + user.id}
-									>
-										Profile
-									</UncontrolledTooltip>
-								</Link>
-							</div> */}
             </div>
           </CardFooter>
         </Card>
@@ -384,7 +356,6 @@ const CardContact = props => {
                     <button
                       type="reset"
                       onClick={() => {
-                        props.setloading_dialog(true)
                         sendEditUserRequest(user.id)
                       }}
                       className="btn btn-success waves-effect btn-label waves-light"
@@ -394,12 +365,12 @@ const CardContact = props => {
                     <button
                       onClick={e => {
                         e.preventDefault()
-                        set_user_update_modal_center(false)
+                        sendDeleteUserRequest(user.id)
                       }}
                       style={{ marginLeft: "5px" }}
                       className="btn btn-danger waves-effect btn-label waves-light"
                     >
-                      <i className="bx bx-check-double label-icon"></i> Болих
+                      <i className="bx bx-trash-alt label-icon"></i> Устгах
                     </button>
                   </Col>
                 </Row>
@@ -412,42 +383,6 @@ const CardContact = props => {
               </Col>
             </Row>
           )}
-        </div>
-      </Modal>
-      <Modal
-        isOpen={user_delete_modal_center}
-        toggle={() => {
-          toggle_user_delete_modal()
-        }}
-        centered={true}
-      >
-        <div className="modal-header">
-          <h5 className="modal-title mt-0">
-            <b>Ажилтны мэдээлэл устгах</b>
-          </h5>
-          <button
-            type="button"
-            onClick={() => {
-              set_user_delete_modal_center(false)
-            }}
-            className="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div className="m-3 text-right">
-          <button
-            type="reset"
-            onClick={() => {
-              props.setloading_dialog(true)
-              sendDeleteUserRequest(user.id)
-            }}
-            className="btn btn-danger waves-effect btn-label waves-light"
-          >
-            <i className="bx bx-check-double label-icon"></i> Устгах
-          </button>
         </div>
       </Modal>
     </React.Fragment>

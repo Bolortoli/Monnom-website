@@ -5,20 +5,17 @@ const MostPopularPodcast = () => {
   return (
     <Card>
       <CardBody>
-        {/* <CardTitle>Хамгийн эрэлттэй подкастууд</CardTitle> */}
-        <CardSubtitle className="mb-3">
-          {/* For basic styling—light padding and only horizontal dividers—add the
-          base className .table to any &lt;table&gt;. */}
-        </CardSubtitle>
+        <CardTitle>Хамгийн олон дагагчтай подкаст сувгууд</CardTitle>
+        <CardSubtitle className="mb-3"></CardSubtitle>
 
-        {/* <div className="table-responsive">
+        <div className="table-responsive">
           <Table className="table mb-0">
             <thead>
               <tr>
-                <th>#</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Username</th>
+                <th>Дугаар</th>
+                <th>Нэр</th>
+                <th>Онцлох</th>
+                <th>Нийт дагагчид</th>
               </tr>
             </thead>
             <tbody>
@@ -96,7 +93,7 @@ const MostPopularPodcast = () => {
               </tr>
             </tbody>
           </Table>
-        </div> */}
+        </div>
       </CardBody>
     </Card>
   )

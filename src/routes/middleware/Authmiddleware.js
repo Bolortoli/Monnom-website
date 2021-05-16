@@ -11,19 +11,57 @@ const Authmiddleware = ({
   <Route
     {...rest}
     render={props => {
-      // console.log('localStorage.getItem("authUser")')
-      // console.log(localStorage.getItem("isAuthenticated"))
       if (
         isAuthProtected &&
         (!localStorage.getItem("isAuthenticated") ||
           localStorage.getItem("user_information") == null)
       ) {
+        // if ()
         return (
           <Redirect
             to={{ pathname: "/login", state: { from: props.location } }}
           />
         )
       }
+      // if (isAuthProtected) {
+      //   if (
+      //     JSON.parse(localStorage.getItem("user_information")).user.user_role ==
+      //     3
+      //   )
+      //     return (
+      //       <Redirect
+      //         to={{ pathname: "/delivery", state: { from: props.location } }}
+      //       />
+      //     )
+      //   if (
+      //     JSON.parse(localStorage.getItem("user_information")).user.user_role ==
+      //     4
+      //   )
+      //     return (
+      //       <Redirect
+      //         to={{
+      //           pathname: `/podcastSingle/${
+      //             JSON.parse(localStorage.getItem("user_information")).user.id
+      //           }`,
+      //           state: { from: props.location },
+      //         }}
+      //       />
+      //     )
+      //   if (
+      //     JSON.parse(localStorage.getItem("user_information")).user.user_role ==
+      //     3
+      //   )
+      //     return (
+      //       <Redirect
+      //         to={{
+      //           pathname: `/bookSingle/${
+      //             JSON.parse(localStorage.getItem("user_information")).user.id
+      //           }`,
+      //           state: { from: props.location },
+      //         }}
+      //       />
+      //     )
+      // }
 
       return (
         <Layout>
