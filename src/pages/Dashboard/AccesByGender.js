@@ -1,11 +1,16 @@
 import React from "react"
 import ReactApexChart from "react-apexcharts"
 
-const AccessByGender = () => {
-  const series = [44, 55]
+const AccessByGender = props => {
+  const series = [
+    props.acces_by_gender.maleCount,
+    props.acces_by_gender.femaleCount,
+    props.acces_by_gender.othersCount,
+  ]
+
   const options = {
-    labels: ["Эрэгтэй", "Эмэгтэй"],
-    colors: ["#34c38f", "#556ee6"],
+    labels: ["Эрэгтэй", "Эмэгтэй", "Бусад"],
+    colors: ["#34c38f", "#556ee6", "#e243a2"],
     legend: {
       show: true,
       position: "bottom",

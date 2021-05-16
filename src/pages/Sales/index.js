@@ -71,30 +71,8 @@ const Sales = () => {
     set_ebook_data(ebooks)
   }
 
-  // async function fetchBookData() {
-  //   await axios({
-  //     url: `${process.env.REACT_APP_STRAPI_BASE_URL}/customer-paid-books`,
-  //     method: "GET",
-  //     headers: {
-  //       Authorization: `Bearer ${
-  //         JSON.parse(localStorage.getItem("user_information")).jwt
-  //       }`,
-  //     },
-  //   })
-  //     .then(res => {
-  //       set_book_data(res.data)
-  //       setIsNetworkError(false)
-  //       SetIsNetworkLoading(false)
-  //     })
-  //     .catch(err => {
-  //       SetIsNetworkLoading(false)
-  //       setIsNetworkError(true)
-  //     })
-  // }
-
   useEffect(() => {
     fetchEbookData()
-    // fetchBookData()
   }, [])
 
   return (

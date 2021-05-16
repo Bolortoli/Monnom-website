@@ -1,80 +1,54 @@
-import React from "react";
-import ReactApexChart from "react-apexcharts";
+import React, { useEffect, useState } from "react"
+import ReactApexChart from "react-apexcharts"
 
-const Accessions = () => {
+const Accessions = props => {
   const series = [
-    {
-      name: "Session Duration",
-      data: [45, 52, 38, 24, 33, 26, 21, 20, 6, 8, 15, 10],
-    },
-    {
-      name: "Page Views",
-      data: [36, 42, 60, 42, 13, 18, 29, 37, 36, 51, 32, 35],
-    },
-    {
-      name: "Total Visits",
-      data: [89, 56, 74, 98, 72, 38, 64, 46, 84, 58, 46, 49],
-    },
-  ];
+    props.userByAge.category18,
+    props.userByAge.category18_28,
+    props.userByAge.category28_38,
+    props.userByAge.category38_48,
+    props.userByAge.category48_58,
+    props.userByAge.category58,
+  ]
+
   const options = {
-    chart: { zoom: { enabled: !1 }, toolbar: { show: !1 } },
-    colors: ["#556ee6", "#f46a6a", "#34c38f"],
-    dataLabels: { enabled: !1 },
-    stroke: { width: [3, 4, 3], curve: "straight", dashArray: [0, 8, 5] },
-    title: { text: "Page Statistics", align: "left" },
-    markers: { size: 0, hover: { sizeOffset: 6 } },
-    xaxis: {
-      categories: [
-        "01 Jan",
-        "02 Jan",
-        "03 Jan",
-        "04 Jan",
-        "05 Jan",
-        "06 Jan",
-        "07 Jan",
-        "08 Jan",
-        "09 Jan",
-        "10 Jan",
-        "11 Jan",
-        "12 Jan",
-      ],
+    labels: [
+      "18 доош нас",
+      "18 - 28 нас",
+      "28 - 38 нас",
+      "38 - 48 нас",
+      "48 - 58 нас",
+      "58 дээш нас ",
+    ],
+    colors: ["#34c38f", "#556ee6", "#e243a2", "#1c93a3", "#f1cd23", "#b83023"],
+    legend: {
+      show: true,
+      position: "bottom",
+      horizontalAlign: "center",
+      verticalAlign: "middle",
+      floating: false,
+      fontSize: "14px",
+      offsetX: 0,
+      offsetY: -10,
     },
-    tooltip: {
-      y: [
-        {
-          title: {
-            formatter: function (e) {
-              return e + " (mins)";
-            },
+    responsive: [
+      {
+        breakpoint: 600,
+        options: {
+          chart: {
+            height: 240,
+          },
+          legend: {
+            show: false,
           },
         },
-        {
-          title: {
-            formatter: function (e) {
-              return e + " per session";
-            },
-          },
-        },
-        {
-          title: {
-            formatter: function (e) {
-              return e;
-            },
-          },
-        },
-      ],
-    },
-    grid: { borderColor: "#f1f1f1" },
-  };
+      },
+    ],
+  }
 
   return (
-    <ReactApexChart
-      options={options}
-      series={series}
-      type="line"
-      height="380"
-    />
-  );
-};
+    <ReactApexChart options={options} series={series} type="pie" height="380" />
+  )
+}
 
-export default Accessions;
+export default Accessions

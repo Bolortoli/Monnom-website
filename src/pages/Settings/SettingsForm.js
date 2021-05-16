@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react"
 import axios from "axios"
 import SweetAlert from "react-bootstrap-sweetalert"
-import { Card, CardBody, Col, Row, CardTitle, Button, Label } from "reactstrap"
+import {
+  Card,
+  CardBody,
+  Col,
+  Row,
+  CardTitle,
+  Button,
+  Label,
+  Alert,
+} from "reactstrap"
 import Select from "react-select"
 import { Link } from "react-router-dom"
 import { Editor } from "react-draft-wysiwyg"
@@ -990,7 +999,7 @@ const SettingsForm = () => {
                                 set_insert_channels_id(e.target.value)
                               }
                             >
-                               <option selected defaultValue hidden value={null}>
+                              <option selected defaultValue hidden value={null}>
                                 --Сонгох--
                               </option>
                               {all_channels.length != 0
