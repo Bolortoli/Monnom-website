@@ -99,7 +99,6 @@ const AddBook = props => {
     formData.append("files.pdf_book_path", book_files[0])
     formData.append("files.picture", book_picture)
     for (let i = 0; i < selectedFiles.length; i++) {
-      console.log(selectedFiles[i].name.split(".").slice(0, -1).join("."))
       formData.append(
         "files.picture_comment",
         selectedFiles[i],
@@ -126,8 +125,6 @@ const AddBook = props => {
             getAudioFileDuration(audio_book_files_for_save[index])
               .then(resp => {
                 let audio_duration = resp
-                console.log(audio_duration)
-                console.log("let audio_duration = res")
                 let tempFormData = new FormData()
                 let data = {
                   chapter_name: audio_book_files_for_save[index].name
@@ -149,7 +146,6 @@ const AddBook = props => {
                 })
               })
               .catch(err => {
-                console.log(err)
               })
           )
         })
@@ -175,7 +171,6 @@ const AddBook = props => {
               })
           })
           .catch(e => {
-            console.log(e)
             setloading_dialog(false)
             seterror_dialog(true)
           })
@@ -192,9 +187,7 @@ const AddBook = props => {
           window.webkitAudioContext)()
         audioContext.decodeAudioData(event.target.result).then(buffer => {
           let duration = buffer.duration
-          console.log(
-            "The duration of the song is of: " + duration + " seconds"
-          )
+          
           resolve(duration)
         })
       }
@@ -202,7 +195,6 @@ const AddBook = props => {
     })
   
   async function getBookInfo() {
-    console.log(admin_id)
     await axios({
       url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/book-single-by-author/${admin_id}`,
       method: "GET",
@@ -226,8 +218,6 @@ const AddBook = props => {
 
   // props oos irsen nomnii categoruudiig awah
   const getAuthorsCategoriesInfo = (authors, categories) => {
-    console.log("author")
-    console.log(authors)
     const a = authors.map(author => {
       return {
         label: author.author_name,
@@ -356,7 +346,6 @@ const AddBook = props => {
     var files = e.target.files
 
     let tempfiles = []
-    console.log(files)
     for (let i = 0; i < files.length; i++) {
       tempfiles.push(files[i])
     }

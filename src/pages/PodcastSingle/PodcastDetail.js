@@ -53,7 +53,6 @@ const PodcastDetail = props => {
         setTimeout(() => {
           window.location.reload()
         }, 2000)
-        console.log(res.data)
       })
       .catch(err => {
         seterror_dialog(true)

@@ -9,8 +9,6 @@ const GRID = 8
 
 // fake data generator
 const getItems = files => {
-  // return [];
-  // console.log(files)
   files.sort((a, b) =>
     a.stack_number > b.stack_number
       ? 1
@@ -27,7 +25,6 @@ const getItems = files => {
       audio_id: files[key].id,
     })
   })
-  // console.log(tempArray)
   return tempArray
 }
 
@@ -144,8 +141,6 @@ const Live = () => {
         getAudioFileDuration(audio_files_for_save[index])
           .then(resp => {
             let audio_duration = resp
-            console.log(audio_duration)
-            console.log("let audio_duration = res")
             let tempFormData = new FormData()
             let data = {
               audio_name: audio_files_for_save[index].name
@@ -164,7 +159,6 @@ const Live = () => {
             })
           })
           .catch(err => {
-            console.log(err)
           })
       )
     })
@@ -190,7 +184,6 @@ const Live = () => {
           })
       })
       .catch(e => {
-        console.log(e)
         setloading_dialog(false)
         seterror_dialog(true)
       })
@@ -211,7 +204,6 @@ const Live = () => {
         index,
       }
     })
-    console.log(tempStackSequence)
 
     axios
       .all(
@@ -241,7 +233,6 @@ const Live = () => {
     var files = e.target.files
     set_upload_files(getUploadItems(files))
     let tempfiles = []
-    console.log(files)
     for (let i = 0; i < files.length; i++) {
       tempfiles.push(files[i])
     }
@@ -258,9 +249,7 @@ const Live = () => {
           window.webkitAudioContext)()
         audioContext.decodeAudioData(event.target.result).then(buffer => {
           let duration = buffer.duration
-          console.log(
-            "The duration of the song is of: " + duration + " seconds"
-          )
+          
           resolve(duration)
         })
       }
@@ -321,8 +310,6 @@ const Live = () => {
       result.source.index,
       result.destination.index
     )
-
-    console.log(items)
 
     set_old_files(items)
   }

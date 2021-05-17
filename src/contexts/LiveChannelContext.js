@@ -12,7 +12,6 @@ function LiveChannelContextProvider({ children }) {
   const [isNetworking, setIsNetworking] = useState(false)
 
   async function fetchData() {
-    console.log("hhe daata")
     await axios({
       url: `${process.env.REACT_APP_STRAPI_BASE_URL}/radio-channels/`,
       method: "GET",
@@ -23,8 +22,6 @@ function LiveChannelContextProvider({ children }) {
       },
     })
       .then(res => {
-        console.log("hhe daata")
-        console.log(res.data)
         set_live_channels(res.data)
         setSelectedCard(res.data)
         setIsNetworking(false)
@@ -35,7 +32,6 @@ function LiveChannelContextProvider({ children }) {
   }
 
   useEffect(() => {
-    console.log("useEffect")
     fetchData()
   }, [])
 

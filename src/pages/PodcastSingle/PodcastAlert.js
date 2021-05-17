@@ -50,7 +50,6 @@ const PodcastAlert = (props) => {
       tempData = { ...tempData, password: edit_password };
     if (edit_phone != "") tempData = { ...tempData, phone: edit_phone };
     if (edit_email != "") tempData = { ...tempData, email: edit_email };
-    console.log(tempData);
     axios({
       method: "POST",
       url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/update-employee`,
@@ -62,10 +61,8 @@ const PodcastAlert = (props) => {
       },
     })
       .then((res) => {
-        console.log(res);
       })
       .catch((err) => {
-        console.log(err);
       });
   };
 
@@ -102,11 +99,7 @@ const PodcastAlert = (props) => {
 
   return (
     <React.Fragment>
-      {/* {console.log(user)}
-			{console.log(edit_username)}
-			{console.log(edit_password)}
-			{console.log(edit_phone)}
-			{console.log(edit_email)} */}
+      
       <Col xl="3" sm="6">
         <Card className="text-center">
           <CardBody>

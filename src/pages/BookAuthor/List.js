@@ -190,7 +190,6 @@ const List = props => {
   // props oos irsen nomnii categoruudiig awah
   const getAuthorsInfo = (authors, book_id) => {
     const bookAuthors = props.books
-      // console.log(props.books.find(b => b.id == 1))
       .find(b => b.id == book_id)
       .book_author.map(author => {
         return {
@@ -207,13 +206,11 @@ const List = props => {
         value: author.id,
       }
     })
-    console.log()
     set_optionGroup_authors(a)
   }
 
   const getCategoryInfo = (categories, book_id) => {
     const bookCategories = props.books
-      // console.log(props.books.find(b => b.id == 1))
       .find(b => b.id == book_id)
       .book_category.map(category => {
         return {
@@ -230,12 +227,10 @@ const List = props => {
         value: category.id,
       }
     })
-    console.log()
     set_optionGroup_categories(a)
   }
 
   const initData = booksData => {
-    console.log(booksData)
     let tempInitialData = booksData.map(d => {
       return {
         book_id: d.id,
@@ -340,8 +335,6 @@ const List = props => {
   }
 
   useEffect(() => {
-    console.log("props")
-    console.log(props)
 
     initData(props.books)
   }, [])
@@ -360,7 +353,6 @@ const List = props => {
 
   // delete comment
   const removeComment = async comm => {
-    console.log(comm)
     set_edit_book_comments(edit_book_comments.filter(x => x !== comm))
     await axios
       .delete(
@@ -439,7 +431,6 @@ const List = props => {
             onConfirm={() => {
               set_edit_user_step(false)
               set_confirm_edit(true)
-              console.log("file = > ", selectedMulti_author)
             }}
             onCancel={() => {
               set_edit_user_step(false)
@@ -479,7 +470,6 @@ const List = props => {
                       isMulti={true}
                       placeholder="Сонгох ... "
                       onChange={e => {
-                        console.log(e)
                         handleMulti_book_author(e)
                       }}
                       options={optionGroup_authors}
@@ -500,7 +490,6 @@ const List = props => {
                       isMulti={true}
                       placeholder="Сонгох ... "
                       onChange={e => {
-                        console.log(e)
                         handleMulti_book_category(e)
                       }}
                       options={optionGroup_categories}

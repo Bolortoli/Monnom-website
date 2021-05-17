@@ -18,7 +18,6 @@ const PodcastList = () => {
   const [isNetworkLoading, SetIsNetworkLoading] = useState(false)
 
   async function fetchData() {
-    console.log("id -> ", id)
     await axios({
       url: `${process.env.REACT_APP_EXPRESS_BASE_URL}/podcast-channels`,
       method: "GET",
@@ -29,13 +28,11 @@ const PodcastList = () => {
       },
     })
       .then(res => {
-        console.log("hehe")
-        console.log(res.data)
+
         SetIsNetworkLoading(true)
         set_data(res.data)
       })
       .catch(err => {
-        console.log("err2")
         setIsNetworking(true)
       })
   }

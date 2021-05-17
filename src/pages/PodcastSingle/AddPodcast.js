@@ -69,7 +69,6 @@ const AddPodcast = props => {
       episode_number: latestEpisodeNumber + 1,
       mp3_duration: mp3_file_duration,
     }
-    console.log(tempSendData)
     podcastDataToUpload.append("data", JSON.stringify(tempSendData))
 
     const config = {
@@ -148,7 +147,6 @@ const AddPodcast = props => {
 
       audioContext.decodeAudioData(event.target.result, function (buffer) {
         var duration = buffer.duration
-        // console.log("The duration of the song is of: " + duration + " seconds")
         set_mp3_file_duration(duration.toString())
       })
     }

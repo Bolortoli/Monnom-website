@@ -260,8 +260,6 @@ const SettingsForm = () => {
   const saveBook = async () => {
     setloading_dialog(true)
 
-    console.log(special_book_id)
-
     const config = {
       headers: {
         Authorization: `Bearer ${
@@ -480,7 +478,6 @@ const SettingsForm = () => {
   }
 
   const getCategoriesInfo = categories => {
-    console.log("id myu ", categories[0].value)
     const a = categories.map(category => {
       return {
         label: category.label,
@@ -541,8 +538,6 @@ const SettingsForm = () => {
                     {termsData ? (
                       <Editor
                         onEditorStateChange={e => {
-                          console.log(e)
-                          console.log("eeee => ", wysiwyg_content)
                           set_wysiwyg_content(e)
                         }}
                         defaultEditorState={wysiwyg_content}
@@ -593,7 +588,6 @@ const SettingsForm = () => {
                           id="bookAuthorsCategory"
                           onChange={e => {
                             set_author_category_id(e.target.value)
-                            console.log("id [ ", e.target.value)
                           }}
                         >
                           <option selected defaultValue hidden value={null}>
@@ -763,7 +757,6 @@ const SettingsForm = () => {
                           className="form-control"
                           id="podcastCategory"
                           onChange={e => {
-                            console.log(e.target.value)
                             set_podcast_category_id(e.target.value)
                           }}
                         >

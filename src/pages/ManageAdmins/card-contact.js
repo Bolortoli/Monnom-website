@@ -14,7 +14,6 @@ import {
 
 const CardContact = props => {
   const [user, set_user] = useState(props.user)
-  // console.log(user);
   const [user_desc_modal_center, set_user_desc_modal_center] = useState(false)
   const [user_delete_modal_center, set_user_delete_modal_center] =
     useState(false)
@@ -75,8 +74,6 @@ const CardContact = props => {
       },
     })
       .then(res => {
-        // console.log(res.data)
-        // console.log(props.initializeUsersList([res.data]))
         props.setloading_dialog(false)
         props.success(true)
         set_edit_form_loading(false)
@@ -90,7 +87,7 @@ const CardContact = props => {
         props.setloading_dialog(false)
         props.error(true)
         set_edit_form_loading(false)
-        console.log(err)
+        
       })
   }
 

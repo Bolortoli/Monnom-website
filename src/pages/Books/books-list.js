@@ -85,12 +85,10 @@ let BookCard = props => {
                     id={props.book.id}
                     onClick={() => {
                       if (props.book.is_featured) {
-                        console.log("props.book.podcast_name")
                         props.set_are_you_sure_title(
                           `"${props.book.book_name}" номыг онцлох номноос хасах гэж байна. Та итгэлтэй байна уу?`
                         )
                       } else {
-                        console.log(props.book.book_name)
                         props.set_are_you_sure_title(
                           `"${props.book.book_name}" номыг онцлох ном болгох гэж байна. Та итгэлтэй байна уу?`
                         )
@@ -268,13 +266,13 @@ const Books = () => {
               <Container fluid>
                 <Row>
                   <Col lg={4}>
-                    <AddBook
+                    {/* <AddBook
                       admins_info={admins_info}
                       setIsNetworkingError={setIsNetworkingError}
-                    />
+                    /> */}
                   </Col>
 
-                  <Col xl={4} lg={6} md={8} xs={8} sm={8}>
+                  <Col xl={4} lg={4} md={6} xs={6} sm={6}>
                     <form className="app-search d-none d-lg-block">
                       <div className="position-relative">
                         <input

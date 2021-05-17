@@ -20,9 +20,6 @@ const BookAnalysis = props => {
       set_book_series(tempBookSeries)
       set_online_book_series(tempOnlineBookSeries)
     })
-
-    console.log("props.books")
-    console.log(props.books)
   }, [])
 
   const series = [

@@ -111,11 +111,6 @@ export default function Delivery() {
   const [book_for_description, set_book_for_description] = useState({})
 
   const removeFromNotDelivered = async id => {
-    console.log("data")
-    console.log(update_data)
-    console.log("id")
-    console.log(id)
-
     const config = {
       headers: {
         Authorization: `Bearer ${

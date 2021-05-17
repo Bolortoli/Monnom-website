@@ -3,8 +3,6 @@ import React from "react"
 import ReactApexChart from "react-apexcharts"
 
 const PodcastAnalysisSkeleton = props => {
-  console.log(props.data)
-
   const series = [
     {
       name: "Хандалт",
