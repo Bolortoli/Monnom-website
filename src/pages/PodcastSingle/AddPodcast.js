@@ -36,19 +36,16 @@ const AddPodcast = props => {
 
   const [progressValue, setprogressValue] = useState(33)
   const [podcast_name_message, set_podcast_name_message] = useState("")
-  const [
-    podcast_description_message,
-    set_podcast_description_message,
-  ] = useState("")
+  const [podcast_description_message, set_podcast_description_message] =
+    useState("")
   const [file_upload_name_message, set_file_upload_name_message] = useState("")
   const [next_button_label, set_next_button_label] = useState("Дараах")
   const [loading_dialog, setloading_dialog] = useState(false)
 
   // axios -oor damjuulah state uud
   const [podcast_name_value, set_podcast_name_value] = useState("")
-  const [podcast_description_value, set_podcast_description_value] = useState(
-    ""
-  )
+  const [podcast_description_value, set_podcast_description_value] =
+    useState("")
   const [checked, set_checked] = useState(false)
   const [episode_picture, set_episode_picture] = useState(null)
   const [profileImage, set_profileImage] = useState()
@@ -59,8 +56,16 @@ const AddPodcast = props => {
   const createPodcast = async () => {
     const url = `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-episodes`
     const podcastDataToUpload = new FormData()
-    podcastDataToUpload.append("files.audio_file_path", selectedFiles)
-    podcastDataToUpload.append("files.picture", episode_picture)
+    podcastDataToUpload.append(
+      "files.audio_file_path",
+      selectedFiles,
+      selectedFiles.name
+    )
+    podcastDataToUpload.append(
+      "files.picture",
+      episode_picture,
+      episode_picture.name
+    )
 
     const tempSendData = {
       episode_name: podcast_name_value,

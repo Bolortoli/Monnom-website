@@ -23,6 +23,14 @@ import {
 } from "draft-js"
 import draftToHtml from "draftjs-to-html"
 
+const config = {
+  headers: {
+    Authorization: `Bearer ${
+      JSON.parse(localStorage.getItem("user_information")).jwt
+    }`,
+  },
+}
+
 const SettingsForm = () => {
   // Check network
   const [isNetworkingError, setIsNetworkingError] = useState(false)
@@ -57,25 +65,16 @@ const SettingsForm = () => {
   const [confirm_add_author, set_confirm_add_author] = useState(false)
   const [confirm_remove_author, set_confirm_remove_author] = useState(false)
   const [confirm_delete_channel, set_confirm_delete_channel] = useState(false)
-  const [confirm_add_book_category, set_confirm_add_book_category] = useState(
-    false
-  )
-  const [
-    confirm_remove_book_category,
-    set_confirm_remove_book_category,
-  ] = useState(false)
-  const [
-    confirm_add_podcast_category,
-    set_confirm_add_podcast_category,
-  ] = useState(false)
-  const [
-    confirm_remove_podcast_category,
-    set_confirm_remove_podcast_category,
-  ] = useState(false)
-  const [
-    confirm_add_podcast_channel,
-    set_confirm_add_podcast_channel,
-  ] = useState(false)
+  const [confirm_add_book_category, set_confirm_add_book_category] =
+    useState(false)
+  const [confirm_remove_book_category, set_confirm_remove_book_category] =
+    useState(false)
+  const [confirm_add_podcast_category, set_confirm_add_podcast_category] =
+    useState(false)
+  const [confirm_remove_podcast_category, set_confirm_remove_podcast_category] =
+    useState(false)
+  const [confirm_add_podcast_channel, set_confirm_add_podcast_channel] =
+    useState(false)
 
   const [success_dialog, setsuccess_dialog] = useState(false)
   const [error_dialog, seterror_dialog] = useState(false)
@@ -87,17 +86,6 @@ const SettingsForm = () => {
   const [termsData, setTermsData] = useState(false)
 
   const addBookCategory = async () => {
-    const formData = new FormData()
-
-    formData.append("book_authors.label", new_book_category)
-
-    const config = {
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    }
     await axios
       .post(
         `${process.env.REACT_APP_STRAPI_BASE_URL}/book-categories`,
@@ -120,14 +108,6 @@ const SettingsForm = () => {
   }
 
   const addBookAuthor = async () => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    }
-
     await axios
       .post(
         `${process.env.REACT_APP_STRAPI_BASE_URL}/book-authors`,
@@ -150,14 +130,6 @@ const SettingsForm = () => {
   }
 
   const deleteBookCategory = async id => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    }
-
     await axios
       .delete(
         `${process.env.REACT_APP_STRAPI_BASE_URL}/book-categories/${book_category_id}`,
@@ -177,13 +149,6 @@ const SettingsForm = () => {
   }
 
   const deleteBookAuthor = async id => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    }
     await axios
       .delete(
         `${process.env.REACT_APP_STRAPI_BASE_URL}/book-authors/${id}`,
@@ -203,13 +168,6 @@ const SettingsForm = () => {
   }
 
   const deletePodcastCategory = async id => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    }
     await axios
       .delete(
         `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-categories/${id}`,
@@ -229,13 +187,6 @@ const SettingsForm = () => {
   }
 
   const addPodcastCategory = async () => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("user_information")).jwt
-        }`,
-      },
-    }
     await axios
       .post(
         `${process.env.REACT_APP_STRAPI_BASE_URL}/podcast-categories`,
@@ -302,7 +253,11 @@ const SettingsForm = () => {
     }
 
     formData.append("data", JSON.stringify(data))
-    formData.append("files.cover_pic", channel_cover_pic)
+    formData.append(
+      "files.cover_pic",
+      channel_cover_pic,
+      channel_cover_pic.name
+    )
 
     const config = {
       headers: {
