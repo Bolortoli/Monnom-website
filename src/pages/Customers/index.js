@@ -78,8 +78,6 @@ const Customers = () => {
       },
     })
       .then(res => {
-        console.log("res.data")
-        console.log(res.data)
         setIsNetworkError(false)
         SetIsNetworkLoading(false)
         let tempRows = res.data.map(data => {
@@ -107,7 +105,6 @@ const Customers = () => {
         setTableRows(tempRows)
       })
       .catch(err => {
-        console.log("err")
         SetIsNetworkLoading(false)
         setIsNetworkError(false)
       })

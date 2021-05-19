@@ -229,12 +229,10 @@ const ContactsGrid = props => {
                                     id={`customCheck1-${podcast.id}`}
                                     onClick={() => {
                                       if (podcast.is_featured) {
-                                        console.log("podcast.podcast_name")
                                         set_are_you_sure_title(
                                           `${podcast.podcast_name} сувгийг онцлох сувгаас хасах гэж байна. Та итгэлтэй байна уу?`
                                         )
                                       } else {
-                                        console.log(podcast.podcast_name)
                                         set_are_you_sure_title(
                                           `${podcast.podcast_name} сувгийг онцлох суваг болгох гэж байна. Та итгэлтэй байна уу?`
                                         )
@@ -261,8 +259,6 @@ const ContactsGrid = props => {
                       </Col>
                     )
                 } catch (e) {
-                  console.log(e)
-                  // return (<Alert color="primary">ERROR! {e}</Alert>)
                 }
               })
           : null}

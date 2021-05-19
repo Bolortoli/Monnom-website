@@ -110,7 +110,6 @@ const ManageAdmins = () => {
         default:
           break
       }
-      console.log(error)
       return
     }
 
@@ -176,7 +175,7 @@ const ManageAdmins = () => {
       .catch(err => {
         seterror_dialog(true)
         setAddAdminStep1(false)
-        console.log(err)
+        log(err)
         SetIsNetworkLoading(false)
       })
   }

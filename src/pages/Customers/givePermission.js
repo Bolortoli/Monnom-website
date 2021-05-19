@@ -53,7 +53,6 @@ const GivePermission = props => {
 
   const initialState = () => {
     let tempCols = books.map(book => {
-      // console.log(book.id)
       return {
         name: book.name,
         type: (

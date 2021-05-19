@@ -25,7 +25,6 @@ const Login = props => {
   const login = e => {
     // setSessionPeriod();
     e.preventDefault()
-    console.log(`${process.env.REACT_APP_EXPRESS_BASE_URL}/admin-login`)
     axios({
       headers: {
         "Content-Type": "application/json",
@@ -38,9 +37,6 @@ const Login = props => {
       },
     })
       .then(res => {
-        console.log("res.data")
-        console.log(res.data)
-        // setSessionPeriod();
         if (res.data.response == "error") {
           throw new Error("fuck you")
         }
@@ -52,8 +48,6 @@ const Login = props => {
         // redirectTo(res.data.data.role);
       })
       .catch(error => {
-        console.log("error")
-        console.log(error.message)
         setUsername("")
         setPassword("")
         setErrorMessage("Нэвтрэх нэр эсвэл нууц үг буруу")
@@ -64,7 +58,6 @@ const Login = props => {
   const setAuthenticated = obj => {
     localStorage.setItem("isAuthenticated", true)
     localStorage.setItem("user_information", JSON.stringify(obj))
-    console.log(JSON.parse(localStorage.getItem("user_information")))
     // localStorage.setItem("authFullname", obj.data.fullname);
     // localStorage.setItem("authToken", obj.token);
     // localStorage.setItem("isAuthenticated", true);

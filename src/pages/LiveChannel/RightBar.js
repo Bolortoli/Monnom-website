@@ -5,9 +5,13 @@ import SweetAlert from "react-bootstrap-sweetalert"
 import Switch from "react-switch"
 import { useLiveChannelStates } from "../../contexts/LiveChannelContext"
 
-const RighBar = props => {
-  const { selectedCard, setSelectedCard } = useLiveChannelStates()
-  const { edit_live_channel, set_edit_live_channel } = useLiveChannelStates()
+const RighBar = () => {
+  const {
+    selectedCard,
+    setSelectedCard,
+    edit_live_channel,
+    set_edit_live_channel,
+  } = useLiveChannelStates()
 
   const [confirm_edit, set_confirm_edit] = useState(false)
   const [confirm_delete, set_confirm_delete] = useState(false)
@@ -87,7 +91,6 @@ const RighBar = props => {
   useEffect(() => {
     if (edit_live_channel != null) {
       let tempCard = selectedCard.find(card => card.id == edit_live_channel)
-      console.log(tempCard)
       set_edit_live_state(tempCard.is_active)
       set_edit_live_name(tempCard.name)
       set_edit_live_desc(tempCard.description)
